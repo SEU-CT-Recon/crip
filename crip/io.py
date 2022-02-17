@@ -22,4 +22,4 @@ def imwriteRaw(img, path, dtype=np.float32):
 
 
 def imwriteTiff(img, path):
-    tifffile.imwrite(img, path)
+    tifffile.imwrite(path, img)

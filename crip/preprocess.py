@@ -6,7 +6,7 @@ def averageProjections(projections):
     """
         Average projections. For example, to calculate the flat field.
     """
-    res = np.array(projections.asarray(np.float32).sum() / projections.shape[0])
+    res = np.array(projections.astype(np.float32).sum() / projections.shape[0])
     return res
 
 
@@ -17,7 +17,7 @@ def flatDarkFieldCorrection(projection, flat, coeff=1, dark=None):
     assert np.array_equal(projection.shape, flat.shape), "projection and flat should have same shape."
     if dark is None:
         dark = 0
-    res = -np.log((projection.asarray(np.float32) - dark) / ((coeff * flat) - dark))
+    res = -np.log((projection.astype(np.float32) - dark) / ((coeff * flat) - dark))
     res[res == np.inf] = 0
     res[res == np.nan] = 0
     return res
