@@ -1,10 +1,16 @@
+'''
+    Shared module of crip.
+
+    by z0gSh1u @ https://github.com/z0gSh1u/crip
+'''
+
 import numpy as np
 import cv2
 
 
 def rotate(img, deg):
     """
-        Rotate img
+        Rotate img by deg [DEG] (multiple of 90) clockwise.
     """
     deg = int(deg % 360)
     if deg == 0:
@@ -40,9 +46,10 @@ def binning(projection, binning=(1, 1)):
     return res
 
 
-def splitToSingle():
-    pass
-
-
-def mergeToStack():
-    pass
+def gaussianSmooth(projection, ksize, sigma):
+    """
+        Perform Gaussian smooth with kernel size = ksize and Gaussian \sigma = sigma (int or tuple (x, y)).
+    """
+    if isinstance(sigma, int):
+        sigma = (sigma, sigma)
+    return cv2.GaussianBlur(projection.astype(np.float32), ksize, sigmaX=sigma[0], sigmaY=sigma[1])

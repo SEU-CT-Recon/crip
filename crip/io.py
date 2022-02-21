@@ -1,25 +1,53 @@
+'''
+    I/O module of crip.
+
+    by z0gSh1u @ https://github.com/z0gSh1u/crip
+'''
+
 import numpy as np
 import tifffile
 import pydicom
 
-def imreadDicom(path):
-    dcm = pydicom.read_file(path)
-    return dcm.pixel_array
 
-def imreadRaw(path, h, w, nSlice=1, dtype=np.float32):
+def imreadDicom(path):
+    """
+        Read DICOM file. Return numpy array.
+    """
+    dcm = pydicom.read_file(path)
+    return np.array(dcm.pixel_array)
+
+
+def imreadRaw(path, h, w, dtype=np.float32, nSlice=1, offset=0):
+    """
+        Read binary raw file. Return numpy array. `offset` in bytes.
+    """
     with open(path, 'rb') as fp:
+        fp.seek(offset)
         arr = np.frombuffer(fp.read(), dtype=dtype).reshape((nSlice, h, w)).squeeze()
     return arr
 
 
 def imreadTiff(path):
-    return tifffile.imread(path)
+    """
+        Read TIFF file. Return numpy array.
+    """
+    return np.array(tifffile.imread(path))
 
 
-def imwriteRaw(img, path, dtype=np.float32):
+def imwriteRaw(img, path, dtype='keep'):
+    """
+        Write raw file.
+    """
+    if dtype != 'keep':
+        img = img.astype(dtype)
     with open(path, 'wb') as fp:
-        fp.write(img.astype(dtype).tobytes())
+        fp.write(img.flatten().tobytes())
 
 
-def imwriteTiff(img, path):
+def imwriteTiff(img, path, dtype='keep'):
+    """
+        Write TIFF file.
+    """
+    if dtype != 'keep':
+        img = img.astype(dtype)
     tifffile.imwrite(path, img)

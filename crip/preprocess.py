@@ -1,5 +1,11 @@
+'''
+    Preprocess module of crip.
+
+    by z0gSh1u @ https://github.com/z0gSh1u/crip
+'''
+
 import numpy as np
-import cv2
+from .shared import *
 
 
 def averageProjections(projections):
@@ -29,15 +35,6 @@ def flatDarkFieldCorrectionStandalone(projection):
         Air is estimated using the brightest pixel.
     """
     return flatDarkFieldCorrection(projection, np.max(projection))
-
-
-def gaussianSmooth(projection, ksize, sigma):
-    """
-        Perform Gaussian smooth with kernel size = ksize and Gaussian \sigma = sigma (int or tuple (x, y)).
-    """
-    if isinstance(sigma, int):
-        sigma = (sigma, sigma)
-    return cv2.GaussianBlur(projection.astype(np.float32), ksize, sigmaX=sigma[0], sigmaY=sigma[1])
 
 
 def gaussianNoiseInject(projection, sigma):
@@ -91,19 +88,19 @@ def sinogramsToProjections(sinograms):
         projections[i, :, :] = sinograms[:, i, :]
 
 
-
-def padProj(proj, padding: int):
-    def cosineDecay(offCenter, padding):
-        ratio = offCenter / padding
-        return np.cos(np.pi / 2 * ratio)
+def extendProjection(proj, padding: int):
+    """
+        Extend the projection on two wings using symmetric padding and cosine window decay.
+    """
+    cosineDecay = lambda offCenter: np.cos(np.pi / 2 * (offCenter / padding))
 
     pad = np.pad(proj, ((0, 0), (padding, padding)), mode='symmetric')
     h, w = pad.shape
 
     for r in range(h):
         for c in range(0, padding):
-            pad[r, c] *= cosineDecay(padding - c, padding)
+            pad[r, c] *= cosineDecay(padding - c)
         for c in range(w - padding, w):
-            pad[r, c] *= cosineDecay(c - w + padding, padding)
+            pad[r, c] *= cosineDecay(c - w + padding)
 
     return pad

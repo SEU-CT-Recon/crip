@@ -1,3 +1,9 @@
+'''
+    Physics module of crip.
+
+    by z0gSh1u @ https://github.com/z0gSh1u/crip
+'''
+
 # Attenuation Coefficient of Water, Liquid
 AttenWaterText = '''
 https://physics.nist.gov/PhysRefData/XrayMassCoef/tab4.html
@@ -98,7 +104,7 @@ def readSpectrum(content, unit='keV'):
     return spectrumEnergy, spectrumOmega
 
 
-def calcMuWater(spectrum, unit='keV'):
+def calcMuWater(spectrum, unit='keV', rhoWater=RhoWater):
     """
         Calculate \mu value (mm^-1) of water according to a specified spectrum \\
         (@see `readSpectrum` for specturm format) considering only energies in diagonstic

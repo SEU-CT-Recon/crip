@@ -1,9 +1,5 @@
-import os
+'''
+    Utilities of crip.
 
-
-def getExtName(filename: str):
-    basename = os.path.basename(filename)
-    split = basename.split('.')
-    if len(split) == 1:
-        return None
-    return split[-1]
+    by z0gSh1u @ https://github.com/z0gSh1u/crip
+'''
