@@ -88,19 +88,28 @@ def sinogramsToProjections(sinograms):
         projections[i, :, :] = sinograms[:, i, :]
 
 
-def extendProjection(proj, padding: int):
+def padProjection(proj, padding):
     """
-        Extend the projection on two wings using symmetric padding and cosine window decay.
+        Extend the projection on four directions using symmetric `padding` (Up-Right-Down-Left) \\
+        and descending cosine window decay.
     """
-    cosineDecay = lambda offCenter: np.cos(np.pi / 2 * (offCenter / padding))
+    U, R, D, L = padding
+    cosineDecay = lambda offCenter, padding_: np.cos(np.pi / 2 * (offCenter / padding_))
 
-    pad = np.pad(proj, ((0, 0), (padding, padding)), mode='symmetric')
-    h, w = pad.shape
+    def padLR(proj, paddingL, paddingR):
+        pad = np.pad(proj, ((0, 0), (paddingL, paddingR)), mode='symmetric')
+        h, w = pad.shape
 
-    for r in range(h):
-        for c in range(0, padding):
-            pad[r, c] *= cosineDecay(padding - c)
-        for c in range(w - padding, w):
-            pad[r, c] *= cosineDecay(c - w + padding)
+        for r in range(h):
+            for c in range(0, paddingL):
+                pad[r, c] *= cosineDecay(paddingL - c, paddingL)
+            for c in range(w - paddingR, w):
+                pad[r, c] *= cosineDecay(c - w + paddingR, paddingR)
+
+        return pad
+
+    pad = padLR(proj, L, R)
+    pad = padLR(pad.T, U, D)
+    pad = pad.T
 
     return pad

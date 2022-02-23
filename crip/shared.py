@@ -25,7 +25,7 @@ def rotate(img, deg):
 
 def resize(projection, dsize=None, fx=None, fy=None, interp='bicubic'):
     """
-        Resize the projection to `dsize` (if dsize is not None) or scale by ratio `(fx, fy)`
+        Resize the projection to `dsize` (H, W) (if dsize is not None) or scale by ratio `(fx, fy)`
         using `interp` (bicubic, linear, nearest available).
     """
     if dsize is None:
@@ -35,7 +35,8 @@ def resize(projection, dsize=None, fx=None, fy=None, interp='bicubic'):
     else:
         assert fx is None and fy is None
     interp_ = {'bicubic': cv2.INTER_CUBIC, 'linear': cv2.INTER_LINEAR, 'nearest': cv2.INTER_NEAREST}
-    return cv2.resize(projection.astype(np.float32), dsize, None, fx, fy, interpolation=interp_[interp])
+    # OpenCV dsize is in (W, H) form, so we reverse it.
+    return cv2.resize(projection.astype(np.float32), dsize[::-1], None, fx, fy, interpolation=interp_[interp])
 
 
 def binning(projection, binning=(1, 1)):
