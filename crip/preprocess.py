@@ -88,28 +88,32 @@ def sinogramsToProjections(sinograms):
         projections[i, :, :] = sinograms[:, i, :]
 
 
-def padProjection(proj, padding):
+def padProjection(proj, padding, mode='symmetric', smootherDecay=False):
     """
+        [WIP]
         Extend the projection on four directions using symmetric `padding` (Up-Right-Down-Left) \\
         and descending cosine window decay.
     """
-    U, R, D, L = padding
-    cosineDecay = lambda offCenter, padding_: np.cos(np.pi / 2 * (offCenter / padding_))
+    h, w = proj.shape
+    nPadU, nPadR, nPadD, nPadL = padding
+    padH = h + nPadU + nPadD
+    padW = w + nPadL + nPadR
+    xPad = np.pad(proj, ((nPadU, nPadD), (nPadL, nPadR)), mode=mode)
 
-    def padLR(proj, paddingL, paddingR):
-        pad = np.pad(proj, ((0, 0), (paddingL, paddingR)), mode='symmetric')
-        h, w = pad.shape
+    CommonCosineDecay = lambda ascend, dot: np.cos(
+        np.linspace(-np.pi / 2, 0, dot) if ascend else np.linspace(0, np.pi / 2, dot))
+    SmootherCosineDecay = lambda ascend, dot: 0.5 * np.cos(np.linspace(
+        -np.pi, 0, dot)) + 0.5 if ascend else 0.5 * np.cos(np.linspace(0, np.pi, dot)) + 0.5
 
-        for r in range(h):
-            for c in range(0, paddingL):
-                pad[r, c] *= cosineDecay(paddingL - c, paddingL)
-            for c in range(w - paddingR, w):
-                pad[r, c] *= cosineDecay(c - w + paddingR, paddingR)
+    decay = SmootherCosineDecay if smootherDecay else CommonCosineDecay
 
-        return pad
+    def decayLR(xPad, w, nPadL, nPadR):
+        xPad[:, 0:nPadL] *= decay(True, nPadL)[:]
+        xPad[:, w - nPadR:w] *= decay(False, nPadR)[:]
+        return xPad
 
-    pad = padLR(proj, L, R)
-    pad = padLR(pad.T, U, D)
-    pad = pad.T
+    xPad = decayLR(xPad, padW, nPadL, nPadR)
+    xPad = decayLR(xPad.T, padH, nPadU, nPadD)
+    xPad = xPad.T
 
-    return pad
+    return xPad

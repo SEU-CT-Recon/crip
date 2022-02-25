@@ -23,20 +23,20 @@ def rotate(img, deg):
     return cv2.rotate(img, degToCode[str(deg)])
 
 
-def resize(projection, dsize=None, fx=None, fy=None, interp='bicubic'):
+def resize(projection, dsize=None, fH=None, fW=None, interp='bicubic'):
     """
-        Resize the projection to `dsize` (H, W) (if dsize is not None) or scale by ratio `(fx, fy)`
+        Resize the projection to `dsize` (H, W) (if dsize is not None) or scale by ratio `(fH, fW)`
         using `interp` (bicubic, linear, nearest available).
     """
     if dsize is None:
-        assert fx is not None or fy is not None
-        fx = fx if fx else 1
-        fy = fy if fy else 1
+        assert fH is not None or fW is not None
+        fH = fH if fH else 1
+        fW = fW if fW else 1
     else:
-        assert fx is None and fy is None
+        assert fH is None and fW is None
     interp_ = {'bicubic': cv2.INTER_CUBIC, 'linear': cv2.INTER_LINEAR, 'nearest': cv2.INTER_NEAREST}
     # OpenCV dsize is in (W, H) form, so we reverse it.
-    return cv2.resize(projection.astype(np.float32), dsize[::-1], None, fx, fy, interpolation=interp_[interp])
+    return cv2.resize(projection.astype(np.float32), dsize[::-1], None, fW, fH, interpolation=interp_[interp])
 
 
 def binning(projection, binning=(1, 1)):
@@ -47,9 +47,10 @@ def binning(projection, binning=(1, 1)):
     return res
 
 
-def gaussianSmooth(projection, ksize, sigma):
+def gaussianSmooth(projection, sigma, ksize=None):
     """
-        Perform Gaussian smooth with kernel size = ksize and Gaussian \sigma = sigma (int or tuple (x, y)).
+        Perform Gaussian smooth with kernel size = ksize and Gaussian \sigma = sigma (int or tuple (x, y)). \\
+        Leave `ksize = None` to auto determine to include the majority of Gaussian energy.
     """
     if isinstance(sigma, int):
         sigma = (sigma, sigma)
