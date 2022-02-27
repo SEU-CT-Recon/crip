@@ -13,6 +13,7 @@ def averageProjections(projections):
         Average projections. For example, to calculate the flat field.
     """
     res = np.array(projections.astype(np.float32).sum() / projections.shape[0])
+
     return res
 
 
@@ -26,6 +27,7 @@ def flatDarkFieldCorrection(projection, flat, coeff=1, dark=None):
     res = -np.log((projection.astype(np.float32) - dark) / ((coeff * flat) - dark))
     res[res == np.inf] = 0
     res[res == np.nan] = 0
+
     return res
 
 
@@ -43,6 +45,7 @@ def gaussianNoiseInject(projection, sigma):
     """
     noiseMask = np.random.randn(*projection.shape) * sigma
     res = projection + noiseMask
+
     return res
 
 
@@ -55,6 +58,7 @@ def limitedAngle(projections, srcDeg, dstDeg, startDeg=0):
     nProjPerDeg = float(projections.shape[0]) / srcDeg
     startLoc = int(startDeg * nProjPerDeg)
     dstLen = int(dstDeg * nProjPerDeg)
+
     return np.array(projections[startLoc:startLoc + dstLen, :, :])
 
 
@@ -64,7 +68,8 @@ def limitedView(projections, ratio):
         The second returning is the number of remaining projections.
     """
     dstLen = projections.shape[0] / ratio
-    assert dstLen == int(dstLen), "cannot achieve uniform sampling"
+    assert dstLen == int(dstLen), "Cannot achieve uniform sampling."
+
     return np.array(projections[::ratio, :, :]), projections.shape[0] % ratio - 1
 
 
@@ -77,6 +82,8 @@ def projectionsToSinograms(projections):
     for i in range(views):
         sinograms[:, i, :] = projections[i, :, :]
 
+    return sinograms
+
 
 def sinogramsToProjections(sinograms):
     """
@@ -87,12 +94,13 @@ def sinogramsToProjections(sinograms):
     for i in range(views):
         projections[i, :, :] = sinograms[:, i, :]
 
+    return projections
+
 
 def padProjection(proj, padding, mode='symmetric', smootherDecay=False):
     """
-        [WIP]
-        Extend the projection on four directions using symmetric `padding` (Up-Right-Down-Left) \\
-        and descending cosine window decay.
+        Extend the projection on four directions using symmetric `padding` (Up, Right, Down, Left) \\
+        and descending cosine window decay. `mode` can be `symmetric` or `edge`.
     """
     h, w = proj.shape
     nPadU, nPadR, nPadD, nPadL = padding

@@ -4,9 +4,25 @@
     by z0gSh1u @ https://github.com/z0gSh1u/crip
 '''
 
+import os
 import numpy as np
 import tifffile
 import pydicom
+import natsort
+
+
+def listDirectory(folder, sort='nat', joinFolder=False):
+    """
+        List files under `folder` and `sort` using `"nat"` (natural) or \\
+        `"dict"` (dictionary) order. Set `joinFolder` to True to get the paths, \\
+        otherwise filename only.
+    """
+    assert sort == 'nat' or sort == 'dict', 'Invalid `sort` method.'
+    files = os.listdir(folder)
+    files = sorted(files) if sort == 'dict' else natsort.natsorted(files)
+    if joinFolder:
+        files = [os.path.join(folder, file) for file in files]
+    return files
 
 
 def imreadDicom(path):
