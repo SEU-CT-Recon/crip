@@ -12,7 +12,7 @@ def averageProjections(projections):
     """
         Average projections. For example, to calculate the flat field.
     """
-    res = np.array(projections.astype(np.float32).sum() / projections.shape[0])
+    res = np.array(projections.astype(np.float32).sum(axis=0) / projections.shape[0])
 
     return res
 
