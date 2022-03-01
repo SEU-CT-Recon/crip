@@ -34,6 +34,11 @@ See [example](./example) here.
 
 crip is still under development. More features will be added in the future.
 
+- [ ] Crop according to (row, col, h, w)
+- [ ] Center crop according to (h, w)
+- [ ] Vertical Flip
+- [ ] Horizontal Flip
+
 ## Opensource License
 
 MIT
