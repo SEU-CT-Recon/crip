@@ -10,6 +10,8 @@ import tifffile
 import pydicom
 import natsort
 
+from utils import cripAssert
+
 
 def listDirectory(folder, sort='nat', joinFolder=False):
     """
@@ -17,41 +19,13 @@ def listDirectory(folder, sort='nat', joinFolder=False):
         `"dict"` (dictionary) order. Set `joinFolder` to True to get the paths, \\
         otherwise filename only.
     """
-    assert sort == 'nat' or sort == 'dict', 'Invalid `sort` method.'
+    cripAssert(sort == 'nat' or sort == 'dict', 'Invalid `sort` method.')
     files = os.listdir(folder)
     files = sorted(files) if sort == 'dict' else natsort.natsorted(files)
     if joinFolder:
         files = [os.path.join(folder, file) for file in files]
+
     return files
-
-
-def combineRawImageUnderDirectory(folder, h, w, dtype=np.float32, nSlice=1, offset=0, sort='nat', reverse=False):
-    """
-        Combine Image under 'folder' and 'sort' using `"nat"` (natural) or `"dict"` (dictionary) order.
-        Do: views * (h, w) -> (views, h, w)
-    """
-    list_dir = natsort.natsorted(listDirectory(folder, sort, joinFolder=True), reverse=reverse)
-    views = len(list_dir)
-    combine_rawImage = np.zeros((views, h, w), dtype=np.float32)  # dtype frozen
-
-    for i, file in enumerate(list_dir):
-        combine_rawImage[i, :, :] = imreadRaw(file, h, w, dtype, nSlice, offset)
-    return combine_rawImage
-
-
-def combineTiffImageUnderDirectory(folder, sort='nat', reverse=False):
-    """
-        Combine Image under 'folder' and 'sort' using `"nat"` (natural) or `"dict"` (dictionary) order.
-        Do: views * (h, w) -> (views, h, w)
-    """
-    list_dir = natsort.natsorted(listDirectory(folder, sort, joinFolder=True), reverse=reverse)
-    views = len(list_dir)
-    h, w = imreadTiff(list_dir[0]).shape
-    combine_rawImage = np.zeros((views, h, w), dtype=np.float32)  # dtype frozen
-
-    for i, file in enumerate(list_dir):
-        combine_rawImage[i, :, :] = imreadTiff(file)
-    return combine_rawImage
 
 
 def imreadDicom(path):

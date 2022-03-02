@@ -34,7 +34,7 @@ def flatDarkFieldCorrection(projection, flat, coeff=1, dark=None):
 def flatDarkFieldCorrectionStandalone(projection):
     """
         Perform flat field and dark field correction without actual field image. \\
-        Air is estimated using the brightest pixel.
+        Air is estimated using the brightest pixel by default.
     """
     return flatDarkFieldCorrection(projection, np.max(projection))
 
@@ -97,9 +97,9 @@ def sinogramsToProjections(sinograms):
     return projections
 
 
-def padProjection(proj, padding, mode='symmetric', smootherDecay=False):
+def padImage(proj, padding, mode='symmetric', smootherDecay=False):
     """
-        Extend the projection on four directions using symmetric `padding` (Up, Right, Down, Left) \\
+        Extend the image on four directions using symmetric `padding` (Up, Right, Down, Left) \\
         and descending cosine window decay. `mode` can be `symmetric` or `edge`.
     """
     h, w = proj.shape
@@ -130,22 +130,11 @@ def padProjection(proj, padding, mode='symmetric', smootherDecay=False):
 def padSinogram(sgm, padding, mode='symmetric', smootherDecay=False):
     """
         'Truncated Artifact Correction' specialized function.
-        Extend the projection on horizontal directions using symmetric `padding` (Right, Left)
+        Extend the projection on horizontal directions using symmetric `padding` (single, or (Right, Left))
         and descending cosine window decay. `mode` can be `symmetric` or `edge`.
     """
-    CommonCosineDecay = lambda ascend, dot: np.cos(
-        np.linspace(-np.pi / 2, 0, dot) if ascend else np.linspace(0, np.pi / 2, dot))
-    SmootherCosineDecay = lambda ascend, dot: 0.5 * np.cos(np.linspace(
-        -np.pi, 0, dot)) + 0.5 if ascend else 0.5 * np.cos(np.linspace(0, np.pi, dot)) + 0.5
+    if type(padding) == int:
+        padding = (padding, padding)
+    l, r = padding
 
-    decay = SmootherCosineDecay if smootherDecay else CommonCosineDecay
-
-    def decayLR(pad):
-        pad[:, 0:padding] *= decay(True, padding)[:]
-        pad[:, w - padding:w] *= decay(False, padding)[:]
-        return pad
-
-    pad = np.pad(sgm, ((0, 0), (padding, padding)), mode=mode)
-    _, w = pad.shape
-
-    return decayLR(pad)
+    return padImage(sgm, (0, r, 0, l), mode, smootherDecay)
