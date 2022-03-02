@@ -25,6 +25,35 @@ def listDirectory(folder, sort='nat', joinFolder=False):
     return files
 
 
+def combineRawImageUnderDirectory(folder, h, w, dtype=np.float32, nSlice=1, offset=0, sort='nat', reverse=False):
+    """
+        Combine Image under 'folder' and 'sort' using `"nat"` (natural) or `"dict"` (dictionary) order.
+        Do: views * (h, w) -> (views, h, w)
+    """
+    list_dir = natsort.natsorted(listDirectory(folder, sort, joinFolder=True), reverse=reverse)
+    views = len(list_dir)
+    combine_rawImage = np.zeros((views, h, w), dtype=np.float32)  # dtype frozen
+
+    for i, file in enumerate(list_dir):
+        combine_rawImage[i, :, :] = imreadRaw(file, h, w, dtype, nSlice, offset)
+    return combine_rawImage
+
+
+def combineTiffImageUnderDirectory(folder, sort='nat', reverse=False):
+    """
+        Combine Image under 'folder' and 'sort' using `"nat"` (natural) or `"dict"` (dictionary) order.
+        Do: views * (h, w) -> (views, h, w)
+    """
+    list_dir = natsort.natsorted(listDirectory(folder, sort, joinFolder=True), reverse=reverse)
+    views = len(list_dir)
+    h, w = imreadTiff(list_dir[0]).shape
+    combine_rawImage = np.zeros((views, h, w), dtype=np.float32)  # dtype frozen
+
+    for i, file in enumerate(list_dir):
+        combine_rawImage[i, :, :] = imreadTiff(file)
+    return combine_rawImage
+
+
 def imreadDicom(path):
     """
         Read DICOM file. Return numpy array.

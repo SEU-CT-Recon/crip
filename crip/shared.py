@@ -55,3 +55,11 @@ def gaussianSmooth(projection, sigma, ksize=None):
     if isinstance(sigma, int):
         sigma = (sigma, sigma)
     return cv2.GaussianBlur(projection.astype(np.float32), ksize, sigmaX=sigma[0], sigmaY=sigma[1])
+
+
+def verticalFlip(img):
+    return np.flipud(img)
+
+
+def horizontalFlip(img):
+    return np.fliplr(img)

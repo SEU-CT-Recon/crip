@@ -78,7 +78,7 @@ def projectionsToSinograms(projections):
         Permute projections to sinograms by axes swapping `(views, h, w) -> (h, views, w)`.
     """
     (views, h, w) = projections.shape
-    sinograms = np.zeros((h, views, w))
+    sinograms = np.zeros((h, views, w), dtype=np.float32)
     for i in range(views):
         sinograms[:, i, :] = projections[i, :, :]
 
@@ -90,7 +90,7 @@ def sinogramsToProjections(sinograms):
         Permute sinograms back to projections by axes swapping `(h, views, w) -> (views, h, w)`.
     """
     (h, views, w) = sinograms.shape
-    projections = np.zeros((views, h, w))
+    projections = np.zeros((views, h, w), dtype=np.float32)
     for i in range(views):
         projections[i, :, :] = sinograms[:, i, :]
 
@@ -125,3 +125,27 @@ def padProjection(proj, padding, mode='symmetric', smootherDecay=False):
     xPad = xPad.T
 
     return xPad
+
+
+def padSinogram(sgm, padding, mode='symmetric', smootherDecay=False):
+    """
+        'Truncated Artifact Correction' specialized function.
+        Extend the projection on horizontal directions using symmetric `padding` (Right, Left)
+        and descending cosine window decay. `mode` can be `symmetric` or `edge`.
+    """
+    CommonCosineDecay = lambda ascend, dot: np.cos(
+        np.linspace(-np.pi / 2, 0, dot) if ascend else np.linspace(0, np.pi / 2, dot))
+    SmootherCosineDecay = lambda ascend, dot: 0.5 * np.cos(np.linspace(
+        -np.pi, 0, dot)) + 0.5 if ascend else 0.5 * np.cos(np.linspace(0, np.pi, dot)) + 0.5
+
+    decay = SmootherCosineDecay if smootherDecay else CommonCosineDecay
+
+    def decayLR(pad):
+        pad[:, 0:padding] *= decay(True, padding)[:]
+        pad[:, w - padding:w] *= decay(False, padding)[:]
+        return pad
+
+    pad = np.pad(sgm, ((0, 0), (padding, padding)), mode=mode)
+    _, w = pad.shape
+
+    return decayLR(pad)
