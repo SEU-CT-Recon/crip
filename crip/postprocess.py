@@ -4,10 +4,9 @@
     by z0gSh1u @ https://github.com/z0gSh1u/crip
 '''
 from .shared import *
-from matplotlib import pyplot as plt
 
 
-def drawCircle(rec_img, r, center=None, style='b-.'):
+def drawCircle(rec_img, r, center=None):
     """
         'Truncated Artifact Correction' specialized function.
         Draw circle before crop
@@ -19,7 +18,7 @@ def drawCircle(rec_img, r, center=None, style='b-.'):
     x = center[0] + r * np.cos(theta)
     y = center[1] + r * np.sin(theta)
 
-    plt.plot(x, y, style)
+    return x, y
 
 
 def fovCropRadiusReference(SOD, SDD, detectorWidth, pixelSpacing):

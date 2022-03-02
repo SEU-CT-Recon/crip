@@ -78,7 +78,7 @@ def projectionsToSinograms(projections):
         Permute projections to sinograms by axes swapping `(views, h, w) -> (h, views, w)`.
     """
     (views, h, w) = projections.shape
-    sinograms = np.zeros((h, views, w), dtype=np.float32)
+    sinograms = np.zeros((h, views, w), dtype=projections.dtype)
     for i in range(views):
         sinograms[:, i, :] = projections[i, :, :]
 
@@ -90,7 +90,7 @@ def sinogramsToProjections(sinograms):
         Permute sinograms back to projections by axes swapping `(h, views, w) -> (views, h, w)`.
     """
     (h, views, w) = sinograms.shape
-    projections = np.zeros((views, h, w), dtype=np.float32)
+    projections = np.zeros((views, h, w), dtype=sinograms.dtype)
     for i in range(views):
         projections[i, :, :] = sinograms[:, i, :]
 

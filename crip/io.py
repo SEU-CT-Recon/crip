@@ -10,10 +10,10 @@ import tifffile
 import pydicom
 import natsort
 
-from utils import cripAssert
+from crip.utils import cripAssert
 
 
-def listDirectory(folder, sort='nat', joinFolder=False):
+def listDirectory(folder, sort='nat', joinFolder=False, reverse=False):
     """
         List files under `folder` and `sort` using `"nat"` (natural) or \\
         `"dict"` (dictionary) order. Set `joinFolder` to True to get the paths, \\
@@ -21,7 +21,7 @@ def listDirectory(folder, sort='nat', joinFolder=False):
     """
     cripAssert(sort == 'nat' or sort == 'dict', 'Invalid `sort` method.')
     files = os.listdir(folder)
-    files = sorted(files) if sort == 'dict' else natsort.natsorted(files)
+    files = sorted(files, reverse=reverse) if sort == 'dict' else natsort.natsorted(files, reverse=reverse)
     if joinFolder:
         files = [os.path.join(folder, file) for file in files]
 
