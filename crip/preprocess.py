@@ -34,7 +34,7 @@ def flatDarkFieldCorrection(projection, flat, coeff=1, dark=None):
 def flatDarkFieldCorrectionStandalone(projection):
     """
         Perform flat field and dark field correction without actual field image. \\
-        Air is estimated using the brightest pixel.
+        Air is estimated using the brightest pixel by default.
     """
     return flatDarkFieldCorrection(projection, np.max(projection))
 
@@ -78,7 +78,7 @@ def projectionsToSinograms(projections):
         Permute projections to sinograms by axes swapping `(views, h, w) -> (h, views, w)`.
     """
     (views, h, w) = projections.shape
-    sinograms = np.zeros((h, views, w))
+    sinograms = np.zeros((h, views, w), dtype=projections.dtype)
     for i in range(views):
         sinograms[:, i, :] = projections[i, :, :]
 
@@ -90,16 +90,16 @@ def sinogramsToProjections(sinograms):
         Permute sinograms back to projections by axes swapping `(h, views, w) -> (views, h, w)`.
     """
     (h, views, w) = sinograms.shape
-    projections = np.zeros((views, h, w))
+    projections = np.zeros((views, h, w), dtype=sinograms.dtype)
     for i in range(views):
         projections[i, :, :] = sinograms[:, i, :]
 
     return projections
 
 
-def padProjection(proj, padding, mode='symmetric', smootherDecay=False):
+def padImage(proj, padding, mode='symmetric', smootherDecay=False):
     """
-        Extend the projection on four directions using symmetric `padding` (Up, Right, Down, Left) \\
+        Extend the image on four directions using symmetric `padding` (Up, Right, Down, Left) \\
         and descending cosine window decay. `mode` can be `symmetric` or `edge`.
     """
     h, w = proj.shape
@@ -125,3 +125,16 @@ def padProjection(proj, padding, mode='symmetric', smootherDecay=False):
     xPad = xPad.T
 
     return xPad
+
+
+def padSinogram(sgm, padding, mode='symmetric', smootherDecay=False):
+    """
+        'Truncated Artifact Correction' specialized function.
+        Extend the projection on horizontal directions using symmetric `padding` (single, or (Right, Left))
+        and descending cosine window decay. `mode` can be `symmetric` or `edge`.
+    """
+    if type(padding) == int:
+        padding = (padding, padding)
+    l, r = padding
+
+    return padImage(sgm, (0, r, 0, l), mode, smootherDecay)

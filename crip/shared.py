@@ -7,6 +7,8 @@
 import numpy as np
 import cv2
 
+from crip.utils import cripAssert
+
 
 def rotate(img, deg):
     """
@@ -55,3 +57,33 @@ def gaussianSmooth(projection, sigma, ksize=None):
     if isinstance(sigma, int):
         sigma = (sigma, sigma)
     return cv2.GaussianBlur(projection.astype(np.float32), ksize, sigmaX=sigma[0], sigmaY=sigma[1])
+
+
+def verticalFlip(img):
+    '''
+        Vertical flip one image.
+    '''
+    cripAssert(len(img.shape) == 2, 'verticalFlip supports only 2D image.')
+
+    return np.flipud(img)
+
+
+def horizontalFlip(img):
+    '''
+        Horizontal flip one image.
+    '''
+    cripAssert(len(img.shape) == 2, 'horizontalFlip supports only 2D image.')
+
+    return np.fliplr(img)
+
+
+def stackImages(imgList, dtype='keep'):
+    '''
+        Stack seperate image into one numpy array. I.e., views * (h, w) -> (views, h, w).
+    '''
+    cripAssert(type(imgList) == list, '`imgList` should be Python list.')
+    stack = np.array(imgList)
+    if dtype != 'keep':
+        stack = stack.astype(dtype)
+
+    return stack
