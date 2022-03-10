@@ -138,3 +138,6 @@ def padSinogram(sgm, padding, mode='symmetric', smootherDecay=False):
     l, r = padding
 
     return padImage(sgm, (0, r, 0, l), mode, smootherDecay)
+
+def correctBeamHardeningPolynomial(postlog, coeffs, bias=True):
+    pass
