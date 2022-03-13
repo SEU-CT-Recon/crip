@@ -1,6 +1,4 @@
-# Test if crip can be imported without error.
-
-import _importcrip
+# import _importcrip
 
 import unittest
 import unittest.mock as mock

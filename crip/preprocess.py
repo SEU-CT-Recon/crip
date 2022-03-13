@@ -1,52 +1,88 @@
 '''
     Preprocess module of crip.
 
-    by z0gSh1u @ https://github.com/z0gSh1u/crip
+    https://github.com/z0gSh1u/crip
 '''
 
 import numpy as np
 from .shared import *
+from .typing import *
+from .utils import *
 
 
-def averageProjections(projections):
+@ConvertProjList
+def averageProjections(projections: Or[ProjList, ProjStack]):
     """
         Average projections. For example, to calculate the flat field.
+        Projections can be either `(views, H, W)` shaped numpy array, or
+        `views * (H, W)` Python List.
     """
-    res = np.array(projections.astype(np.float32).sum(axis=0) / projections.shape[0])
+    cripAssert(is3D(projections), '`projections` should be 3D array.')
+    projections = ensureFloatArray(projections)
+
+    res = projections.sum(axis=0) / projections.shape[0]
 
     return res
 
 
-def flatDarkFieldCorrection(projection, flat, coeff=1, dark=None):
+@ConvertProjList
+def flatDarkFieldCorrection(projections: Or[Proj, ProjList, ProjStack],
+                            flat: Or[Proj, float],
+                            coeff: float = 1,
+                            dark: Or[Proj, float] = 0):
     """
         Perform flat field (air) and dark field correction to get post-log value.
+        I.e., `- log [(X - D) / (C * F - D)]`. Multi projections accepted.
     """
-    assert np.array_equal(projection.shape, flat.shape), "projection and flat should have same shape."
-    if dark is None:
-        dark = 0
-    res = -np.log((projection.astype(np.float32) - dark) / ((coeff * flat) - dark))
+    sampleProjection = projections if is2D(projections) else projections[0]
+
+    if isType(flat, Proj):
+        cripAssert(haveSameShape(sampleProjection, flat), "`projection` and `flat` should have same shape.")
+    if isType(dark, Proj):
+        cripAssert(haveSameShape(sampleProjection, dark), "`projection` and `dark` should have same shape.")
+
+    res = -np.log((projections - dark) / (coeff * flat - dark))
     res[res == np.inf] = 0
     res[res == np.nan] = 0
 
     return res
 
 
-def flatDarkFieldCorrectionStandalone(projection):
+def flatDarkFieldCorrectionStandalone(projection: Proj):
     """
         Perform flat field and dark field correction without actual field image. \\
         Air is estimated using the brightest pixel by default.
     """
-    return flatDarkFieldCorrection(projection, np.max(projection))
+    # We support 2D only in standalone version, since `flat` for each projection might differ.
+    cripAssert(is2D(projection), '`projection` should be 2D.')
+
+    return flatDarkFieldCorrection(projection, np.max(projection), 1, 0)
 
 
-def gaussianNoiseInject(projection, sigma):
+@ConvertProjList
+def injectGaussianNoise(projections: Or[Proj, ProjList, ProjStack], sigma: float, mu: float = 0):
     """
-        Inject Gaussian noise which obeys distribution N(0, sigma^2).
+        Inject Gaussian noise which obeys distribution `N(\mu, \sigma^2)`.
     """
-    noiseMask = np.random.randn(*projection.shape) * sigma
-    res = projection + noiseMask
+    cripAssert(is2or3D(projections), '`projections` should be 2D or 3D.')
+
+    def injectOne(img):
+        noise = np.random.randn(*img.shape) * sigma + mu
+        return img + noise
+
+    if is3D(projections):
+        res = np.zeros_like(projections)
+        for c in projections.shape[0]:
+            res[c, ...] = injectOne(projections[c, ...])
+    else:
+        res = injectOne(projections)
 
     return res
+
+
+def injectPoissonNoise(projection: Proj):
+    raise 'Unimplemented for now.'
+    pass  # TODO
 
 
 def limitedAngle(projections, srcDeg, dstDeg, startDeg=0):
@@ -73,7 +109,8 @@ def limitedView(projections, ratio):
     return np.array(projections[::ratio, :, :]), projections.shape[0] % ratio - 1
 
 
-def projectionsToSinograms(projections):
+@ConvertProjList
+def projectionsToSinograms(projections: Or[ProjList, ProjStack]):
     """
         Permute projections to sinograms by axes swapping `(views, h, w) -> (h, views, w)`.
     """
@@ -85,7 +122,8 @@ def projectionsToSinograms(projections):
     return sinograms
 
 
-def sinogramsToProjections(sinograms):
+@ConvertProjList
+def sinogramsToProjections(sinograms: Or[ProjList, ProjStack]):
     """
         Permute sinograms back to projections by axes swapping `(h, views, w) -> (views, h, w)`.
     """
@@ -99,7 +137,7 @@ def sinogramsToProjections(sinograms):
 
 def padImage(proj, padding, mode='symmetric', smootherDecay=False):
     """
-        Extend the image on four directions using symmetric `padding` (Up, Right, Down, Left) \\
+        Pad the image on four directions using symmetric `padding` (Up, Right, Down, Left) \\
         and descending cosine window decay. `mode` can be `symmetric` or `edge`.
     """
     h, w = proj.shape
@@ -138,6 +176,7 @@ def padSinogram(sgm, padding, mode='symmetric', smootherDecay=False):
     l, r = padding
 
     return padImage(sgm, (0, r, 0, l), mode, smootherDecay)
+
 
 def correctBeamHardeningPolynomial(postlog, coeffs, bias=True):
     pass
