@@ -21,6 +21,5 @@ jobs:
           pip install -r requirements.txt
       - name: RunTests
         run: |
-          cd test
-          chmod 755 _runAll.sh
-          ./_runAll.sh
+          chmod 755 runAllTests.sh
+          ./runAllTests.sh

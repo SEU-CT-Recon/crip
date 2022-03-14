@@ -1,0 +1,274 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>crip package &#8212; crip v0.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="crip-package">
+<h1>crip package<a class="headerlink" href="#crip-package" title="Permalink to this headline">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-crip.io">
+<span id="crip-io-module"></span><h2>crip.io module<a class="headerlink" href="#module-crip.io" title="Permalink to this headline">¶</a></h2>
+<p>I/O module of crip.</p>
+<p>by z0gSh1u &#64; <a class="reference external" href="https://github.com/z0gSh1u/crip">https://github.com/z0gSh1u/crip</a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="crip.io.imreadDicom">
+<span class="sig-prename descclassname"><span class="pre">crip.io.</span></span><span class="sig-name descname"><span class="pre">imreadDicom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.io.imreadDicom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read DICOM file. Return numpy array.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="crip.io.imreadRaw">
+<span class="sig-prename descclassname"><span class="pre">crip.io.</span></span><span class="sig-name descname"><span class="pre">imreadRaw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nSlice=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset=0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.io.imreadRaw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read binary raw file. Return numpy array. <cite>offset</cite> in bytes.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="crip.io.imreadTiff">
+<span class="sig-prename descclassname"><span class="pre">crip.io.</span></span><span class="sig-name descname"><span class="pre">imreadTiff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.io.imreadTiff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read TIFF file. Return numpy array.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="crip.io.imwriteRaw">
+<span class="sig-prename descclassname"><span class="pre">crip.io.</span></span><span class="sig-name descname"><span class="pre">imwriteRaw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'keep'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.io.imwriteRaw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write raw file.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="crip.io.imwriteTiff">
+<span class="sig-prename descclassname"><span class="pre">crip.io.</span></span><span class="sig-name descname"><span class="pre">imwriteTiff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'keep'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.io.imwriteTiff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write TIFF file.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="crip.io.listDirectory">
+<span class="sig-prename descclassname"><span class="pre">crip.io.</span></span><span class="sig-name descname"><span class="pre">listDirectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'nat'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">joinFolder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.io.listDirectory" title="Permalink to this definition">¶</a></dt>
+<dd><p>List files under <cite>folder</cite> and <cite>sort</cite> using <cite>“nat”</cite> (natural) or <cite>“dict”</cite> (dictionary) order. Set <cite>joinFolder</cite> to True to get the paths, otherwise filename only.</p>
+</dd></dl>
+
+</section>
+<section id="crip-mangoct-module">
+<h2>crip.mangoct module<a class="headerlink" href="#crip-mangoct-module" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-crip.physics">
+<span id="crip-physics-module"></span><h2>crip.physics module<a class="headerlink" href="#module-crip.physics" title="Permalink to this headline">¶</a></h2>
+<p>Physics module of crip.</p>
+<p>by z0gSh1u &#64; <a class="reference external" href="https://github.com/z0gSh1u/crip">https://github.com/z0gSh1u/crip</a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="crip.physics.calcMuWater">
+<span class="sig-prename descclassname"><span class="pre">crip.physics.</span></span><span class="sig-name descname"><span class="pre">calcMuWater</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spectrum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'keV'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhoWater</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.physics.calcMuWater" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate mu value (mm^-1) of water according to a specified spectrum (&#64;see <cite>readSpectrum</cite> for specturm format) considering only energies in diagonstic
+range (10 ~ 150 keV).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="crip.physics.readAtten">
+<span class="sig-prename descclassname"><span class="pre">crip.physics.</span></span><span class="sig-name descname"><span class="pre">readAtten</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.physics.readAtten" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read NIST ASCII format attenuation coefficient list. <cite>rho</cite> in (g/cm^3). Returns energy (MeV) and corresponding mu value (mm^-1).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="crip.physics.readSpectrum">
+<span class="sig-prename descclassname"><span class="pre">crip.physics.</span></span><span class="sig-name descname"><span class="pre">readSpectrum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'keV'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.physics.readSpectrum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read spectrum list whose unit of energy is keV. Return energies in keV and omega. Set <cite>unit</cite> to <cite>eV</cite> if the unit in spectrum is <cite>eV</cite>.</p>
+</dd></dl>
+
+</section>
+<section id="module-crip.postprocess">
+<span id="crip-postprocess-module"></span><h2>crip.postprocess module<a class="headerlink" href="#module-crip.postprocess" title="Permalink to this headline">¶</a></h2>
+<p>Postprocess module of crip.</p>
+<p>by z0gSh1u &#64; <a class="reference external" href="https://github.com/z0gSh1u/crip">https://github.com/z0gSh1u/crip</a></p>
+</section>
+<section id="module-crip.preprocess">
+<span id="crip-preprocess-module"></span><h2>crip.preprocess module<a class="headerlink" href="#module-crip.preprocess" title="Permalink to this headline">¶</a></h2>
+<p>Preprocess module of crip.</p>
+<p>by z0gSh1u &#64; <a class="reference external" href="https://github.com/z0gSh1u/crip">https://github.com/z0gSh1u/crip</a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="crip.preprocess.averageProjections">
+<span class="sig-prename descclassname"><span class="pre">crip.preprocess.</span></span><span class="sig-name descname"><span class="pre">averageProjections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projections</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.preprocess.averageProjections" title="Permalink to this definition">¶</a></dt>
+<dd><p>Average projections. For example, to calculate the flat field.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="crip.preprocess.flatDarkFieldCorrection">
+<span class="sig-prename descclassname"><span class="pre">crip.preprocess.</span></span><span class="sig-name descname"><span class="pre">flatDarkFieldCorrection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dark</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.preprocess.flatDarkFieldCorrection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform flat field (air) and dark field correction to get post-log value.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="crip.preprocess.flatDarkFieldCorrectionStandalone">
+<span class="sig-prename descclassname"><span class="pre">crip.preprocess.</span></span><span class="sig-name descname"><span class="pre">flatDarkFieldCorrectionStandalone</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projection</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.preprocess.flatDarkFieldCorrectionStandalone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform flat field and dark field correction without actual field image. Air is estimated using the brightest pixel.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="crip.preprocess.gaussianNoiseInject">
+<span class="sig-prename descclassname"><span class="pre">crip.preprocess.</span></span><span class="sig-name descname"><span class="pre">gaussianNoiseInject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.preprocess.gaussianNoiseInject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inject Gaussian noise which obeys distribution N(0, sigma^2).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="crip.preprocess.limitedAngle">
+<span class="sig-prename descclassname"><span class="pre">crip.preprocess.</span></span><span class="sig-name descname"><span class="pre">limitedAngle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">srcDeg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dstDeg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">startDeg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.preprocess.limitedAngle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample limited angle projections from <cite>startDeg</cite> to <cite>startDeg + dstDeg</cite>. The original total angle is <cite>srcDeg</cite>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="crip.preprocess.limitedView">
+<span class="sig-prename descclassname"><span class="pre">crip.preprocess.</span></span><span class="sig-name descname"><span class="pre">limitedView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratio</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.preprocess.limitedView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample projections uniformly with <cite>::ratio</cite> to get sparse views projections. The second returning is the number of remaining projections.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="crip.preprocess.padProjection">
+<span class="sig-prename descclassname"><span class="pre">crip.preprocess.</span></span><span class="sig-name descname"><span class="pre">padProjection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'symmetric'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smootherDecay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.preprocess.padProjection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extend the projection on four directions using symmetric <cite>padding</cite> (Up, Right, Down, Left) and descending cosine window decay. <cite>mode</cite> can be <cite>symmetric</cite> or <cite>edge</cite>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="crip.preprocess.projectionsToSinograms">
+<span class="sig-prename descclassname"><span class="pre">crip.preprocess.</span></span><span class="sig-name descname"><span class="pre">projectionsToSinograms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projections</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.preprocess.projectionsToSinograms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Permute projections to sinograms by axes swapping <cite>(views, h, w) -&gt; (h, views, w)</cite>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="crip.preprocess.sinogramsToProjections">
+<span class="sig-prename descclassname"><span class="pre">crip.preprocess.</span></span><span class="sig-name descname"><span class="pre">sinogramsToProjections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sinograms</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.preprocess.sinogramsToProjections" title="Permalink to this definition">¶</a></dt>
+<dd><p>Permute sinograms back to projections by axes swapping <cite>(h, views, w) -&gt; (views, h, w)</cite>.</p>
+</dd></dl>
+
+</section>
+<section id="module-crip.shared">
+<span id="crip-shared-module"></span><h2>crip.shared module<a class="headerlink" href="#module-crip.shared" title="Permalink to this headline">¶</a></h2>
+<p>Shared module of crip.</p>
+<p>by z0gSh1u &#64; <a class="reference external" href="https://github.com/z0gSh1u/crip">https://github.com/z0gSh1u/crip</a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="crip.shared.binning">
+<span class="sig-prename descclassname"><span class="pre">crip.shared.</span></span><span class="sig-name descname"><span class="pre">binning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">1)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.shared.binning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform binning on row and col directions. <cite>binning=(rowBinning, colBinning)</cite>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="crip.shared.gaussianSmooth">
+<span class="sig-prename descclassname"><span class="pre">crip.shared.</span></span><span class="sig-name descname"><span class="pre">gaussianSmooth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ksize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.shared.gaussianSmooth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform Gaussian smooth with kernel size = ksize and Gaussian sigma = sigma (int or tuple (x, y)). Leave <cite>ksize = None</cite> to auto determine to include the majority of Gaussian energy.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="crip.shared.resize">
+<span class="sig-prename descclassname"><span class="pre">crip.shared.</span></span><span class="sig-name descname"><span class="pre">resize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bicubic'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.shared.resize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resize the projection to <cite>dsize</cite> (H, W) (if dsize is not None) or scale by ratio <cite>(fH, fW)</cite>
+using <cite>interp</cite> (bicubic, linear, nearest available).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="crip.shared.rotate">
+<span class="sig-prename descclassname"><span class="pre">crip.shared.</span></span><span class="sig-name descname"><span class="pre">rotate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.shared.rotate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotate img by deg [DEG] (multiple of 90) clockwise.</p>
+</dd></dl>
+
+</section>
+<section id="module-crip.utils">
+<span id="crip-utils-module"></span><h2>crip.utils module<a class="headerlink" href="#module-crip.utils" title="Permalink to this headline">¶</a></h2>
+<p>Utilities of crip.</p>
+<p>by z0gSh1u &#64; <a class="reference external" href="https://github.com/z0gSh1u/crip">https://github.com/z0gSh1u/crip</a></p>
+</section>
+<section id="module-crip">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-crip" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">crip</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, z0gSh1u.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/crip.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

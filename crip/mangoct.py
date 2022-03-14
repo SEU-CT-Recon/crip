@@ -19,14 +19,14 @@ class Mgfbp:
 
     def buildCmd(self):
         platform = sys.platform
-        if platform == 'win32':
-            self.cmd = ['set CUDA_VISIBLE_DEVICES={}'.format(self.cudaDevice), '{} <1>'.format(self.exe)]
-        elif platform == 'linux':
-            self.cmd = ['CUDA_VISIBLE_DEVICES={} {} <1>'.format(self.cudaDevice, self.exe)]
+        if platform.find('win32') != -1:
+            self.cmd = ['set CUDA_VISIBLE_DEVICES={}'.format(self.cudaDevice), '"{}" <1>'.format(self.exe)]
+        elif platform.find('linux') != -1:
+            self.cmd = ['CUDA_VISIBLE_DEVICES={} "{}" <1>'.format(self.cudaDevice, self.exe)]
         else:
             cripAssert(False, 'Unsupported platform for Mgfbp calling.')
 
     def exec(self, conf):
         for cmd in self.cmd:
-            cmd = cmd.replace('<1>', '{}'.format(conf))
+            cmd = cmd.replace('<1>', '"{}"'.format(conf))
             os.system(cmd)
