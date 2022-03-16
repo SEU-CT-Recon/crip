@@ -73,6 +73,3 @@ def imwriteTiff(img: np.ndarray, path: str, dtype=None):
         img = img.astype(dtype)
     tifffile.imwrite(path, img)
 
-
-def readFileText():
-    pass

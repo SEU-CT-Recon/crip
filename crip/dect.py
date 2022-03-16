@@ -12,20 +12,16 @@ def muDecomposeSingleMaterial(srcAtten, basis1Atten, basis2Atten):
 
     M = np.array([mu1, mu2]).T
     MPinv = np.linalg.pinv(M)
-    return MPinv * srcMu # a1, a2
+    return MPinv * srcMu  # a1, a2
+
 
 def deDecomposeProjDomainCoeff():
     pass
+
 
 def deDecomposeProjDomain():
     pass
 
 
-
-
 def deDecomposeImageDomain():
     pass
-
-
-
-

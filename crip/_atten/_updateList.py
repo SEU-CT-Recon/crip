@@ -12,7 +12,7 @@ import json
 
 if __name__ == '__main__':
     Folders = ['compound', 'mixture', 'simple']
-    _AttenPath = path.abspath('')
+    _AttenPath = path.dirname(path.abspath(__file__))
     Dict = {}
 
     for folder in Folders:
