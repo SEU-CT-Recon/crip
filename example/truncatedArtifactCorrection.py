@@ -36,7 +36,7 @@ Mgfbp(mgfbp_exe).exec(config_path)
 
 # 4. calculate radius reference and plot
 rec_img = np.fromfile(rec_img_path, dtype=np.float32).reshape(60, 512, 512)
-r_reference = fovCropRadiusReference(SOD=750, SDD=1250, detectorWidth=399.168, pixelSpacing=0.5)
+r_reference = fovCropRadiusReference(SOD=750, SDD=1250, detectorWidth=399.168, reconPixelSize=0.5)
 x, y = drawCircle(rec_img[0], r=r_reference)
 plt.imshow(rec_img[0], cmap='gray')
 plt.plot(x, y, 'b-.'), plt.legend(['crop reference']), plt.show()
