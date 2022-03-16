@@ -80,3 +80,31 @@ def spectrumAtten(material: str, rho: float, spectrumOmega: np.array, E=1) -> fl
     """
     attenMu = getAtten(material, rho, np.linspace(1, 149, 149))
     return sum(spectrumOmega * E * attenMu) / sum(spectrumOmega * E)
+
+
+def decompose(material, rho, material_1, rho_1, material_2, rho_2, energy: np.array) -> np.array:
+    """
+        Point-wise material decompose.
+    """
+    attenMu1 = getAtten(material_1, rho_1, energy)
+    attenMu2 = getAtten(material_2, rho_2, energy)
+    attenMu = getAtten(material, rho, energy)
+
+    vector = np.array([attenMu1, attenMu2], dtype=float)
+    coef = attenMu @ vector.T @ np.linalg.inv(vector @ vector.T)
+    return coef
+
+
+def decomposeRatio(material, rho, material_1, rho_1, material_2, rho_2, energy: np.array) -> np.array:
+    """
+        Point-wise material decompose.
+        All attenuation have the same weight.
+    """
+    attenMu1 = getAtten(material_1, rho_1, energy)
+    attenMu2 = getAtten(material_2, rho_2, energy)
+    attenMu = getAtten(material, rho, energy)
+
+    vector = np.array([attenMu1, attenMu2], dtype=float) / attenMu
+    attenMu = attenMu / attenMu
+    coef = attenMu @ vector.T @ np.linalg.inv(vector @ vector.T)
+    return coef
