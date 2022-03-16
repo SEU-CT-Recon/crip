@@ -80,9 +80,23 @@ def injectGaussianNoise(projections: Or[Proj, ProjList, ProjStack], sigma: float
     return res
 
 
-def injectPoissonNoise(projection: Proj):
-    raise 'Unimplemented for now.'
-    pass  # TODO
+def injectPoissonNoise(projections: Or[Proj, ProjList, ProjStack]):
+    """
+        Inject Poisson noise which obeys distribution `P(\lamda)`.
+    """
+    cripAssert(is2or3D(projections), '`projections` should be 2D or 3D.')
+
+    def injectOne(img):
+        return np.random.poisson(img)
+
+    if is3D(projections):
+        res = np.zeros_like(projections)
+        for c in projections.shape[0]:
+            res[c, ...] = injectOne(projections[c, ...])
+    else:
+        res = injectOne(projections)
+
+    return res
 
 
 def limitedAngle(projections, srcDeg, dstDeg, startDeg=0):
@@ -190,4 +204,65 @@ def binning(projection: Or[Proj, ProjList, ProjStack], binning=(1, 1), mode='ski
     # skip, average, min, max, median, sum
 
     res = np.array(projection[..., ::binning[0], ::binning[1]])
+    return res
+
+
+def Mu2HU(img: np.array, mu_water: float) -> np.array:
+    """
+        Convert mu to HU: HU = (\mu - \mu_water) / \mu_water * 1000.
+        img[x, y] = mu.
+    """
+    cripAssert(is2or3D(img), '`image` should be 2D or 3D.')
+
+    def injectOne(img):
+        return (img - mu_water) / mu_water * 1000
+
+    if is3D(img):
+        res = np.zeros_like(img)
+        for c in img.shape[0]:
+            res[c, ...] = injectOne(img[c, ...])
+    else:
+        res = injectOne(img)
+
+    return res
+
+
+def HU2Mu(img: np.array, mu_water: float) -> np.array:
+    """
+        Convert HU to mu: HU = (\mu - \mu_water) / \mu_water * 1000.
+        img[x, y] = mu.
+    """
+    cripAssert(is2or3D(img), '`image` should be 2D or 3D.')
+
+    def injectOne(img):
+        return img / 1000 * mu_water + mu_water
+
+    if is3D(img):
+        res = np.zeros_like(img)
+        for c in img.shape[0]:
+            res[c, ...] = injectOne(img[c, ...])
+    else:
+        res = injectOne(img)
+
+    return res
+
+
+def HUAdd(img, bias=1000):
+    """
+        Add bias in: HU = (\mu - \mu_water) / \mu_water * 1000 = \mu / \mu_Water * 1000 - 1000.
+        After this, there would be a linear relationship between HU and mu.
+        Return \mu / \mu_Water * 1000
+    """
+    cripAssert(is2or3D(img), '`image` should be 2D or 3D.')
+
+    def injectOne(img, bias):
+        return img + bias
+
+    if is3D(img):
+        res = np.zeros_like(img)
+        for c in img.shape[0]:
+            res[c, ...] = injectOne(img[c, ...], bias)
+    else:
+        res = injectOne(img, bias)
+
     return res

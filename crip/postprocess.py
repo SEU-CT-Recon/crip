@@ -50,7 +50,7 @@ def fovCropRadiusReference(SOD: float, SDD: float, detectorWidth: float, reconPi
     return min(r_reference, r_reference2, r_reference3)  # r3 is the smallest
 
 
-def cropCircleFOV(recon, radius, ratio=None, fill=0):
+def cropCircleFOV(recon, radiusOrRatio, fill=0):
     '''
         Crop a circle FOV on `recon`.
     '''

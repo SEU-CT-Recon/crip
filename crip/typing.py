@@ -14,7 +14,6 @@ try:
     FloatLike = Union[np.float16, np.float32, np.float64, np.float128, float]
 except:
     FloatLike = Union[np.float16, np.float32, np.float64, float]
-
 Proj = np.ndarray
 ProjList = List[np.ndarray]
 ProjStack = np.ndarray
