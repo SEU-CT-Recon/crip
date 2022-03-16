@@ -12,7 +12,7 @@ import numpy as np
 from os import path
 from typing import Callable
 
-from .typing import BuiltInAttenEnergyUnit, DefaultEnergyUnit, DefaultFloatDType, DefaultMuUnit, Or, VoltageUnit
+from .typing import BuiltInAttenEnergyUnit, DefaultEnergyUnit, DefaultFloatDType, DefaultMuUnit, Or
 from .utils import cvtEnergyUnit, cvtMuUnit, inArray, cripAssert, getChildFolder, inRange, isNumber, isType, readFileText
 
 ## Constants ##
@@ -35,7 +35,7 @@ class Spectrum:
             omega = spec.spectrum[E]
         ```
     '''
-    def __init__(self, specText: str, unit: VoltageUnit = 'keV'):
+    def __init__(self, specText: str, unit='keV'):
         self.specText = specText
 
         cripAssert(inArray(unit, ['MeV', 'keV', 'eV']), f'Invalid unit: {unit}')
@@ -133,7 +133,7 @@ def getBuiltInAttenList():
     _attenListPath = path.join(getChildFolder('_atten'), './_attenList.json')
     _attenList = readFileText(_attenListPath)
 
-    return _attenList
+    return json.loads(_attenList)
 
 
 def getBuiltInAttenText(materialName: str, dataSource='NIST'):

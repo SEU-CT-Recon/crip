@@ -3,16 +3,35 @@
 '''
 
 import numpy as np
+from crip.physics import *
 
 
-def muDecomposeSingleMaterial(srcAtten, basis1Atten, basis2Atten):
-    srcMu = srcAtten.getArray().T
-    mu1 = basis1Atten.getArray().T
-    mu2 = basis2Atten.getArray().T
+def singleMaterialMuDecompose(material, rho, material_1, rho_1, material_2, rho_2, energyRange: tuple) -> np.array:
+    """
+        Point-wise material decompose.
+    """
+    attenMu1 = getBuiltInAtten(material_1, rho_1).mu[energyRange[0]: energyRange[1]]
+    attenMu2 = getBuiltInAtten(material_2, rho_2).mu[energyRange[0]: energyRange[1]]
+    attenMu = getBuiltInAtten(material, rho).mu[energyRange[0]: energyRange[1]]
 
-    M = np.array([mu1, mu2]).T
-    MPinv = np.linalg.pinv(M)
-    return MPinv * srcMu  # a1, a2
+    vector = np.array([attenMu1, attenMu2], dtype=float)
+    coef = attenMu @ vector.T @ np.linalg.inv(vector @ vector.T)
+    return coef
+
+
+def singleMaterialMuDecomposeRatio(material, rho, material_1, rho_1, material_2, rho_2, energyRange: tuple) -> np.array:
+    """
+        Point-wise material decompose.
+        All attenuation have the same weight.
+    """
+    attenMu1 = getBuiltInAtten(material_1, rho_1).mu[energyRange[0]: energyRange[1]]
+    attenMu2 = getBuiltInAtten(material_2, rho_2).mu[energyRange[0]: energyRange[1]]
+    attenMu = getBuiltInAtten(material, rho).mu[energyRange[0]: energyRange[1]]
+
+    vector = np.array([attenMu1, attenMu2], dtype=float) / attenMu
+    attenMu = attenMu / attenMu
+    coef = attenMu @ vector.T @ np.linalg.inv(vector @ vector.T)
+    return coef
 
 
 def deDecomposeProjDomainCoeff():
