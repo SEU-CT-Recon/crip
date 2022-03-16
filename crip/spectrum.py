@@ -1,7 +1,7 @@
 # class ReadSpectrum:
 import numpy as np
 import re
-import crip._atten
+from crip.io import *
 
 
 class Spectrum:
@@ -47,19 +47,10 @@ def getAtten(material: str, rho: float, energy: np.array) -> np.array:
         Read NIST or ICRP110 ASCII format attenuation coefficient list. `rho` in (g/cm^3). \\
         Return \mu value (mm^-1).
     """
-    import os, os.path as path
-    def getFileList(material, folder, extension):
-        file_list = []
-        for dir_path, dir_names, file_names in os.walk(folder):
-            for file in file_names:
-                file_material, file_type = os.path.splitext(file)
-                if material == file_material and file_type == extension:
-                    file_fullname = os.path.join(dir_path, file)
-                    file_list.append(file_fullname)
-        return file_list
+    from os import path
     path = path.join(path.dirname(path.abspath(__file__)), '_atten')
-
     assert getFileList(material, path, '.txt') != [], 'Material not found!'
+
     with open(*getFileList(material, path, '.txt'), 'r') as f:
         content = f.read()
     content = list(map(lambda x: x.strip(), content.replace('\r\n', '\n').split('\n')))

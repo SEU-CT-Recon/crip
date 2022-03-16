@@ -28,6 +28,20 @@ def listDirectory(folder, sort='nat', joinFolder=False, reverse=False):
     return files
 
 
+def getFileList(material, folder, extension):
+    """
+        'getAtten' specialized function
+    """
+    file_list = []
+    for dir_path, dir_names, file_names in os.walk(folder):
+        for file in file_names:
+            file_material, file_type = os.path.splitext(file)
+            if material == file_material and file_type == extension:
+                file_fullname = os.path.join(dir_path, file)
+                file_list.append(file_fullname)
+    return file_list
+
+
 def imreadDicom(path):
     """
         Read DICOM file. Return numpy array.
