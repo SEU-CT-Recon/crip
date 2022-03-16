@@ -1,3 +1,4 @@
+from typing import Literal
 import numpy as np
 from typing import *
 
@@ -17,3 +18,8 @@ except:
 Proj = np.ndarray
 ProjList = List[np.ndarray]
 ProjStack = np.ndarray
+
+VoltageUnit = str
+# VoltageUnit = Literal['keV', 'eV'] # Future: python 3.8+
+def checkVoltageUnit(unit):
+    return unit in ['keV', 'eV']

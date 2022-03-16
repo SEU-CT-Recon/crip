@@ -4,54 +4,6 @@
     by z0gSh1u @ https://github.com/z0gSh1u/crip
 '''
 
-# Attenuation Coefficient of Water, Liquid
-AttenWaterText = '''
-https://physics.nist.gov/PhysRefData/XrayMassCoef/tab4.html
-Water, Liquid
-ASCII format
-_________________________________
-
-  Energy        μ/ρ        μen/ρ 
-   (MeV)      (cm2/g)     (cm2/g)
-_________________________________
-
-1.00000E-03  4.078E+03  4.065E+03 
-1.50000E-03  1.376E+03  1.372E+03 
-2.00000E-03  6.173E+02  6.152E+02 
-3.00000E-03  1.929E+02  1.917E+02 
-4.00000E-03  8.278E+01  8.191E+01 
-5.00000E-03  4.258E+01  4.188E+01 
-6.00000E-03  2.464E+01  2.405E+01 
-8.00000E-03  1.037E+01  9.915E+00 
-1.00000E-02  5.329E+00  4.944E+00 
-1.50000E-02  1.673E+00  1.374E+00 
-2.00000E-02  8.096E-01  5.503E-01 
-3.00000E-02  3.756E-01  1.557E-01 
-4.00000E-02  2.683E-01  6.947E-02 
-5.00000E-02  2.269E-01  4.223E-02 
-6.00000E-02  2.059E-01  3.190E-02 
-8.00000E-02  1.837E-01  2.597E-02 
-1.00000E-01  1.707E-01  2.546E-02 
-1.50000E-01  1.505E-01  2.764E-02 
-2.00000E-01  1.370E-01  2.967E-02 
-3.00000E-01  1.186E-01  3.192E-02 
-4.00000E-01  1.061E-01  3.279E-02 
-5.00000E-01  9.687E-02  3.299E-02 
-6.00000E-01  8.956E-02  3.284E-02 
-8.00000E-01  7.865E-02  3.206E-02 
-1.00000E+00  7.072E-02  3.103E-02 
-1.25000E+00  6.323E-02  2.965E-02 
-1.50000E+00  5.754E-02  2.833E-02 
-2.00000E+00  4.942E-02  2.608E-02 
-3.00000E+00  3.969E-02  2.281E-02 
-4.00000E+00  3.403E-02  2.066E-02 
-5.00000E+00  3.031E-02  1.915E-02 
-6.00000E+00  2.770E-02  1.806E-02 
-8.00000E+00  2.429E-02  1.658E-02 
-1.00000E+01  2.219E-02  1.566E-02 
-1.50000E+01  1.941E-02  1.441E-02 
-2.00000E+01  1.813E-02  1.382E-02 
-'''
 RhoWater = 1.0  # g/cm^3
 DiagnosticEnergyRange = (10, 150)
 DiagEnergyLow = 0
@@ -59,10 +11,132 @@ DiagEnergyHigh = 150
 DiagEnergyRange = (DiagEnergyLow, DiagEnergyHigh + 1)  # [low, high)
 DiagEnergyLen = DiagEnergyHigh - DiagEnergyLow + 1
 
+import json
 import numpy as np
 import re
+import os
+import os.path as path
 
-from .utils import cripAssert, isInt, isList
+from .typing import DefaultFloatDType, VoltageUnit, checkVoltageUnit
+from .utils import cripAssert, getChildFolder, inRange, isInt, isList
+
+
+class Spectrum:
+    '''
+        Read spectrum text and parse it.
+        
+        Refer to the document for spectrum text format. @see https://github.com/z0gSh1u/crip
+
+        Get \omega of certain energy (keV):
+        ```py
+            omega = spec.spectrum[voltage]
+        ```
+    '''
+    def __init__(self, spectrumContent: str, unit: VoltageUnit = 'keV'):
+        self.content = spectrumContent
+
+        cripAssert(checkVoltageUnit(unit), f'Invalid unit: {unit}')
+        self.unit = unit
+
+        self.spectrum = np.zeros(DiagEnergyLen, dtype=DefaultFloatDType)
+        self._read()
+
+        self.sumOmega = np.sum(self.spectrum)
+
+    def _read(self):
+        # split content into list, and ignore all lines starting with non-digit
+        self.content = list(
+            filter(lambda y: len(y) > 0 and str.isdigit(y[0]),
+                   list(map(lambda x: x.strip(),
+                            self.content.replace('\r\n', '\n').split('\n')))))
+
+        def procSpectrumLine(line: str):
+            tup = tuple(map(float, re.split(r'\s+', line)))
+            cripAssert(len(tup) == 2, f'Invalid line in spectrum: \n{line}\n')
+            return tup  # (energy, omega)
+
+        # parse the spectrum text
+        self.content = np.array(list(map(procSpectrumLine, self.content)), dtype=DefaultFloatDType)
+        spectrumEnergy, spectrumOmega = self.content.T
+
+        # to keV
+        if self.unit == 'eV':
+            spectrumEnergy /= 1000
+
+        startVoltage, cutOffVoltage = int(spectrumEnergy[0]), int(spectrumEnergy[-1])
+        cripAssert(inRange(startVoltage, DiagEnergyRange), '`startVoltage` is out of `DiagEnergyRange`.')
+        cripAssert(inRange(cutOffVoltage, DiagEnergyRange), '`cutOffVoltage` is out of `DiagEnergyRange`.')
+
+        self.spectrum[startVoltage:cutOffVoltage] = spectrumOmega[:]
+
+
+def getAttenList():
+    _attenListPath = path.join(getChildFolder('_atten'), './_attenList.json')
+    with open(_attenListPath, 'r') as fp:
+        _attenList = json.load(fp)
+
+    return _attenList
+
+
+def getBuiltInAttenText(materialName: str, ICRP=False):
+    _attenList = getAttenList()
+    _attenPath = getChildFolder('_atten')
+    _attenFile = '{}{}.txt'.format(materialName, '_ICRP' if ICRP else '')
+    _attenFilePath = path.join(_attenPath, f'./{_attenList[materialName]}', f'./{_attenFile}')
+    cripAssert(path.exists(_attenFilePath), f'Atten file {_attenFile} does not exist.')
+
+    with open(_attenFilePath, 'r') as fp:
+        content = fp.read()
+    return content
+
+
+def getAtten(material: str, rho: float, energy: np.array) -> np.array:
+    """
+        Read NIST or ICRP110 ASCII format attenuation coefficient list. `rho` in (g/cm^3). \\
+        Return \mu value (mm^-1).
+    """
+    def getFileList(material, folder, extension):
+        file_list = []
+        for dir_path, dir_names, file_names in os.walk(folder):
+            for file in file_names:
+                file_material, file_type = os.path.splitext(file)
+                if material == file_material and file_type == extension:
+                    file_fullname = os.path.join(dir_path, file)
+                    file_list.append(file_fullname)
+        return file_list
+
+    path = path.join(path.dirname(path.abspath(__file__)), '_atten')
+
+    assert getFileList(material, path, '.txt') != [], 'Material not found!'
+    with open(*getFileList(material, path, '.txt'), 'r') as f:
+        content = f.read()
+    content = list(map(lambda x: x.strip(), content.replace('\r\n', '\n').split('\n')))
+    content = list(filter(lambda y: len(y) > 0 and str.isdigit(y[0]), content))
+
+    def procAttenLine(line: str):
+        parameter = tuple(map(float, re.split(r'\s+', line)))
+        return parameter[0], parameter[1]  # attenEnergy, attenMuDivRho
+
+    content = np.array(list(map(procAttenLine, content)), dtype=float)
+    attenEnergy, attenMuDivRho = content.T
+    attenEnergy = attenEnergy * 1000  # to keV, 1 MeV = 1000 keV
+
+    # Perform log-domain interpolation.
+    attenInterpMuDivRho = np.interp(np.log(energy), np.log(attenEnergy), np.log(attenMuDivRho))
+    attenNewMu = 0.1 * rho * np.exp(attenInterpMuDivRho)  # value (mm^-1)
+
+    return attenNewMu
+
+
+def spectrumAtten(material: str, rho: float, spectrumOmega: np.array, E=1) -> float:
+    """
+        Generate material attention reference under specific spectrum.
+        E=1: Flat Panel Detector
+        E=np.linspace(1, 149, 149): Photon Counting Detector
+        Return \mu value (mm^-1).
+    """
+    attenMu = getAtten(material, rho, np.linspace(1, 149, 149))
+    return sum(spectrumOmega * E * attenMu) / sum(spectrumOmega * E)
 
 
 class MaterialAtten:
@@ -77,9 +151,6 @@ class MaterialAtten:
         self.name = name
         self.array = array
         self.rho = rho
-    
-    
-
 
 
 def readAtten(content, rho):

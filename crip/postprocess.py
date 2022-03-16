@@ -81,9 +81,10 @@ def postlogToProj():
     pass
 
 
-def transpose(order):
-    pass
+def transpose(vol, order):
+    return vol.transpose(order)
 
 
 def permute(from_, to, reverse=False):
+    # sagittal, coronal, transverse
     pass

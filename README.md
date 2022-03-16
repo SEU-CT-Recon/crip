@@ -1,4 +1,4 @@
-# crip
+![crip](crip.png)
 
 A tool for Cone-Beam CT Data IO, Pre/Post-process and Physics.
 
