@@ -3,7 +3,11 @@
 
     https://github.com/z0gSh1u/crip
 '''
+
+import numpy as np
 from .shared import *
+from .typing import *
+from .utils import *
 
 
 def drawCircle(rec_img, r, center=None):
@@ -69,21 +73,49 @@ def cropCircleFOV(recon, radiusOrRatio, fill=0):
     return img_crop
 
 
-def muToHU():
-    pass
+@ConvertListNDArray
+def MuToHU(image: Or[ReconSlice, ReconList, ReconVolume], muWater: float) -> Or[ReconSlice, ReconVolume]:
+    '''
+        Convert \mu map to HU.
+        
+        `HU = (\mu - \muWater) / \muWater * 1000`
+    '''
+    cripAssert(is2or3D(image), '`image` should be 2D or 3D.')
+
+    return (image - muWater) / muWater * 1000
 
 
-def HUToMu():
-    pass
+@ConvertListNDArray
+def HUToMu(image: Or[ReconSlice, ReconList, ReconVolume], muWater: float) -> Or[ReconSlice, ReconVolume]:
+    '''
+        Convert HU to mu. (Invert of `MuToHU`.)
+    '''
+    cripAssert(is2or3D(image), '`image` should be 2D or 3D.')
+
+    return image / 1000 * muWater + muWater
+
+
+@ConvertListNDArray
+def HUNoRescale(image: Or[ReconSlice, ReconList, ReconVolume],
+                b: float = -1000,
+                k: float = 1) -> Or[ReconSlice, ReconVolume]:
+    '''
+        Invert the rescale-slope (y = kx + b) of HU value to get linear relationship between HU and mu.
+    '''
+    cripAssert(is2or3D(image), '`image` should be 2D or 3D.')
+
+    return (image - b) / k
 
 
 def postlogToProj():
+    # TODO
     pass
 
 
-def transpose(order):
-    pass
+def transpose(vol, order):
+    return vol.transpose(order)
 
 
 def permute(from_, to, reverse=False):
+    # sagittal, coronal, transverse
     pass

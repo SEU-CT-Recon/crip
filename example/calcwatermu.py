@@ -4,7 +4,10 @@
     by z0gSh1u @ https://github.com/z0gSh1u/crip
 '''
 
-from . import _importcrip
+import sys
+sys.path.insert(0, '../')
+
+from crip.physics import calcMu, getBuiltInAtten, Spectrum
 
 # A sample spectrum file.
 SpectrumFile = '''
@@ -22,6 +25,7 @@ Energy (eV)    Omega
 60000 	 989532
 '''.strip()
 
-from crip.physics import calcMuWater
-# Since energy unit is eV in our spectrum, we should pass parameter 'eV'.
-print('\\mu_water = {:.6f} mm^-1'.format(calcMuWater(SpectrumFile, 'eV')))
+spec = Spectrum(SpectrumFile, 'eV')
+atten = getBuiltInAtten('Water', 1.0)
+mu = calcMu(atten, spec, lambda x: 1)
+print(f'\\mu = {mu} mm-1.')

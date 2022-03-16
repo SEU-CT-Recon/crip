@@ -1,165 +1,191 @@
 '''
     Physics module of crip.
 
-    by z0gSh1u @ https://github.com/z0gSh1u/crip
+    https://github.com/z0gSh1u/crip
 '''
 
-# Attenuation Coefficient of Water, Liquid
-AttenWaterText = '''
-https://physics.nist.gov/PhysRefData/XrayMassCoef/tab4.html
-Water, Liquid
-ASCII format
-_________________________________
+__all__ = ['Spectrum', 'Atten', 'getBuiltInAttenList', 'getBuiltInAttenText', 'getBuiltInAtten', 'calcMu']
 
-  Energy        μ/ρ        μen/ρ 
-   (MeV)      (cm2/g)     (cm2/g)
-_________________________________
+import json
+import re
+import numpy as np
+from os import path
+from typing import Callable
 
-1.00000E-03  4.078E+03  4.065E+03 
-1.50000E-03  1.376E+03  1.372E+03 
-2.00000E-03  6.173E+02  6.152E+02 
-3.00000E-03  1.929E+02  1.917E+02 
-4.00000E-03  8.278E+01  8.191E+01 
-5.00000E-03  4.258E+01  4.188E+01 
-6.00000E-03  2.464E+01  2.405E+01 
-8.00000E-03  1.037E+01  9.915E+00 
-1.00000E-02  5.329E+00  4.944E+00 
-1.50000E-02  1.673E+00  1.374E+00 
-2.00000E-02  8.096E-01  5.503E-01 
-3.00000E-02  3.756E-01  1.557E-01 
-4.00000E-02  2.683E-01  6.947E-02 
-5.00000E-02  2.269E-01  4.223E-02 
-6.00000E-02  2.059E-01  3.190E-02 
-8.00000E-02  1.837E-01  2.597E-02 
-1.00000E-01  1.707E-01  2.546E-02 
-1.50000E-01  1.505E-01  2.764E-02 
-2.00000E-01  1.370E-01  2.967E-02 
-3.00000E-01  1.186E-01  3.192E-02 
-4.00000E-01  1.061E-01  3.279E-02 
-5.00000E-01  9.687E-02  3.299E-02 
-6.00000E-01  8.956E-02  3.284E-02 
-8.00000E-01  7.865E-02  3.206E-02 
-1.00000E+00  7.072E-02  3.103E-02 
-1.25000E+00  6.323E-02  2.965E-02 
-1.50000E+00  5.754E-02  2.833E-02 
-2.00000E+00  4.942E-02  2.608E-02 
-3.00000E+00  3.969E-02  2.281E-02 
-4.00000E+00  3.403E-02  2.066E-02 
-5.00000E+00  3.031E-02  1.915E-02 
-6.00000E+00  2.770E-02  1.806E-02 
-8.00000E+00  2.429E-02  1.658E-02 
-1.00000E+01  2.219E-02  1.566E-02 
-1.50000E+01  1.941E-02  1.441E-02 
-2.00000E+01  1.813E-02  1.382E-02 
-'''
+from .typing import BuiltInAttenEnergyUnit, DefaultEnergyUnit, DefaultFloatDType, DefaultMuUnit, Or, VoltageUnit
+from .utils import cvtEnergyUnit, cvtMuUnit, inArray, cripAssert, getChildFolder, inRange, isNumber, isType, readFileText
+
+## Constants ##
+
 RhoWater = 1.0  # g/cm^3
-DiagnosticEnergyRange = (10, 150)
 DiagEnergyLow = 0
 DiagEnergyHigh = 150
-DiagEnergyRange = (DiagEnergyLow, DiagEnergyHigh + 1)  # [low, high)
+DiagEnergyRange = range(DiagEnergyLow, DiagEnergyHigh + 1)  # [low, high)
 DiagEnergyLen = DiagEnergyHigh - DiagEnergyLow + 1
 
-import numpy as np
-import re
 
-from .utils import cripAssert, isInt, isList
+class Spectrum:
+    '''
+        Parse spectrum text as `Spectrum` class object.
+        
+        Refer to the document for spectrum text format. @see https://github.com/z0gSh1u/crip
+
+        Get \omega of certain energy (keV):
+        ```py
+            omega = spec.spectrum[E]
+        ```
+    '''
+    def __init__(self, specText: str, unit: VoltageUnit = 'keV'):
+        self.specText = specText
+
+        cripAssert(inArray(unit, ['MeV', 'keV', 'eV']), f'Invalid unit: {unit}')
+        self.unit = unit
+
+        self.spectrum = np.zeros(DiagEnergyLen, dtype=DefaultFloatDType)
+        self._read()
+
+        self.sumOmega = np.sum(self.spectrum)
+
+    def _read(self):
+        # split content into list, and ignore all lines starting with non-digit
+        content = list(
+            filter(lambda y: len(y) > 0 and str.isdigit(y[0]),
+                   list(map(lambda x: x.strip(),
+                            self.specText.replace('\r\n', '\n').split('\n')))))
+
+        def procSpectrumLine(line: str):
+            tup = tuple(map(float, re.split(r'\s+', line)))
+            cripAssert(len(tup) == 2, f'Invalid line in spectrum: \n{line}\n')
+            return tup  # (energy, omega)
+
+        # parse the spectrum text
+        content = np.array(list(map(procSpectrumLine, content)), dtype=DefaultFloatDType)
+        specEnergy, specOmega = content.T
+
+        # to keV
+        specEnergy = cvtEnergyUnit(specEnergy, self.unit, DefaultEnergyUnit)
+
+        startEnergy, cutOffEnergy = int(specEnergy[0]), int(specEnergy[-1])
+        cripAssert(inRange(startEnergy, DiagEnergyRange), '`startEnergy` is out of `DiagEnergyRange`.')
+        cripAssert(inRange(cutOffEnergy, DiagEnergyRange), '`cutOffEnergy` is out of `DiagEnergyRange`.')
+
+        self.spectrum[startEnergy:cutOffEnergy + 1] = specOmega[:]
 
 
-class MaterialAtten:
-    def __init__(self, name, array, rho) -> None:
+class Atten:
+    '''
+        Parse atten text as `Atten` class object. Interpolation is performed to fill `DiagEnergyRange`.
+
+        Refer to the document for atten text format (NIST ASCII or ICRP). @see https://github.com/z0gSh1u/crip
+
+        \\rho: g/cm^3.
+
+        Get \mu of certain energy (keV):
+        ```py
+            mu = atten.mu[E]
+        ```
+    '''
+    def __init__(self, attenText: str, rho: float, energyUnit='MeV') -> None:
         cripAssert(rho > 0, '`rho` should > 0.')
-        if isList(array):
-            array = np.array(array)
-        array = array.squeeze()
 
-        cripAssert(len(array) == DiagEnergyLen, '`array` should have same length as energy range.')
-
-        self.name = name
-        self.array = array
+        self.attenText = attenText
         self.rho = rho
-    
-    
+        self.energyUnit = energyUnit
+
+        self.mu = np.zeros(DiagEnergyLen, dtype=DefaultFloatDType)
+        self._read()
+
+    def _read(self):
+        # split attenText into list, and ignore all lines starting with non-digit
+        content = list(
+            filter(lambda y: len(y) > 0 and str.isdigit(y[0]),
+                   list(map(lambda x: x.strip(),
+                            self.attenText.replace('\r\n', '\n').split('\n')))))
+
+        def procAttenLine(line: str):
+            tup = tuple(map(float, re.split(r'\s+', line)))
+            cripAssert(inArray(len(tup), [2, 3]), f'Invalid line in attenText: {line}')
+            energy, muDivRho = tuple(map(float, re.split(r'\s+', line)))[0:2]
+            return energy, muDivRho
+
+        content = np.array(list(map(procAttenLine, content)), dtype=DefaultFloatDType)
+
+        energy, muDivRho = content.T
+        energy = cvtEnergyUnit(energy, self.energyUnit, DefaultEnergyUnit)  # keV
+
+        # perform log-domain interpolation to fill in `DiagEnergyRange`
+        interpEnergy = np.log(DiagEnergyRange[1:])  # avoid log(0)
+        interpMuDivRho = np.interp(interpEnergy, np.log(energy), np.log(muDivRho))
+
+        # now we have mu for every energy in `DiagEnergyRange`.
+        mu = np.exp(interpMuDivRho) * self.rho  # cm-1
+        mu = cvtMuUnit(mu, 'cm-1', DefaultMuUnit)  # mm-1
+        mu = np.insert(mu, 0, 0, axis=0)  # prepend energy = 0
+        self.mu = mu
 
 
+def getBuiltInAttenList():
+    '''
+        Get the built-in atten list file content.
 
-def readAtten(content, rho):
-    """
-        Read NIST ASCII format attenuation coefficient list. `rho` in (g/cm^3). \\
-        Returns energy (MeV) and corresponding \mu value (mm^-1).
-    """
-    # Ignore all lines starts with non-digit.
-    content = list(map(lambda x: x.strip(), content.replace('\r\n', '\n').split('\n')))
-    content = list(filter(lambda y: len(y) > 0 and str.isdigit(y[0]), content))
+        Returns `{materialName: materialType}`
+    '''
+    _attenListPath = path.join(getChildFolder('_atten'), './_attenList.json')
+    _attenList = readFileText(_attenListPath)
 
-    def procAttenLine(line: str):
-        energy, muDivRho, _ = tuple(map(float, re.split(r'\s+', line)))
-        return energy, muDivRho
-
-    content = np.array(list(map(procAttenLine, content)), dtype=float)
-    attenEnergy, attenMuDivRho = content.T
-    attenEnergy = attenEnergy * 1000  # to keV, 1 MeV = 1000 keV
-    attenMu = attenMuDivRho * rho * 0.1  # to mu mm^-1
-
-    return attenEnergy, attenMu
+    return _attenList
 
 
-def readSpectrum(content, unit='keV'):
-    """
-        Read spectrum list whose unit of energy is keV. Return energies in keV and omega. \\
-        Set `unit` to `eV` if the unit in spectrum is `eV`.
-    """
-    # Ignore all lines starts with non-digit.
-    content = list(
-        filter(lambda y: len(y) > 0 and str.isdigit(y[0]),
-               list(map(lambda x: x.strip(),
-                        content.replace('\r\n', '\n').split('\n')))))
+def getBuiltInAttenText(materialName: str, dataSource='NIST'):
+    '''
+        Get the built-in atten file content of `materialName`.
 
-    def procSpectrumLine(line: str):
-        energy, omega = tuple(map(float, re.split(r'\s+', line)))
-        return energy, omega
+        Available data sources: `NIST`, `ICRP`. Call `getBuiltInAttenList` to get the material list.
+    '''
+    cripAssert(inArray(dataSource, ['NIST', 'ICRP']), f'Invalid dataSource: {dataSource}')
+    dataSourcePostfix = {'NIST': '', 'ICRP': '_ICRP'}[dataSource]
 
-    content = np.array(list(map(procSpectrumLine, content)), dtype=float)
-    spectrumEnergy, spectrumOmega = content.T
+    _attenList = getBuiltInAttenList()
+    _attenPath = getChildFolder('_atten')
+    _attenFile = '{}{}.txt'.format(materialName, dataSourcePostfix)
+    _attenFilePath = path.join(_attenPath, f'./{_attenList[materialName]}', f'./{_attenFile}')
+    cripAssert(path.exists(_attenFilePath), f'Atten file {_attenFile} does not exist.')
 
-    if unit == 'eV':
-        spectrumEnergy /= 1000  # to keV
-
-    return spectrumEnergy, spectrumOmega
+    content = readFileText(_attenFilePath)
+    return content
 
 
-def calcMuWater(spectrum, unit='keV', rhoWater=RhoWater):
-    """
-        Calculate \mu value (mm^-1) of water according to a specified spectrum \\
-        (@see `readSpectrum` for specturm format) considering only energies in diagonstic
-        range (10 ~ 150 keV).
-    """
-    # Read attenuation.
-    attenWaterEnergy, attenWaterMu = readAtten(AttenWaterText, RhoWater)
+def getBuiltInAtten(materialName: str, rho: float, dataSource='NIST'):
+    '''
+        Get the built-in atten object.
 
-    # We only consider energies in diagnostic range.
-    attenWaterInDiag = np.intersect1d(np.argwhere(attenWaterEnergy >= DiagnosticEnergyRange[0]),
-                                      np.argwhere(attenWaterEnergy <= DiagnosticEnergyRange[1]))
-    attenWaterEnergy = attenWaterEnergy[attenWaterInDiag]
-    attenWaterMu = attenWaterMu[attenWaterInDiag]
+        Available data sources: `NIST`, `ICRP`.       
+        
+        \\rho: g/cm^3.
+    '''
+    return Atten(getBuiltInAttenText(materialName, dataSource), rho, BuiltInAttenEnergyUnit)
 
-    # Perform log-domain interpolation.
-    attenWaterEnergyDense = np.arange(DiagnosticEnergyRange[0], DiagnosticEnergyRange[1] + 1, 1)
-    attenWaterMu = np.interp(np.log(attenWaterEnergyDense), np.log(attenWaterEnergy), np.log(attenWaterMu))
-    attenWaterEnergy = attenWaterEnergyDense
-    attenWaterMu = np.exp(attenWaterMu)
 
-    # Read spectrum.
-    spectrumEnergy, spectrumOmega = readSpectrum(spectrum, unit)
+def calcMu(atten: Atten, spec: Spectrum, energyConversion: Or[str, float, int, Callable]) -> float:
+    '''
+        Calculate the \mu value (mm-1) of certain atten under a specific spectrum.
 
-    # Intergrate along energies.
-    sumOmegaMuWater = 0.0
-    sumOmega = 0.0
-    for idx, E in enumerate(spectrumEnergy):
-        E = int(E)
-        # We only consider energies in diagnostic range.
-        if E >= DiagnosticEnergyRange[0] and E <= DiagnosticEnergyRange[1]:
-            sumOmegaMuWater += spectrumOmega[idx] * attenWaterMu[np.argwhere(attenWaterEnergy == E)]
-            sumOmega += spectrumOmega[idx]
+        `energyConversion` determines the energy conversion efficiency of the detector.
+            - 'PCD' (Photon Counting), 'EID' (Energy Integrating)
+            - a constant value
+            - a callback function (callable) that takes energy in keV and returns the factor
+    '''
+    mus = atten.mu
+    eff = None
 
-    muWaterRef = sumOmegaMuWater / sumOmega  # mm^-1
-    return muWaterRef.squeeze().squeeze()
+    if isType(energyConversion, str):
+        cripAssert(inArray(energyConversion, ['PCD', 'EID']), f'Invalid `energyConversion`: {energyConversion}')
+        eff = {'PCD': 1, 'EID': np.array(DiagEnergyRange)}[energyConversion]
+
+    elif isNumber(energyConversion):
+        eff = energyConversion
+
+    elif isType(energyConversion, Callable):
+        eff = np.array(list(map(energyConversion, list(DiagEnergyRange)))).squeeze()
+
+    return np.sum(spec.spectrum * eff * mus) / np.sum(spec.spectrum * eff)
