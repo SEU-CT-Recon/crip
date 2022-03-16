@@ -67,3 +67,23 @@ def cropCircleFOV(recon, radius, ratio=None, fill=0):
     img_crop[:, idx_zero] = fill
 
     return img_crop
+
+
+def muToHU():
+    pass
+
+
+def HUToMu():
+    pass
+
+
+def postlogToProj():
+    pass
+
+
+def transpose(order):
+    pass
+
+
+def permute(from_, to, reverse=False):
+    pass

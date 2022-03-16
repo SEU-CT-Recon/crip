@@ -53,10 +53,33 @@ _________________________________
 2.00000E+01  1.813E-02  1.382E-02 
 '''
 RhoWater = 1.0  # g/cm^3
-DiagnosticEnergyRange = (10, 150)  # keV
+DiagnosticEnergyRange = (10, 150)
+DiagEnergyLow = 0
+DiagEnergyHigh = 150
+DiagEnergyRange = (DiagEnergyLow, DiagEnergyHigh + 1)  # [low, high)
+DiagEnergyLen = DiagEnergyHigh - DiagEnergyLow + 1
 
 import numpy as np
 import re
+
+from .utils import cripAssert, isInt, isList
+
+
+class MaterialAtten:
+    def __init__(self, name, array, rho) -> None:
+        cripAssert(rho > 0, '`rho` should > 0.')
+        if isList(array):
+            array = np.array(array)
+        array = array.squeeze()
+
+        cripAssert(len(array) == DiagEnergyLen, '`array` should have same length as energy range.')
+
+        self.name = name
+        self.array = array
+        self.rho = rho
+    
+    
+
 
 
 def readAtten(content, rho):

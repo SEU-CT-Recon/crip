@@ -8,7 +8,12 @@ DefaultFloatDType = np.float32
 UintLike = Union[np.uint8, np.uint16, np.uint32, np.uint64]
 SignedIntLike = Union[int, np.int8, np.int16, np.int32, np.int64]
 IntLike = Union[UintLike, SignedIntLike]
-FloatLike = Union[np.float16, np.float32, np.float64, np.float128, float]
+
+# @see https://stackoverflow.com/questions/58686018
+try:
+    FloatLike = Union[np.float16, np.float32, np.float64, np.float128, float]
+except:
+    FloatLike = Union[np.float16, np.float32, np.float64, float]
 
 Proj = np.ndarray
 ProjList = List[np.ndarray]

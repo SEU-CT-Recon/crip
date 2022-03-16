@@ -180,3 +180,14 @@ def padSinogram(sgm, padding, mode='symmetric', smootherDecay=False):
 
 def correctBeamHardeningPolynomial(postlog, coeffs, bias=True):
     pass
+
+
+@ConvertProjList
+def binning(projection: Or[Proj, ProjList, ProjStack], binning=(1, 1), mode='skip'):
+    """
+        Perform binning on row and col directions. `binning=(row, col)`.
+    """
+    # skip, average, min, max, median, sum
+
+    res = np.array(projection[..., ::binning[0], ::binning[1]])
+    return res

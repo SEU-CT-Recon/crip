@@ -41,14 +41,6 @@ def resize(projection, dsize=None, fH=None, fW=None, interp='bicubic'):
     return cv2.resize(projection.astype(np.float32), dsize[::-1], None, fW, fH, interpolation=interp_[interp])
 
 
-def binning(projection, binning=(1, 1)):
-    """
-        Perform binning on row and col directions. `binning=(rowBinning, colBinning)`.
-    """
-    res = np.array(projection[::binning[0], ::binning[1]])
-    return res
-
-
 def gaussianSmooth(projection, sigma, ksize=None):
     """
         Perform Gaussian smooth with kernel size = ksize and Gaussian \sigma = sigma (int or tuple (x, y)). \\

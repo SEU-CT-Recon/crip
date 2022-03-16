@@ -1,1 +1,6 @@
-#
+'''
+    Dual-Energy
+'''
+
+
+def singleMaterialMuDecompose()
