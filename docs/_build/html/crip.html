@@ -72,13 +72,31 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="crip.io.listDirectory">
-<span class="sig-prename descclassname"><span class="pre">crip.io.</span></span><span class="sig-name descname"><span class="pre">listDirectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'nat'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">joinFolder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.io.listDirectory" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">crip.io.</span></span><span class="sig-name descname"><span class="pre">listDirectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'nat'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">joinFolder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reverse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.io.listDirectory" title="Permalink to this definition">¶</a></dt>
 <dd><p>List files under <cite>folder</cite> and <cite>sort</cite> using <cite>“nat”</cite> (natural) or <cite>“dict”</cite> (dictionary) order. Set <cite>joinFolder</cite> to True to get the paths, otherwise filename only.</p>
 </dd></dl>
 
 </section>
-<section id="crip-mangoct-module">
-<h2>crip.mangoct module<a class="headerlink" href="#crip-mangoct-module" title="Permalink to this headline">¶</a></h2>
+<section id="module-crip.mangoct">
+<span id="crip-mangoct-module"></span><h2>crip.mangoct module<a class="headerlink" href="#module-crip.mangoct" title="Permalink to this headline">¶</a></h2>
+<p>MangoCT integration of crip.</p>
+<p><a class="reference external" href="https://github.com/z0gSh1u/crip">https://github.com/z0gSh1u/crip</a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="crip.mangoct.Mgfbp">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">crip.mangoct.</span></span><span class="sig-name descname"><span class="pre">Mgfbp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cudaDevice</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.mangoct.Mgfbp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="crip.mangoct.Mgfbp.buildCmd">
+<span class="sig-name descname"><span class="pre">buildCmd</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#crip.mangoct.Mgfbp.buildCmd" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="crip.mangoct.Mgfbp.exec">
+<span class="sig-name descname"><span class="pre">exec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.mangoct.Mgfbp.exec" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="module-crip.physics">
 <span id="crip-physics-module"></span><h2>crip.physics module<a class="headerlink" href="#module-crip.physics" title="Permalink to this headline">¶</a></h2>
@@ -108,6 +126,30 @@ range (10 ~ 150 keV).</p>
 <span id="crip-postprocess-module"></span><h2>crip.postprocess module<a class="headerlink" href="#module-crip.postprocess" title="Permalink to this headline">¶</a></h2>
 <p>Postprocess module of crip.</p>
 <p>by z0gSh1u &#64; <a class="reference external" href="https://github.com/z0gSh1u/crip">https://github.com/z0gSh1u/crip</a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="crip.postprocess.cropCircleFOV">
+<span class="sig-prename descclassname"><span class="pre">crip.postprocess.</span></span><span class="sig-name descname"><span class="pre">cropCircleFOV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radiusOrRatio</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fillValue</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.postprocess.cropCircleFOV" title="Permalink to this definition">¶</a></dt>
+<dd><p>Crop a circle FOV on <cite>recon</cite>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="crip.postprocess.drawCircle">
+<span class="sig-prename descclassname"><span class="pre">crip.postprocess.</span></span><span class="sig-name descname"><span class="pre">drawCircle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rec_img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.postprocess.drawCircle" title="Permalink to this definition">¶</a></dt>
+<dd><p>‘Truncated Artifact Correction’ specialized function.
+Draw circle before crop</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="crip.postprocess.fovCropRadiusReference">
+<span class="sig-prename descclassname"><span class="pre">crip.postprocess.</span></span><span class="sig-name descname"><span class="pre">fovCropRadiusReference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">SOD</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SDD</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detectorWidth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pixelSpacing</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.postprocess.fovCropRadiusReference" title="Permalink to this definition">¶</a></dt>
+<dd><p>‘Truncated Artifact Correction’ specialized function.
+Reconstruction FOV section is independent of detector length</p>
+<p>SOD: Source object distance (mm)
+SDD: Source detector distance  (mm)
+detectorWidth: detector_elements * pixel_width (mm)
+pixelSpacing: pixel size of reconstructed image (mm)</p>
+</dd></dl>
+
 </section>
 <section id="module-crip.preprocess">
 <span id="crip-preprocess-module"></span><h2>crip.preprocess module<a class="headerlink" href="#module-crip.preprocess" title="Permalink to this headline">¶</a></h2>
@@ -128,7 +170,7 @@ range (10 ~ 150 keV).</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="crip.preprocess.flatDarkFieldCorrectionStandalone">
 <span class="sig-prename descclassname"><span class="pre">crip.preprocess.</span></span><span class="sig-name descname"><span class="pre">flatDarkFieldCorrectionStandalone</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projection</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.preprocess.flatDarkFieldCorrectionStandalone" title="Permalink to this definition">¶</a></dt>
-<dd><p>Perform flat field and dark field correction without actual field image. Air is estimated using the brightest pixel.</p>
+<dd><p>Perform flat field and dark field correction without actual field image. Air is estimated using the brightest pixel by default.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -150,9 +192,17 @@ range (10 ~ 150 keV).</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="crip.preprocess.padProjection">
-<span class="sig-prename descclassname"><span class="pre">crip.preprocess.</span></span><span class="sig-name descname"><span class="pre">padProjection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'symmetric'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smootherDecay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.preprocess.padProjection" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extend the projection on four directions using symmetric <cite>padding</cite> (Up, Right, Down, Left) and descending cosine window decay. <cite>mode</cite> can be <cite>symmetric</cite> or <cite>edge</cite>.</p>
+<dt class="sig sig-object py" id="crip.preprocess.padImage">
+<span class="sig-prename descclassname"><span class="pre">crip.preprocess.</span></span><span class="sig-name descname"><span class="pre">padImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'symmetric'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smootherDecay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.preprocess.padImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extend the image on four directions using symmetric <cite>padding</cite> (Up, Right, Down, Left) and descending cosine window decay. <cite>mode</cite> can be <cite>symmetric</cite> or <cite>edge</cite>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="crip.preprocess.padSinogram">
+<span class="sig-prename descclassname"><span class="pre">crip.preprocess.</span></span><span class="sig-name descname"><span class="pre">padSinogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sgm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'symmetric'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smootherDecay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.preprocess.padSinogram" title="Permalink to this definition">¶</a></dt>
+<dd><p>‘Truncated Artifact Correction’ specialized function.
+Extend the projection on horizontal directions using symmetric <cite>padding</cite> (single, or (Right, Left))
+and descending cosine window decay. <cite>mode</cite> can be <cite>symmetric</cite> or <cite>edge</cite>.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -185,6 +235,12 @@ range (10 ~ 150 keV).</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="crip.shared.horizontalFlip">
+<span class="sig-prename descclassname"><span class="pre">crip.shared.</span></span><span class="sig-name descname"><span class="pre">horizontalFlip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.shared.horizontalFlip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Horizontal flip one image.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="crip.shared.resize">
 <span class="sig-prename descclassname"><span class="pre">crip.shared.</span></span><span class="sig-name descname"><span class="pre">resize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fH</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bicubic'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.shared.resize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Resize the projection to <cite>dsize</cite> (H, W) (if dsize is not None) or scale by ratio <cite>(fH, fW)</cite>
@@ -197,11 +253,34 @@ using <cite>interp</cite> (bicubic, linear, nearest available).</p>
 <dd><p>Rotate img by deg [DEG] (multiple of 90) clockwise.</p>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="crip.shared.stackImages">
+<span class="sig-prename descclassname"><span class="pre">crip.shared.</span></span><span class="sig-name descname"><span class="pre">stackImages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imgList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'keep'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.shared.stackImages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stack seperate image into one numpy array. I.e., views * (h, w) -&gt; (views, h, w).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="crip.shared.verticalFlip">
+<span class="sig-prename descclassname"><span class="pre">crip.shared.</span></span><span class="sig-name descname"><span class="pre">verticalFlip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.shared.verticalFlip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Vertical flip one image.</p>
+</dd></dl>
+
 </section>
 <section id="module-crip.utils">
 <span id="crip-utils-module"></span><h2>crip.utils module<a class="headerlink" href="#module-crip.utils" title="Permalink to this headline">¶</a></h2>
 <p>Utilities of crip.</p>
 <p>by z0gSh1u &#64; <a class="reference external" href="https://github.com/z0gSh1u/crip">https://github.com/z0gSh1u/crip</a></p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="crip.utils.CripException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">crip.utils.</span></span><span class="sig-name descname"><span class="pre">CripException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.utils.CripException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseException</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="crip.utils.cripAssert">
+<span class="sig-prename descclassname"><span class="pre">crip.utils.</span></span><span class="sig-name descname"><span class="pre">cripAssert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cond</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hint</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#crip.utils.cripAssert" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </section>
 <section id="module-crip">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-crip" title="Permalink to this headline">¶</a></h2>
