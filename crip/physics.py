@@ -123,47 +123,47 @@ class Atten:
         mu = np.insert(mu, 0, 0, axis=0)  # prepend energy = 0
         self.mu = mu
 
+    @staticmethod
+    def builtInAttenList():
+        '''
+            Get the built-in atten list file content.
 
-def getBuiltInAttenList():
-    '''
-        Get the built-in atten list file content.
+            Returns `{materialName: materialType}`
+        '''
+        _attenListPath = path.join(getChildFolder('_atten'), './_attenList.json')
+        _attenList = readFileText(_attenListPath)
 
-        Returns `{materialName: materialType}`
-    '''
-    _attenListPath = path.join(getChildFolder('_atten'), './_attenList.json')
-    _attenList = readFileText(_attenListPath)
+        return json.loads(_attenList)
 
-    return json.loads(_attenList)
+    @staticmethod
+    def builtInAttenText(materialName: str, dataSource='NIST'):
+        '''
+            Get the built-in atten file content of `materialName`.
 
+            Available data sources: `NIST`, `ICRP`. Call `getBuiltInAttenList` to get the material list.
+        '''
+        cripAssert(inArray(dataSource, ['NIST', 'ICRP']), f'Invalid dataSource: {dataSource}')
+        dataSourcePostfix = {'NIST': '', 'ICRP': '_ICRP'}[dataSource]
 
-def getBuiltInAttenText(materialName: str, dataSource='NIST'):
-    '''
-        Get the built-in atten file content of `materialName`.
+        _attenList = Atten.builtInAttenList()
+        _attenPath = getChildFolder('_atten')
+        _attenFile = '{}{}.txt'.format(materialName, dataSourcePostfix)
+        _attenFilePath = path.join(_attenPath, f'./{_attenList[materialName]}', f'./{_attenFile}')
+        cripAssert(path.exists(_attenFilePath), f'Atten file {_attenFile} does not exist.')
 
-        Available data sources: `NIST`, `ICRP`. Call `getBuiltInAttenList` to get the material list.
-    '''
-    cripAssert(inArray(dataSource, ['NIST', 'ICRP']), f'Invalid dataSource: {dataSource}')
-    dataSourcePostfix = {'NIST': '', 'ICRP': '_ICRP'}[dataSource]
+        content = readFileText(_attenFilePath)
+        return content
 
-    _attenList = getBuiltInAttenList()
-    _attenPath = getChildFolder('_atten')
-    _attenFile = '{}{}.txt'.format(materialName, dataSourcePostfix)
-    _attenFilePath = path.join(_attenPath, f'./{_attenList[materialName]}', f'./{_attenFile}')
-    cripAssert(path.exists(_attenFilePath), f'Atten file {_attenFile} does not exist.')
+    @staticmethod
+    def fromBuiltIn(materialName: str, rho: float, dataSource='NIST'):
+        '''
+            Get the built-in atten object.
 
-    content = readFileText(_attenFilePath)
-    return content
-
-
-def getBuiltInAtten(materialName: str, rho: float, dataSource='NIST'):
-    '''
-        Get the built-in atten object.
-
-        Available data sources: `NIST`, `ICRP`.       
-        
-        \\rho: g/cm^3.
-    '''
-    return Atten(getBuiltInAttenText(materialName, dataSource), rho, BuiltInAttenEnergyUnit)
+            Available data sources: `NIST`, `ICRP`.       
+            
+            \\rho: g/cm^3.
+        '''
+        return Atten(Atten.builtInAttenText(materialName, dataSource), rho, BuiltInAttenEnergyUnit)
 
 
 def calcMu(atten: Atten, spec: Spectrum, energyConversion: Or[str, float, int, Callable]) -> float:

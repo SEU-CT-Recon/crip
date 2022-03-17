@@ -4,6 +4,7 @@
     by z0gSh1u @ https://github.com/z0gSh1u/crip
 '''
 
+import os
 import logging
 import math
 import numpy as np
@@ -110,6 +111,10 @@ def isType(x, t):
     return type(x) == t or isinstance(x, t)
 
 
+def isNumber(a):
+    return isType(a, int) or isType(a, float)
+
+
 def isList(x):
     return isType(x, list)
 
@@ -129,9 +134,6 @@ def inRange(a, range_=None, low=None, high=None):
         low, high = range_
 
     return low <= a and a < high
-
-
-import os
 
 
 def getChildFolder(folder):
@@ -170,10 +172,6 @@ def cvtMuUnit(arr, from_, to):
     to = to.replace('-1', '')
 
     return cvtLengthUnit(arr, to, from_)
-
-
-def isNumber(a):
-    return isType(a, int) or isType(a, float)
 
 
 def readFileText(path_):

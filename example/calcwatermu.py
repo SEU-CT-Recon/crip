@@ -7,7 +7,7 @@
 import sys
 sys.path.insert(0, '../')
 
-from crip.physics import calcMu, getBuiltInAtten, Spectrum
+from crip.physics import calcMu, Atten, Spectrum
 
 # A sample spectrum file.
 SpectrumFile = '''
@@ -26,6 +26,6 @@ Energy (eV)    Omega
 '''.strip()
 
 spec = Spectrum(SpectrumFile, 'eV')
-atten = getBuiltInAtten('Water', 1.0)
+atten = Atten.fromBuiltIn('Water', 1.0)
 mu = calcMu(atten, spec, lambda x: 1)
 print(f'\\mu = {mu} mm-1.')

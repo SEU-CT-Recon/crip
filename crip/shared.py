@@ -43,7 +43,8 @@ def resize(projection, dsize=None, fH=None, fW=None, interp='bicubic'):
 
 def gaussianSmooth(projection, sigma, ksize=None):
     """
-        Perform Gaussian smooth with kernel size = ksize and Gaussian \sigma = sigma (int or tuple (x, y)). \\
+        Perform Gaussian smooth with kernel size = ksize and Gaussian \sigma = sigma (int or tuple (x, y)).
+        
         Leave `ksize = None` to auto determine to include the majority of Gaussian energy.
     """
     if isinstance(sigma, int):
