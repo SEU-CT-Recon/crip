@@ -4,7 +4,7 @@
     https://github.com/z0gSh1u/crip
 '''
 
-__all__ = ['Spectrum', 'Atten', 'getBuiltInAttenList', 'getBuiltInAttenText', 'getBuiltInAtten', 'calcMu']
+__all__ = ['Spectrum', 'Atten', 'calcMu']
 
 import json
 import re
