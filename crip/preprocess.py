@@ -32,6 +32,7 @@ def flatDarkFieldCorrection(projections: Or[Proj, ProjList, ProjStack],
                             dark: Or[Proj, float] = 0):
     '''
         Perform flat field (air) and dark field correction to get post-log value.
+
         I.e., `- log [(X - D) / (C * F - D)]`. Multi projections accepted.
     '''
     sampleProjection = projections if is2D(projections) else projections[0]
@@ -50,7 +51,8 @@ def flatDarkFieldCorrection(projections: Or[Proj, ProjList, ProjStack],
 
 def flatDarkFieldCorrectionStandalone(projection: Proj):
     '''
-        Perform flat field and dark field correction without actual field image. \\
+        Perform flat field and dark field correction without actual field image.
+
         Air is estimated using the brightest pixel by default.
     '''
     # We support 2D only in standalone version, since `flat` for each projection might differ.
@@ -101,7 +103,8 @@ def injectPoissonNoise(projections: Or[Proj, ProjList, ProjStack]):
 
 def limitedAngle(projections, srcDeg, dstDeg, startDeg=0):
     '''
-        Sample limited angle projections from `startDeg` to `startDeg + dstDeg`. \\
+        Sample limited angle projections from `startDeg` to `startDeg + dstDeg`.
+        
         The original total angle is `srcDeg`.
     '''
     assert startDeg + dstDeg <= srcDeg

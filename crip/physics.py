@@ -35,14 +35,15 @@ class Spectrum:
             omega = spec.spectrum[E]
         ```
     '''
-    def __init__(self, specText: str, unit='keV'):
+    def __init__(self, specText: Or[str, None], unit='keV'):
         self.specText = specText
 
         cripAssert(inArray(unit, ['MeV', 'keV', 'eV']), f'Invalid unit: {unit}')
         self.unit = unit
 
         self.spectrum = np.zeros(DiagEnergyLen, dtype=DefaultFloatDType)
-        self._read()
+        if specText is not None:
+            self._read()
 
         self.sumOmega = np.sum(self.spectrum)
 
@@ -70,6 +71,16 @@ class Spectrum:
         cripAssert(inRange(cutOffEnergy, DiagEnergyRange), '`cutOffEnergy` is out of `DiagEnergyRange`.')
 
         self.spectrum[startEnergy:cutOffEnergy + 1] = specOmega[:]
+
+    @staticmethod
+    def fromOmegaArray(omega: np.ndarray, unit='keV'):
+        cripAssert(len(omega) == DiagEnergyLen, 'omega array should have same length as DiagEnergyLen.')
+
+        spec = Spectrum(None, unit)
+        spec.spectrum = omega
+        spec.sumOmega = np.sum(spec.spectrum)
+
+        return spec
 
 
 class Atten:
@@ -171,7 +182,7 @@ def calcMu(atten: Atten, spec: Spectrum, energyConversion: Or[str, float, int, C
         Calculate the \mu value (mm-1) of certain atten under a specific spectrum.
 
         `energyConversion` determines the energy conversion efficiency of the detector.
-            - 'PCD' (Photon Counting), 'EID' (Energy Integrating)
+            - "PCD" (Photon Counting), "EID" (Energy Integrating)
             - a constant value
             - a callback function (callable) that takes energy in keV and returns the factor
     '''
@@ -187,5 +198,8 @@ def calcMu(atten: Atten, spec: Spectrum, energyConversion: Or[str, float, int, C
 
     elif isType(energyConversion, Callable):
         eff = np.array(list(map(energyConversion, list(DiagEnergyRange)))).squeeze()
+
+    else:
+        cripAssert(False, 'Invalid `energyConversion`.')
 
     return np.sum(spec.spectrum * eff * mus) / np.sum(spec.spectrum * eff)

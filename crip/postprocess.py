@@ -11,10 +11,10 @@ from .utils import *
 
 
 def drawCircle(rec_img, r, center=None):
-    """
+    '''
         'Truncated Artifact Correction' specialized function.
         Draw circle before crop
-    """
+    '''
     theta = np.arange(0, 2 * np.pi, 0.01)
     if center is None:
         center = (rec_img.shape[0] // 2, rec_img.shape[1] // 2)
@@ -26,7 +26,7 @@ def drawCircle(rec_img, r, center=None):
 
 
 def fovCropRadiusReference(SOD: float, SDD: float, detectorWidth: float, reconPixelSize: float):
-    """
+    '''
         'Truncated Artifact Correction' specialized function.
         Reconstruction FOV section is independent of detector length
 
@@ -34,7 +34,7 @@ def fovCropRadiusReference(SOD: float, SDD: float, detectorWidth: float, reconPi
         SDD: Source detector distance  (mm)
         detectorWidth: detector_elements * pixel_width (mm)
         reconPixelSize: pixel size of reconstructed image (mm)
-    """
+    '''
     # theta: scan angle width / 2
     # view bed plate as arc: arc = theta * r
     half_dw = detectorWidth / 2
@@ -112,7 +112,10 @@ def postlogToProj():
     pass
 
 
-def transpose(vol, order):
+def transpose(vol: np.ndarray, order: tuple):
+    '''
+        Transpose
+    '''
     return vol.transpose(order)
 
 

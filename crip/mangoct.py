@@ -11,6 +11,8 @@ import sys
 
 from crip.utils import cripAssert
 
+# TODO Use subprocess instead of os.system
+
 
 class Mgfbp:
     def __init__(self, exe, cudaDevice=0) -> None:
