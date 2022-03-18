@@ -1,5 +1,3 @@
-# import _importcrip
-
 import unittest
 import unittest.mock as mock
 
@@ -32,12 +30,8 @@ class test_listDirectory(unittest.TestCase):
         with mock.patch('os.listdir') as mockOsListdir:
             mockOsListdir.return_value = ['10.png', '1.png', '2.png']
 
-            list1 = listDirectory('somewhere', sort='nat')
+            list1 = listDirectory('somewhere', sort='nat', style='filename')
             self.assertTupleEqual(tuple(list1), ('1.png', '2.png', '10.png'))
-            
-            list2 = listDirectory('somewhere', sort='dict')
+
+            list2 = listDirectory('somewhere', sort='dict', style='filename')
             self.assertTupleEqual(tuple(list2), ('1.png', '10.png', '2.png'))
-
-
-if __name__ == '__main__':
-    unittest.main()

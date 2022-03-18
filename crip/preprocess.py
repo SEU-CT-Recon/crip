@@ -4,21 +4,28 @@
     https://github.com/z0gSh1u/crip
 '''
 
+__all__ = [
+    'averageProjections', 'flatDarkFieldCorrection', 'flatDarkFieldCorrectionStandalone', 'projectionsToSinograms',
+    'sinogramsToProjections', 'padImage', 'padSinogram', 'correctBeamHardeningPolynomial', 'injectGaussianNoise',
+    'injectPoissonNoise'
+]
+
 import numpy as np
 from .shared import *
-from .typing import *
+from ._typing import *
 from .utils import *
+from .lowdose import injectGaussianNoise, injectPoissonNoise
 
 
 @ConvertListNDArray
-def averageProjections(projections: Or[ProjList, ProjStack]):
+def averageProjections(projections: TwoOrThreeD) -> TwoD:
     '''
         Average projections. For example, to calculate the flat field.
         Projections can be either `(views, H, W)` shaped numpy array, or
         `views * (H, W)` Python List.
     '''
     cripAssert(is3D(projections), '`projections` should be 3D array.')
-    projections = ensureFloatArray(projections)
+    projections = asFloat(projections)
 
     res = projections.sum(axis=0) / projections.shape[0]
 
@@ -26,10 +33,10 @@ def averageProjections(projections: Or[ProjList, ProjStack]):
 
 
 @ConvertListNDArray
-def flatDarkFieldCorrection(projections: Or[Proj, ProjList, ProjStack],
-                            flat: Or[Proj, float],
+def flatDarkFieldCorrection(projections: TwoOrThreeD,
+                            flat: Or[TwoD, float],
                             coeff: float = 1,
-                            dark: Or[Proj, float] = 0):
+                            dark: Or[TwoD, float] = 0) -> TwoOrThreeD:
     '''
         Perform flat field (air) and dark field correction to get post-log value.
 
@@ -37,10 +44,10 @@ def flatDarkFieldCorrection(projections: Or[Proj, ProjList, ProjStack],
     '''
     sampleProjection = projections if is2D(projections) else projections[0]
 
-    if isType(flat, Proj):
-        cripAssert(haveSameShape(sampleProjection, flat), "`projection` and `flat` should have same shape.")
-    if isType(dark, Proj):
-        cripAssert(haveSameShape(sampleProjection, dark), "`projection` and `dark` should have same shape.")
+    if isType(flat, TwoD):
+        cripAssert(isOfSameShape(sampleProjection, flat), "`projection` and `flat` should have same shape.")
+    if isType(dark, TwoD):
+        cripAssert(isOfSameShape(sampleProjection, dark), "`projection` and `dark` should have same shape.")
 
     res = -np.log((projections - dark) / (coeff * flat - dark))
     res[res == np.inf] = 0
@@ -49,7 +56,7 @@ def flatDarkFieldCorrection(projections: Or[Proj, ProjList, ProjStack],
     return res
 
 
-def flatDarkFieldCorrectionStandalone(projection: Proj):
+def flatDarkFieldCorrectionStandalone(projection: TwoD) -> TwoD:
     '''
         Perform flat field and dark field correction without actual field image.
 
@@ -62,75 +69,14 @@ def flatDarkFieldCorrectionStandalone(projection: Proj):
 
 
 @ConvertListNDArray
-def injectGaussianNoise(projections: Or[Proj, ProjList, ProjStack], sigma: float, mu: float = 0):
-    '''
-        Inject Gaussian noise which obeys distribution `N(\mu, \sigma^2)`.
-    '''
-    cripAssert(is2or3D(projections), '`projections` should be 2D or 3D.')
-
-    def injectOne(img):
-        noise = np.random.randn(*img.shape) * sigma + mu
-        return img + noise
-
-    if is3D(projections):
-        res = np.zeros_like(projections)
-        for c in projections.shape[0]:
-            res[c, ...] = injectOne(projections[c, ...])
-    else:
-        res = injectOne(projections)
-
-    return res
-
-
-def injectPoissonNoise(projections: Or[Proj, ProjList, ProjStack]):
-    '''
-        Inject Poisson noise which obeys distribution `P(\lamda)`.
-    '''
-    cripAssert(is2or3D(projections), '`projections` should be 2D or 3D.')
-
-    def injectOne(img):
-        return np.random.poisson(img)
-
-    if is3D(projections):
-        res = np.zeros_like(projections)
-        for c in projections.shape[0]:
-            res[c, ...] = injectOne(projections[c, ...])
-    else:
-        res = injectOne(projections)
-
-    return res
-
-
-def limitedAngle(projections, srcDeg, dstDeg, startDeg=0):
-    '''
-        Sample limited angle projections from `startDeg` to `startDeg + dstDeg`.
-        
-        The original total angle is `srcDeg`.
-    '''
-    assert startDeg + dstDeg <= srcDeg
-    nProjPerDeg = float(projections.shape[0]) / srcDeg
-    startLoc = int(startDeg * nProjPerDeg)
-    dstLen = int(dstDeg * nProjPerDeg)
-
-    return np.array(projections[startLoc:startLoc + dstLen, :, :])
-
-
-def limitedView(projections, ratio):
-    '''
-        Sample projections uniformly with `::ratio` to get sparse views projections. \\
-        The second returning is the number of remaining projections.
-    '''
-    dstLen = projections.shape[0] / ratio
-    assert dstLen == int(dstLen), "Cannot achieve uniform sampling."
-
-    return np.array(projections[::ratio, :, :]), projections.shape[0] % ratio - 1
-
-
-@ConvertListNDArray
-def projectionsToSinograms(projections: Or[ProjList, ProjStack]):
+def projectionsToSinograms(projections: ThreeD):
     '''
         Permute projections to sinograms by axes swapping `(views, h, w) -> (h, views, w)`.
+
+        Note that the width direction is along detector channels of one line.
     '''
+    cripAssert(is3D(projections), 'projections should be 3D.')
+
     (views, h, w) = projections.shape
     sinograms = np.zeros((h, views, w), dtype=projections.dtype)
     for i in range(views):
@@ -140,10 +86,14 @@ def projectionsToSinograms(projections: Or[ProjList, ProjStack]):
 
 
 @ConvertListNDArray
-def sinogramsToProjections(sinograms: Or[ProjList, ProjStack]):
+def sinogramsToProjections(sinograms: ThreeD):
     '''
         Permute sinograms back to projections by axes swapping `(h, views, w) -> (views, h, w)`.
+
+        Note that the width direction is along detector channels of one line.
     '''
+    cripAssert(is3D(sinograms), 'projections should be 3D.')
+
     (h, views, w) = sinograms.shape
     projections = np.zeros((views, h, w), dtype=sinograms.dtype)
     for i in range(views):
@@ -152,60 +102,78 @@ def sinogramsToProjections(sinograms: Or[ProjList, ProjStack]):
     return projections
 
 
-def padImage(proj, padding, mode='symmetric', smootherDecay=False):
+@ConvertListNDArray
+def padImage(img: TwoOrThreeD,
+             padding: Tuple[int, int, int, int],
+             mode: str = 'symmetric',
+             decay: Or[str, None] = None):
     '''
-        Pad the image on four directions using symmetric `padding` (Up, Right, Down, Left) \\
-        and descending cosine window decay. `mode` can be `symmetric` or `edge`.
+        Pad the image on four directions using symmetric `padding` (Up, Right, Down, Left). \\
+        `mode` determines the border value, can be `symmetric`, `edge`, `constant` (zero), `reflect`. \\
+        `decay` can be None, `cosine`, `smoothCosine` to perform a decay on padded border.
     '''
-    h, w = proj.shape
+    cripAssert(mode in ['symmetric', 'edge', 'constant', 'reflect'], f'Invalid mode: {mode}.')
+    cripAssert(decay in [None, 'cosine', 'smoothCosine'], f'Invalid decay: {decay}.')
+
+    decays = {
+        'cosine':
+        lambda ascend, dot: np.cos(np.linspace(-np.pi / 2, 0, dot) if ascend else np.linspace(0, np.pi / 2, dot)),
+        'smoothCosine':
+        lambda ascend, dot: 0.5 * np.cos(np.linspace(-np.pi, 0, dot)) + 0.5
+        if ascend else 0.5 * np.cos(np.linspace(0, np.pi, dot)) + 0.5
+    }
+
+    h, w = getHW(img)
     nPadU, nPadR, nPadD, nPadL = padding
     padH = h + nPadU + nPadD
     padW = w + nPadL + nPadR
-    xPad = np.pad(proj, ((nPadU, nPadD), (nPadL, nPadR)), mode=mode)
 
-    CommonCosineDecay = lambda ascend, dot: np.cos(
-        np.linspace(-np.pi / 2, 0, dot) if ascend else np.linspace(0, np.pi / 2, dot))
-    SmootherCosineDecay = lambda ascend, dot: 0.5 * np.cos(np.linspace(
-        -np.pi, 0, dot)) + 0.5 if ascend else 0.5 * np.cos(np.linspace(0, np.pi, dot)) + 0.5
-
-    decay = SmootherCosineDecay if smootherDecay else CommonCosineDecay
-
-    def decayLR(xPad, w, nPadL, nPadR):
+    def decayLR(xPad, w, nPadL, nPadR, decay):
         xPad[:, 0:nPadL] *= decay(True, nPadL)[:]
         xPad[:, w - nPadR:w] *= decay(False, nPadR)[:]
         return xPad
 
-    xPad = decayLR(xPad, padW, nPadL, nPadR)
-    xPad = decayLR(xPad.T, padH, nPadU, nPadD)
-    xPad = xPad.T
+    def procOne(img):
+        xPad = np.pad(img, ((nPadU, nPadD), (nPadL, nPadR)), mode=mode)
+        if decay is not None:
+            xPad = decayLR(xPad, padW, nPadL, nPadR, decays[decay])
+            xPad = decayLR(xPad.T, padH, nPadU, nPadD, decays[decay])
+            xPad = xPad.T
+        return xPad
 
-    return xPad
-
-
-def padSinogram(sgm, padding, mode='symmetric', smootherDecay=False):
-    '''
-        'Truncated Artifact Correction' specialized function.
-        Extend the projection on horizontal directions using symmetric `padding` (single, or (Right, Left))
-        and descending cosine window decay. `mode` can be `symmetric` or `edge`.
-    '''
-    if type(padding) == int:
-        padding = (padding, padding)
-    l, r = padding
-
-    return padImage(sgm, (0, r, 0, l), mode, smootherDecay)
-
-
-def correctBeamHardeningPolynomial(postlog, coeffs, bias=True):
-    pass
+    if is3D(img):
+        res = [procOne(img[i, ...]) for i in range(img.shape[0])]
+        return np.array(res)
+    else:
+        return procOne(img)
 
 
 @ConvertListNDArray
-def binning(projection: Or[Proj, ProjList, ProjStack], binning=(1, 1), mode='skip'):
+def padSinogram(sgms: TwoOrThreeD, padding: Or[int, Tuple[int, int]], mode='symmetric', decay='smoothCosine'):
     '''
-        Perform binning on row and col directions. `binning=(row, col)`.
-    '''
-    # TODO
-    # skip, average, min, max, median, sum
-    res = np.array(projection[..., ::binning[0], ::binning[1]])
-    return res
+        Pad sinograms in width direction (same line detector elements) using `mode` and `decay`\\
+        with `padding` (single int, or (right, left)).
 
+        @see padImage for parameter details.
+    '''
+    if isType(padding, int):
+        padding = (padding, padding)
+
+    l, r = padding
+
+    return padImage(sgms, (0, r, 0, l), mode, decay)
+
+
+@ConvertListNDArray
+def correctBeamHardeningPolynomial(postlog: TwoOrThreeD, coeffs: Or[Tuple, np.poly1d], bias=True):
+    '''
+        Apply the polynomial (\\mu L vs. PostLog fit) on postlog to perform basic beam hardening correction.
+        `coeffs` can be either `tuple` or `np.poly1d`. Set `bias=True` if your coeffs includes the bias (order 0) term.
+    '''
+    cripWarning(isType(coeffs, np.poly1d) and bias is False, 'When using np.poly1d as coeffs, bias is always True.')
+
+    if isType(coeffs, Tuple):
+        if bias is False:
+            coeffs = np.poly1d([*coeffs, 0])
+
+    return coeffs(postlog)

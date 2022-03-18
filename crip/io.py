@@ -13,25 +13,34 @@ import pydicom
 import natsort
 
 from .utils import *
+from ._typing import *
 
 
-def listDirectory(folder: str, sort='nat', joinFolder=False, reverse=False):
+def listDirectory(folder: str, sort='nat', style='filename', natAlg='default', reverse=False):
     '''
-        List files under `folder` and `sort` using `"nat"` (natural) or \\
-        `"dict"` (dictionary) order. Set `joinFolder` to True to get paths, \\
-        otherwise filenames only.
+        List files under `folder` and sort using `"nat"` (natural) or \\
+        `"dict"` (dictionary) order. The return `style` can be `filename`, `fullpath` or `both`.
     '''
-    cripAssert(inArray(sort, ['nat', 'dict']), 'Invalid `sort` method.')
+    cripAssert(sort in ['nat', 'dict'], 'Invalid sort.')
+    cripAssert(style in ['filename', 'fullpath', 'both'], 'Invalid style.')
+    cripAssert(natAlg in ['default', 'locale'], 'Invalid natAlg.')
 
     files = os.listdir(folder)
-    files = sorted(files, reverse=reverse) if sort == 'dict' else natsort.natsorted(files, reverse=reverse)
-    if joinFolder:
-        files = [os.path.join(folder, file) for file in files]
+    files = sorted(files, reverse=reverse) if sort == 'dict' else natsort.natsorted(
+        files, reverse=reverse, alg={
+            'default': natsort.ns.DEFAULT,
+            'locale': natsort.ns.LOCALE
+        }[natAlg])
 
-    return files
+    if style == 'filename':
+        return files
+    elif style == 'fullpath':
+        return [os.path.join(folder, file) for file in files]
+    elif style == 'both':
+        return zip([os.path.join(folder, file) for file in files], files)
 
 
-def imreadDicom(path: str, dtype=None):
+def imreadDicom(path: str, dtype=None) -> np.ndarray:
     '''
         Read DICOM file. Return numpy array.
 
@@ -45,18 +54,19 @@ def imreadDicom(path: str, dtype=None):
         return np.array(dcm.pixel_array)
 
 
-def imreadRaw(path: str, h: int, w: int, dtype=DefaultFloatDType, nSlice: int = 1, offset: int = 0):
+def imreadRaw(path: str, h: int, w: int, dtype=DefaultFloatDType, nSlice: int = 1, offset: int = 0) -> np.ndarray:
     '''
         Read binary raw file. Return numpy array with shape `(nSlice, h, w)`. `offset` in bytes.
     '''
     with open(path, 'rb') as fp:
         fp.seek(offset)
         arr = np.frombuffer(fp.read(), dtype=dtype).reshape((nSlice, h, w)).squeeze()
+
     return arr
 
 
 @ConvertListNDArray
-def imwriteRaw(img: np.ndarray, path: str, dtype=None):
+def imwriteRaw(img: TwoOrThreeD, path: str, dtype=None):
     '''
         Write raw file. Convert dtype with `dtype != None`.
     '''
@@ -78,7 +88,7 @@ def imreadTiff(path: str, dtype=None):
 
 
 @ConvertListNDArray
-def imwriteTiff(img: Or[np.ndarray, ListNDArray], path: str, dtype=None):
+def imwriteTiff(img: TwoOrThreeD, path: str, dtype=None):
     '''
         Write TIFF file. Convert dtype with `dtype != None`.
         
@@ -86,8 +96,7 @@ def imwriteTiff(img: Or[np.ndarray, ListNDArray], path: str, dtype=None):
     '''
     if dtype is not None:
         img = img.astype(dtype)
-
     if isFloatDtype(img.dtype):
-        img = img.astype(np.float32)
+        img = img.astype(np.float32)  # always use float32 for floating image.
 
     tifffile.imwrite(path, img)

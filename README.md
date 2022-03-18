@@ -1,20 +1,22 @@
-![crip](crip.png)
+<p align="center">
+  <img src="crip.png" />
+</p>
 
-A tool for Cone-Beam CT Data IO, Pre/Post-process and Physics.
+A all-in-one tool for Cone-Beam CT Data IO, Pre/Post-process, and Physics, Dual Energy, Low Dose, Deep Learning researches and everything only except Reconstruction.
 
-## Quick Start
+## Install
 
-- Download the latest release from [Releases](https://github.com/z0gSh1u/crip/releases).
+- Via PyPI
 
-- Install the wheel by
+  In the future.
+
+- Via Wheel
+
+  Download the latest release from [Releases](https://github.com/z0gSh1u/crip/releases). Install the wheel by
 
   ```sh
   pip install /path/to/latest/release.whl
   ```
-
-  Dependencies includes `numpy`, `opencv-python`, `pydicom` and `tifffile`.
-
-- Import what you need to start coding.
 
 ## Modules
 
@@ -33,21 +35,6 @@ See [example](./example) here.
 ## Roadmap
 
 crip is still under development. More features will be added in the future.
-
-- [ ] Get attenuation coefficient.
-- [ ] Enhance Read Spectrum.
-- [ ] Dual-Energy Decompose (Projection-domain, Image-domain).
-- [ ] Polynomial Beam Hardening correction. (Up to 2 masses, with fitter).
-- [ ] Enhance Binning with different mode.
-- [ ] HU and mu value two-way converter.
-- [ ] Consider ita(E) (Energy Conversion Efficiency) in integral. (PCD, EID)
-- [ ] Integrate reconstruction and forward projection tools. (mangoct, CRI)
-- [ ] Poisson noise injection.
-- [ ] Unit tests.
-- [ ] Examples.
-- [ ] Docs.
-- [ ] Logo.
-- [ ] Typings.
 
 ## Opensource License
 

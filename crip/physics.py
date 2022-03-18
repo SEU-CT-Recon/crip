@@ -4,7 +4,9 @@
     https://github.com/z0gSh1u/crip
 '''
 
-__all__ = ['Spectrum', 'Atten', 'calcMu']
+__all__ = [
+    'Spectrum', 'Atten', 'calcMu', 'RhoWater', 'DiagEnergyLow', 'DiagEnergyHigh', 'DiagEnergyRange', 'DiagEnergyLen'
+]
 
 import json
 import re
@@ -12,7 +14,7 @@ import numpy as np
 from os import path
 from typing import Callable
 
-from .typing import BuiltInAttenEnergyUnit, DefaultEnergyUnit, DefaultFloatDType, DefaultMuUnit, Or
+from ._typing import BuiltInAttenEnergyUnit, DefaultEnergyUnit, DefaultFloatDType, DefaultMuUnit, Or, Dict
 from .utils import cvtEnergyUnit, cvtMuUnit, inArray, cripAssert, getChildFolder, inRange, isNumber, isType, readFileText
 
 ## Constants ##
@@ -26,61 +28,60 @@ DiagEnergyLen = DiagEnergyHigh - DiagEnergyLow + 1
 
 class Spectrum:
     '''
-        Parse spectrum text as `Spectrum` class object.
-        
-        Refer to the document for spectrum text format. @see https://github.com/z0gSh1u/crip
+        Construct Spectrum object with omega array of every energy.
 
-        Get \omega of certain energy (keV):
+        Get \\omega of certain energy (keV):
         ```py
-            omega = spec.spectrum[E]
+            omega = spec.omega[E]
         ```
     '''
-    def __init__(self, specText: Or[str, None], unit='keV'):
-        self.specText = specText
-
+    def __init__(self, omega: np.ndarray, unit='keV'):
+        cripAssert(len(omega) == DiagEnergyLen, 'omega array should have same length as DiagEnergyLen.')
         cripAssert(inArray(unit, ['MeV', 'keV', 'eV']), f'Invalid unit: {unit}')
+
         self.unit = unit
+        self.omega = np.array(omega)
+        self.update()
 
-        self.spectrum = np.zeros(DiagEnergyLen, dtype=DefaultFloatDType)
-        if specText is not None:
-            self._read()
+    def update(self):
+        self.sumOmega = np.sum(self.omega)
 
-        self.sumOmega = np.sum(self.spectrum)
+    @staticmethod
+    def fromText(specText: str, unit='keV'):
+        '''
+            Parse spectrum text as `Spectrum` class object.
+            
+            Refer to the document for spectrum text format. @see https://github.com/z0gSh1u/crip            
+        '''
+        cripAssert(inArray(unit, ['MeV', 'keV', 'eV']), f'Invalid unit: {unit}')
 
-    def _read(self):
+        omega = np.zeros(DiagEnergyLen, dtype=DefaultFloatDType)
+
         # split content into list, and ignore all lines starting with non-digit
         content = list(
             filter(lambda y: len(y) > 0 and str.isdigit(y[0]),
                    list(map(lambda x: x.strip(),
-                            self.specText.replace('\r\n', '\n').split('\n')))))
+                            specText.replace('\r\n', '\n').split('\n')))))
 
-        def procSpectrumLine(line: str):
+        def procSpecLine(line: str):
             tup = tuple(map(float, re.split(r'\s+', line)))
             cripAssert(len(tup) == 2, f'Invalid line in spectrum: \n{line}\n')
             return tup  # (energy, omega)
 
         # parse the spectrum text
-        content = np.array(list(map(procSpectrumLine, content)), dtype=DefaultFloatDType)
+        content = np.array(list(map(procSpecLine, content)), dtype=DefaultFloatDType)
         specEnergy, specOmega = content.T
 
         # to keV
-        specEnergy = cvtEnergyUnit(specEnergy, self.unit, DefaultEnergyUnit)
+        specEnergy = cvtEnergyUnit(specEnergy, unit, DefaultEnergyUnit)
 
         startEnergy, cutOffEnergy = int(specEnergy[0]), int(specEnergy[-1])
         cripAssert(inRange(startEnergy, DiagEnergyRange), '`startEnergy` is out of `DiagEnergyRange`.')
         cripAssert(inRange(cutOffEnergy, DiagEnergyRange), '`cutOffEnergy` is out of `DiagEnergyRange`.')
 
-        self.spectrum[startEnergy:cutOffEnergy + 1] = specOmega[:]
+        omega[startEnergy:cutOffEnergy + 1] = specOmega[:]
 
-    @staticmethod
-    def fromOmegaArray(omega: np.ndarray, unit='keV'):
-        cripAssert(len(omega) == DiagEnergyLen, 'omega array should have same length as DiagEnergyLen.')
-
-        spec = Spectrum(None, unit)
-        spec.spectrum = omega
-        spec.sumOmega = np.sum(spec.spectrum)
-
-        return spec
+        return Spectrum(omega, unit)
 
 
 class Atten:
@@ -91,7 +92,7 @@ class Atten:
 
         \\rho: g/cm^3.
 
-        Get \mu of certain energy (keV):
+        Get \\mu of certain energy (keV):
         ```py
             mu = atten.mu[E]
         ```
@@ -100,8 +101,8 @@ class Atten:
         cripAssert(rho > 0, '`rho` should > 0.')
 
         self.attenText = attenText
-        self.rho = rho
         self.energyUnit = energyUnit
+        self.rho = rho
 
         self.mu = np.zeros(DiagEnergyLen, dtype=DefaultFloatDType)
         self._read()
@@ -135,7 +136,7 @@ class Atten:
         self.mu = mu
 
     @staticmethod
-    def builtInAttenList():
+    def builtInAttenList() -> Dict:
         '''
             Get the built-in atten list file content.
 
@@ -192,14 +193,11 @@ def calcMu(atten: Atten, spec: Spectrum, energyConversion: Or[str, float, int, C
     if isType(energyConversion, str):
         cripAssert(inArray(energyConversion, ['PCD', 'EID']), f'Invalid `energyConversion`: {energyConversion}')
         eff = {'PCD': 1, 'EID': np.array(DiagEnergyRange)}[energyConversion]
-
     elif isNumber(energyConversion):
         eff = energyConversion
-
     elif isType(energyConversion, Callable):
         eff = np.array(list(map(energyConversion, list(DiagEnergyRange)))).squeeze()
-
     else:
         cripAssert(False, 'Invalid `energyConversion`.')
 
-    return np.sum(spec.spectrum * eff * mus) / np.sum(spec.spectrum * eff)
+    return np.sum(spec.omega * eff * mus) / np.sum(spec.omega * eff)

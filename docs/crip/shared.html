@@ -1,0 +1,581 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>crip.shared API documentation</title>
+<meta name="description" content="Shared module of crip …" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>crip.shared</code></h1>
+</header>
+<section id="section-intro">
+<p>Shared module of crip.</p>
+<p><a href="https://github.com/z0gSh1u/crip">https://github.com/z0gSh1u/crip</a></p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#39;&#39;&#39;
+    Shared module of crip.
+
+    https://github.com/z0gSh1u/crip
+&#39;&#39;&#39;
+
+__all__ = [
+    &#39;rotate&#39;, &#39;verticalFlip&#39;, &#39;horizontalFlip&#39;, &#39;stackFlip&#39;, &#39;resize&#39;, &#39;gaussianSmooth&#39;, &#39;stackImages&#39;, &#39;splitImages&#39;,
+    &#39;binning&#39;, &#39;transpose&#39;, &#39;permute&#39;
+]
+
+import numpy as np
+import cv2
+
+from .utils import ConvertListNDArray, cripAssert, inArray, is2D, is2or3D, is3D, isInt, isType
+from ._typing import *
+
+
+@ConvertListNDArray
+def rotate(img: TwoOrThreeD, deg: int) -&gt; TwoOrThreeD:
+    &#39;&#39;&#39;
+        Rotate the image or each image in a volume by deg [DEG] (multiple of 90) clockwise.
+    &#39;&#39;&#39;
+    deg = int(deg % 360)
+    cripAssert(deg % 90 == 0, &#39;deg should be multiple of 90.&#39;)
+
+    k = deg // 90
+    axes = (1, 2) if is3D(img) else (0, 1)
+
+    return np.rot90(img, -k, axes)
+
+
+def verticalFlip(img: TwoOrThreeD, copy=False) -&gt; TwoOrThreeD:
+    &#39;&#39;&#39;
+        Vertical flip one image, or each image in a volume.
+
+        Set `copy = True` to get a copy of array, otherwise a view only.
+    &#39;&#39;&#39;
+    cripAssert(is2or3D(img), &#39;img should be 2D or 3D.&#39;)
+
+    if copy:
+        return np.array(img[..., ::-1, :], copy=True)
+    else:
+        return img[..., ::-1, :]
+
+
+def horizontalFlip(img: TwoOrThreeD, copy=False) -&gt; TwoOrThreeD:
+    &#39;&#39;&#39;
+        Horizontal flip one image, or each image in a volume.
+        
+        Set `copy = True` to get a copy of array, otherwise a view only.
+    &#39;&#39;&#39;
+    cripAssert(is2or3D(img), &#39;img should be 2D or 3D.&#39;)
+
+    if copy:
+        return np.array(img[..., ::-1], copy=True)
+    else:
+        return img[..., ::-1]
+
+
+def stackFlip(img: ThreeD, copy=False) -&gt; ThreeD:
+    &#39;&#39;&#39;
+        Flip a stack w.r.t. z-axis, i.e., reverse slices.
+
+        Set `copy = True` to get a copy of array, otherwise a view only.
+    &#39;&#39;&#39;
+    cripAssert(is3D(img), &#39;img should be 3D.&#39;)
+
+    if copy:
+        return np.array(np.flip(img, axis=0), copy=True)
+    else:
+        return np.flip(img, axis=0)
+
+
+def resize(img: TwoOrThreeD,
+           dsize: Tuple[int] = None,
+           scale: Tuple[Or[float, int]] = None,
+           interp: str = &#39;bicubic&#39;) -&gt; TwoOrThreeD:
+    &#39;&#39;&#39;
+        Resize the image or each image in a volume to `dsize = (H, W)` (if dsize is not None) or scale 
+        by `scale = (facH, facW)` using `interp` (bicubic, linear, nearest available).
+    &#39;&#39;&#39;
+    cripAssert(inArray(interp, [&#39;bicubic&#39;, &#39;linear&#39;, &#39;nearest&#39;]), &#39;Invalid interp method.&#39;)
+
+    if dsize is None:
+        cripAssert(scale is not None, &#39;dsize and scale cannot be None at the same time.&#39;)
+        cripAssert(len(scale) == 2, &#39;scale should have length 2.&#39;)
+        fH, fW = scale
+    else:
+        cripAssert(scale is None, &#39;scale should not be set when dsize is set.&#39;)
+        # OpenCV dsize is in (W, H) form, so we reverse it.
+        dsize = dsize[::-1]
+
+    interp_ = {&#39;bicubic&#39;: cv2.INTER_CUBIC, &#39;linear&#39;: cv2.INTER_LINEAR, &#39;nearest&#39;: cv2.INTER_NEAREST}
+
+    if is3D(img):
+        c, _, _ = img.shape
+        res = [cv2.resize(img[i, ...], dsize, None, fW, fH, interpolation=interp_[interp]) for i in range(c)]
+        return np.array(res)
+    else:
+        return cv2.resize(img, dsize, None, fW, fH, interpolation=interp_[interp])
+
+
+def gaussianSmooth(img: TwoOrThreeD, sigma: Or[float, int, Tuple[Or[float, int]]], ksize: int = None):
+    &#39;&#39;&#39;
+        Perform Gaussian smooth with kernel size = ksize and Gaussian \sigma = sigma (int or tuple (x, y)).
+        
+        Leave `ksize = None` to auto determine to include the majority of Gaussian energy.
+    &#39;&#39;&#39;
+    if ksize is not None:
+        cripAssert(isInt(ksize), &#39;ksize should be int.&#39;)
+
+    if not isType(sigma, Tuple):
+        sigma = (sigma, sigma)
+
+    if is3D(img):
+        c, _, _ = img.shape
+        res = [cv2.GaussianBlur(img[i, ...], ksize, sigmaX=sigma[0], sigmaY=sigma[1]) for i in range(c)]
+        return np.array(res)
+    else:
+        return cv2.GaussianBlur(img, ksize, sigmaX=sigma[0], sigmaY=sigma[1])
+
+
+@ConvertListNDArray
+def stackImages(imgList: ListNDArray, dtype=None) -&gt; NDArray:
+    &#39;&#39;&#39;
+        Stack seperate image into one numpy array. I.e., views * (h, w) -&gt; (views, h, w).
+
+        Convert dtype with `dtype != None`.
+    &#39;&#39;&#39;
+    if dtype is not None:
+        imgList = imgList.astype(dtype)
+
+    return imgList
+
+
+def splitImages(imgs: ThreeD, dtype=None) -&gt; List[NDArray]:
+    &#39;&#39;&#39;
+        Split stacked image into seperate numpy arrays. I.e., (views, h, w) -&gt; views * (h, w).
+
+        Convert dtype with `dtype != None`.
+    &#39;&#39;&#39;
+    cripAssert(is3D(imgs), &#39;imgs should be 3D.&#39;)
+
+    if dtype is not None:
+        imgs = imgs.astype(dtype)
+
+    return list(imgs)
+
+
+@ConvertListNDArray
+def binning(img: TwoOrThreeD, rate: int = 1, axis=&#39;y&#39;) -&gt; TwoOrThreeD:
+    &#39;&#39;&#39;
+        Perform binning on certain `axis` with `rate`.
+    &#39;&#39;&#39;
+    cripAssert(isInt(rate) and rate &gt; 0, &#39;rate should be positive int.&#39;)
+    cripAssert(inArray(axis, [&#39;x&#39;, &#39;y&#39;, &#39;z&#39;]), &#39;Invalid axis.&#39;)
+
+    if is2D(img):
+        cripAssert(axis != &#39;z&#39;, &#39;img is 2D, while axis is z.&#39;)
+
+    if axis == &#39;x&#39;:
+        return img[..., ::rate]
+    if axis == &#39;y&#39;:
+        return img[..., ::rate, :]
+    if axis == &#39;z&#39;:
+        return img[::rate, ...]
+
+
+@ConvertListNDArray
+def transpose(vol: TwoOrThreeD, order: tuple) -&gt; TwoOrThreeD:
+    &#39;&#39;&#39;
+        Transpose vol with axes swapping `order`.
+    &#39;&#39;&#39;
+    if is2D(vol):
+        cripAssert(len(order) == 2, &#39;order should have length 2 for 2D input.&#39;)
+    if is3D(vol):
+        cripAssert(len(order) == 3, &#39;order should have length 3 for 3D input.&#39;)
+
+    return vol.transpose(order)
+
+
+@ConvertListNDArray
+def permute(vol: ThreeD, from_: str, to: str) -&gt; ThreeD:
+    &#39;&#39;&#39;
+        Permute axes (transpose) from `from_` to `to`, reslicing the reconstructed volume.
+
+        Valid directions are: &#39;sagittal&#39;, &#39;coronal&#39;, &#39;transverse&#39;.
+    &#39;&#39;&#39;
+    dirs = [&#39;sagittal&#39;, &#39;coronal&#39;, &#39;transverse&#39;]
+
+    cripAssert(from_ in dirs, f&#39;Invalid direction string: {from_}&#39;)
+    cripAssert(to in dirs, f&#39;Invalid direction string: {to}&#39;)
+
+    dirFrom = dirs.index(from_)
+    dirTo = dirs.index(to)
+
+    orders = [
+        # to sag       cor         tra      # from
+        [(0, 1, 2), (2, 0, 1), (2, 0, 1)],  # sag
+        [(1, 2, 0), (0, 1, 2), (0, 2, 1)],  # cor
+        [(2, 0, 1), (0, 2, 1), (0, 1, 2)],  # tra
+    ]
+    order = orders[dirFrom][dirTo]
+
+    return transpose(vol, order)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="crip.shared.binning"><code class="name flex">
+<span>def <span class="ident">binning</span></span>(<span>img: Union[numpy.ndarray, List[numpy.ndarray]], rate: int = 1, axis='y') ‑> Union[numpy.ndarray, List[numpy.ndarray]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Perform binning on certain <code>axis</code> with <code>rate</code>.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@ConvertListNDArray
+def binning(img: TwoOrThreeD, rate: int = 1, axis=&#39;y&#39;) -&gt; TwoOrThreeD:
+    &#39;&#39;&#39;
+        Perform binning on certain `axis` with `rate`.
+    &#39;&#39;&#39;
+    cripAssert(isInt(rate) and rate &gt; 0, &#39;rate should be positive int.&#39;)
+    cripAssert(inArray(axis, [&#39;x&#39;, &#39;y&#39;, &#39;z&#39;]), &#39;Invalid axis.&#39;)
+
+    if is2D(img):
+        cripAssert(axis != &#39;z&#39;, &#39;img is 2D, while axis is z.&#39;)
+
+    if axis == &#39;x&#39;:
+        return img[..., ::rate]
+    if axis == &#39;y&#39;:
+        return img[..., ::rate, :]
+    if axis == &#39;z&#39;:
+        return img[::rate, ...]</code></pre>
+</details>
+</dd>
+<dt id="crip.shared.gaussianSmooth"><code class="name flex">
+<span>def <span class="ident">gaussianSmooth</span></span>(<span>img: Union[numpy.ndarray, List[numpy.ndarray]], sigma: Union[float, int, Tuple[Union[float, int]]], ksize: int = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Perform Gaussian smooth with kernel size = ksize and Gaussian \sigma = sigma (int or tuple (x, y)).</p>
+<p>Leave <code>ksize = None</code> to auto determine to include the majority of Gaussian energy.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def gaussianSmooth(img: TwoOrThreeD, sigma: Or[float, int, Tuple[Or[float, int]]], ksize: int = None):
+    &#39;&#39;&#39;
+        Perform Gaussian smooth with kernel size = ksize and Gaussian \sigma = sigma (int or tuple (x, y)).
+        
+        Leave `ksize = None` to auto determine to include the majority of Gaussian energy.
+    &#39;&#39;&#39;
+    if ksize is not None:
+        cripAssert(isInt(ksize), &#39;ksize should be int.&#39;)
+
+    if not isType(sigma, Tuple):
+        sigma = (sigma, sigma)
+
+    if is3D(img):
+        c, _, _ = img.shape
+        res = [cv2.GaussianBlur(img[i, ...], ksize, sigmaX=sigma[0], sigmaY=sigma[1]) for i in range(c)]
+        return np.array(res)
+    else:
+        return cv2.GaussianBlur(img, ksize, sigmaX=sigma[0], sigmaY=sigma[1])</code></pre>
+</details>
+</dd>
+<dt id="crip.shared.horizontalFlip"><code class="name flex">
+<span>def <span class="ident">horizontalFlip</span></span>(<span>img: Union[numpy.ndarray, List[numpy.ndarray]], copy=False) ‑> Union[numpy.ndarray, List[numpy.ndarray]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Horizontal flip one image, or each image in a volume.</p>
+<p>Set <code>copy = True</code> to get a copy of array, otherwise a view only.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def horizontalFlip(img: TwoOrThreeD, copy=False) -&gt; TwoOrThreeD:
+    &#39;&#39;&#39;
+        Horizontal flip one image, or each image in a volume.
+        
+        Set `copy = True` to get a copy of array, otherwise a view only.
+    &#39;&#39;&#39;
+    cripAssert(is2or3D(img), &#39;img should be 2D or 3D.&#39;)
+
+    if copy:
+        return np.array(img[..., ::-1], copy=True)
+    else:
+        return img[..., ::-1]</code></pre>
+</details>
+</dd>
+<dt id="crip.shared.permute"><code class="name flex">
+<span>def <span class="ident">permute</span></span>(<span>vol: Union[numpy.ndarray, List[numpy.ndarray]], from_: str, to: str) ‑> Union[numpy.ndarray, List[numpy.ndarray]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Permute axes (transpose) from <code>from_</code> to <code>to</code>, reslicing the reconstructed volume.</p>
+<p>Valid directions are: 'sagittal', 'coronal', 'transverse'.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@ConvertListNDArray
+def permute(vol: ThreeD, from_: str, to: str) -&gt; ThreeD:
+    &#39;&#39;&#39;
+        Permute axes (transpose) from `from_` to `to`, reslicing the reconstructed volume.
+
+        Valid directions are: &#39;sagittal&#39;, &#39;coronal&#39;, &#39;transverse&#39;.
+    &#39;&#39;&#39;
+    dirs = [&#39;sagittal&#39;, &#39;coronal&#39;, &#39;transverse&#39;]
+
+    cripAssert(from_ in dirs, f&#39;Invalid direction string: {from_}&#39;)
+    cripAssert(to in dirs, f&#39;Invalid direction string: {to}&#39;)
+
+    dirFrom = dirs.index(from_)
+    dirTo = dirs.index(to)
+
+    orders = [
+        # to sag       cor         tra      # from
+        [(0, 1, 2), (2, 0, 1), (2, 0, 1)],  # sag
+        [(1, 2, 0), (0, 1, 2), (0, 2, 1)],  # cor
+        [(2, 0, 1), (0, 2, 1), (0, 1, 2)],  # tra
+    ]
+    order = orders[dirFrom][dirTo]
+
+    return transpose(vol, order)</code></pre>
+</details>
+</dd>
+<dt id="crip.shared.resize"><code class="name flex">
+<span>def <span class="ident">resize</span></span>(<span>img: Union[numpy.ndarray, List[numpy.ndarray]], dsize: Tuple[int] = None, scale: Tuple[Union[float, int]] = None, interp: str = 'bicubic') ‑> Union[numpy.ndarray, List[numpy.ndarray]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Resize the image or each image in a volume to <code>dsize = (H, W)</code> (if dsize is not None) or scale
+by <code>scale = (facH, facW)</code> using <code>interp</code> (bicubic, linear, nearest available).</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def resize(img: TwoOrThreeD,
+           dsize: Tuple[int] = None,
+           scale: Tuple[Or[float, int]] = None,
+           interp: str = &#39;bicubic&#39;) -&gt; TwoOrThreeD:
+    &#39;&#39;&#39;
+        Resize the image or each image in a volume to `dsize = (H, W)` (if dsize is not None) or scale 
+        by `scale = (facH, facW)` using `interp` (bicubic, linear, nearest available).
+    &#39;&#39;&#39;
+    cripAssert(inArray(interp, [&#39;bicubic&#39;, &#39;linear&#39;, &#39;nearest&#39;]), &#39;Invalid interp method.&#39;)
+
+    if dsize is None:
+        cripAssert(scale is not None, &#39;dsize and scale cannot be None at the same time.&#39;)
+        cripAssert(len(scale) == 2, &#39;scale should have length 2.&#39;)
+        fH, fW = scale
+    else:
+        cripAssert(scale is None, &#39;scale should not be set when dsize is set.&#39;)
+        # OpenCV dsize is in (W, H) form, so we reverse it.
+        dsize = dsize[::-1]
+
+    interp_ = {&#39;bicubic&#39;: cv2.INTER_CUBIC, &#39;linear&#39;: cv2.INTER_LINEAR, &#39;nearest&#39;: cv2.INTER_NEAREST}
+
+    if is3D(img):
+        c, _, _ = img.shape
+        res = [cv2.resize(img[i, ...], dsize, None, fW, fH, interpolation=interp_[interp]) for i in range(c)]
+        return np.array(res)
+    else:
+        return cv2.resize(img, dsize, None, fW, fH, interpolation=interp_[interp])</code></pre>
+</details>
+</dd>
+<dt id="crip.shared.rotate"><code class="name flex">
+<span>def <span class="ident">rotate</span></span>(<span>img: Union[numpy.ndarray, List[numpy.ndarray]], deg: int) ‑> Union[numpy.ndarray, List[numpy.ndarray]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Rotate the image or each image in a volume by deg [DEG] (multiple of 90) clockwise.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@ConvertListNDArray
+def rotate(img: TwoOrThreeD, deg: int) -&gt; TwoOrThreeD:
+    &#39;&#39;&#39;
+        Rotate the image or each image in a volume by deg [DEG] (multiple of 90) clockwise.
+    &#39;&#39;&#39;
+    deg = int(deg % 360)
+    cripAssert(deg % 90 == 0, &#39;deg should be multiple of 90.&#39;)
+
+    k = deg // 90
+    axes = (1, 2) if is3D(img) else (0, 1)
+
+    return np.rot90(img, -k, axes)</code></pre>
+</details>
+</dd>
+<dt id="crip.shared.splitImages"><code class="name flex">
+<span>def <span class="ident">splitImages</span></span>(<span>imgs: Union[numpy.ndarray, List[numpy.ndarray]], dtype=None) ‑> List[numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Split stacked image into seperate numpy arrays. I.e., (views, h, w) -&gt; views * (h, w).</p>
+<p>Convert dtype with <code>dtype != None</code>.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def splitImages(imgs: ThreeD, dtype=None) -&gt; List[NDArray]:
+    &#39;&#39;&#39;
+        Split stacked image into seperate numpy arrays. I.e., (views, h, w) -&gt; views * (h, w).
+
+        Convert dtype with `dtype != None`.
+    &#39;&#39;&#39;
+    cripAssert(is3D(imgs), &#39;imgs should be 3D.&#39;)
+
+    if dtype is not None:
+        imgs = imgs.astype(dtype)
+
+    return list(imgs)</code></pre>
+</details>
+</dd>
+<dt id="crip.shared.stackFlip"><code class="name flex">
+<span>def <span class="ident">stackFlip</span></span>(<span>img: Union[numpy.ndarray, List[numpy.ndarray]], copy=False) ‑> Union[numpy.ndarray, List[numpy.ndarray]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Flip a stack w.r.t. z-axis, i.e., reverse slices.</p>
+<p>Set <code>copy = True</code> to get a copy of array, otherwise a view only.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def stackFlip(img: ThreeD, copy=False) -&gt; ThreeD:
+    &#39;&#39;&#39;
+        Flip a stack w.r.t. z-axis, i.e., reverse slices.
+
+        Set `copy = True` to get a copy of array, otherwise a view only.
+    &#39;&#39;&#39;
+    cripAssert(is3D(img), &#39;img should be 3D.&#39;)
+
+    if copy:
+        return np.array(np.flip(img, axis=0), copy=True)
+    else:
+        return np.flip(img, axis=0)</code></pre>
+</details>
+</dd>
+<dt id="crip.shared.stackImages"><code class="name flex">
+<span>def <span class="ident">stackImages</span></span>(<span>imgList: List[numpy.ndarray], dtype=None) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Stack seperate image into one numpy array. I.e., views * (h, w) -&gt; (views, h, w).</p>
+<p>Convert dtype with <code>dtype != None</code>.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@ConvertListNDArray
+def stackImages(imgList: ListNDArray, dtype=None) -&gt; NDArray:
+    &#39;&#39;&#39;
+        Stack seperate image into one numpy array. I.e., views * (h, w) -&gt; (views, h, w).
+
+        Convert dtype with `dtype != None`.
+    &#39;&#39;&#39;
+    if dtype is not None:
+        imgList = imgList.astype(dtype)
+
+    return imgList</code></pre>
+</details>
+</dd>
+<dt id="crip.shared.transpose"><code class="name flex">
+<span>def <span class="ident">transpose</span></span>(<span>vol: Union[numpy.ndarray, List[numpy.ndarray]], order: tuple) ‑> Union[numpy.ndarray, List[numpy.ndarray]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Transpose vol with axes swapping <code>order</code>.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@ConvertListNDArray
+def transpose(vol: TwoOrThreeD, order: tuple) -&gt; TwoOrThreeD:
+    &#39;&#39;&#39;
+        Transpose vol with axes swapping `order`.
+    &#39;&#39;&#39;
+    if is2D(vol):
+        cripAssert(len(order) == 2, &#39;order should have length 2 for 2D input.&#39;)
+    if is3D(vol):
+        cripAssert(len(order) == 3, &#39;order should have length 3 for 3D input.&#39;)
+
+    return vol.transpose(order)</code></pre>
+</details>
+</dd>
+<dt id="crip.shared.verticalFlip"><code class="name flex">
+<span>def <span class="ident">verticalFlip</span></span>(<span>img: Union[numpy.ndarray, List[numpy.ndarray]], copy=False) ‑> Union[numpy.ndarray, List[numpy.ndarray]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Vertical flip one image, or each image in a volume.</p>
+<p>Set <code>copy = True</code> to get a copy of array, otherwise a view only.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def verticalFlip(img: TwoOrThreeD, copy=False) -&gt; TwoOrThreeD:
+    &#39;&#39;&#39;
+        Vertical flip one image, or each image in a volume.
+
+        Set `copy = True` to get a copy of array, otherwise a view only.
+    &#39;&#39;&#39;
+    cripAssert(is2or3D(img), &#39;img should be 2D or 3D.&#39;)
+
+    if copy:
+        return np.array(img[..., ::-1, :], copy=True)
+    else:
+        return img[..., ::-1, :]</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="crip" href="index.html">crip</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="two-column">
+<li><code><a title="crip.shared.binning" href="#crip.shared.binning">binning</a></code></li>
+<li><code><a title="crip.shared.gaussianSmooth" href="#crip.shared.gaussianSmooth">gaussianSmooth</a></code></li>
+<li><code><a title="crip.shared.horizontalFlip" href="#crip.shared.horizontalFlip">horizontalFlip</a></code></li>
+<li><code><a title="crip.shared.permute" href="#crip.shared.permute">permute</a></code></li>
+<li><code><a title="crip.shared.resize" href="#crip.shared.resize">resize</a></code></li>
+<li><code><a title="crip.shared.rotate" href="#crip.shared.rotate">rotate</a></code></li>
+<li><code><a title="crip.shared.splitImages" href="#crip.shared.splitImages">splitImages</a></code></li>
+<li><code><a title="crip.shared.stackFlip" href="#crip.shared.stackFlip">stackFlip</a></code></li>
+<li><code><a title="crip.shared.stackImages" href="#crip.shared.stackImages">stackImages</a></code></li>
+<li><code><a title="crip.shared.transpose" href="#crip.shared.transpose">transpose</a></code></li>
+<li><code><a title="crip.shared.verticalFlip" href="#crip.shared.verticalFlip">verticalFlip</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>
