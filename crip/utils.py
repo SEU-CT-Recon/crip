@@ -1,14 +1,21 @@
 '''
     Utilities of crip.
 
-    by z0gSh1u @ https://github.com/z0gSh1u/crip
+    https://github.com/z0gSh1u/crip
 '''
 
 import os
 import logging
 import math
 import numpy as np
-from .typing import *
+from ._typing import *
+
+
+def readFileText(path_):
+    with open(path_, 'r') as fp:
+        content = fp.read()
+    return content
+
 
 ### Expection ###
 
@@ -42,7 +49,7 @@ def cripWarning(ensure, hint, dumpStack=False):
 
 def ConvertListNDArray(f):
     '''
-        Decorator to convert List[np.ndarray] to np.ndarray.
+        Decorator to convert List[ndarray] to ndarray.
     '''
     def fn(*args, **kwargs):
         # args and kwargs are immutable
@@ -61,7 +68,7 @@ def ConvertListNDArray(f):
     return fn
 
 
-def ensureFloatArray(arr):
+def asFloat(arr):
     '''
         Make sure `arr` has floating type.
     '''
@@ -123,7 +130,7 @@ def isListNDArray(arr):
     return isType(arr, list) and isType(arr[0], np.ndarray)
 
 
-def haveSameShape(a: np.ndarray, b: np.ndarray):
+def isOfSameShape(a: np.ndarray, b: np.ndarray):
     return np.array_equal(a.shape, b.shape)
 
 
@@ -136,15 +143,18 @@ def inRange(a, range_=None, low=None, high=None):
     return low <= a and a < high
 
 
-def getChildFolder(folder):
-    return os.path.join(os.path.dirname(os.path.abspath(__file__)), f'./{folder}')
-
-
 def inArray(a, arr):
     return a in arr
 
 
+def getChildFolder(folder):
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), f'./{folder}')
+
+
 def cvtEnergyUnit(arr, from_, to):
+    '''
+        Convert between energy units. (ev, keV, MeV)
+    '''
     units = ['eV', 'keV', 'MeV']
     from_ = units.index(from_)
     to = units.index(to)
@@ -157,6 +167,9 @@ def cvtEnergyUnit(arr, from_, to):
 
 
 def cvtLengthUnit(arr, from_, to):
+    '''
+        Convert between length units. (um, mm, cm, m)
+    '''
     units = ['um', 'mm', 'cm', 'm']
     from_ = units.index(from_)
     to = units.index(to)
@@ -168,13 +181,18 @@ def cvtLengthUnit(arr, from_, to):
 
 
 def cvtMuUnit(arr, from_, to):
+    '''
+        Convert between mu value units. (um-1, mm-1, cm-1, m-1)
+    '''
     from_ = from_.replace('-1', '')
     to = to.replace('-1', '')
 
     return cvtLengthUnit(arr, to, from_)
 
 
-def readFileText(path_):
-    with open(path_, 'r') as fp:
-        content = fp.read()
-    return content
+def radToDeg(x):
+    return x / np.pi * 180
+
+
+def degToRad(x):
+    return x / 180 * np.pi

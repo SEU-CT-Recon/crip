@@ -56,7 +56,7 @@ def imreadRaw(path: str, h: int, w: int, dtype=DefaultFloatDType, nSlice: int = 
 
 
 @ConvertListNDArray
-def imwriteRaw(img: np.ndarray, path: str, dtype=None):
+def imwriteRaw(img: TwoOrThreeD, path: str, dtype=None):
     '''
         Write raw file. Convert dtype with `dtype != None`.
     '''
@@ -78,7 +78,7 @@ def imreadTiff(path: str, dtype=None):
 
 
 @ConvertListNDArray
-def imwriteTiff(img: Or[np.ndarray, ListNDArray], path: str, dtype=None):
+def imwriteTiff(img: TwoOrThreeD, path: str, dtype=None):
     '''
         Write TIFF file. Convert dtype with `dtype != None`.
         

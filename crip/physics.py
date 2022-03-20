@@ -12,7 +12,7 @@ import numpy as np
 from os import path
 from typing import Callable
 
-from .typing import BuiltInAttenEnergyUnit, DefaultEnergyUnit, DefaultFloatDType, DefaultMuUnit, Or
+from ._typing import BuiltInAttenEnergyUnit, DefaultEnergyUnit, DefaultFloatDType, DefaultMuUnit, Or
 from .utils import cvtEnergyUnit, cvtMuUnit, inArray, cripAssert, getChildFolder, inRange, isNumber, isType, readFileText
 
 ## Constants ##
@@ -26,33 +26,38 @@ DiagEnergyLen = DiagEnergyHigh - DiagEnergyLow + 1
 
 class Spectrum:
     '''
-        Parse spectrum text as `Spectrum` class object.
-        
-        Refer to the document for spectrum text format. @see https://github.com/z0gSh1u/crip
+        Construct Spectrum object with omega array of every energy.
 
         Get \omega of certain energy (keV):
         ```py
-            omega = spec.spectrum[E]
+            omega = spec.omega[E]
         ```
     '''
-    def __init__(self, specText: Or[str, None], unit='keV'):
-        self.specText = specText
+    def __init__(self, omega: np.ndarray, unit='keV'):
+        cripAssert(len(omega) == DiagEnergyLen, 'omega array should have same length as DiagEnergyLen.')
+        cripAssert(inArray(unit, ['MeV', 'keV', 'eV']), f'Invalid unit: {unit}')
 
+        self.unit = unit
+        self.omega = np.array(omega)
+        self.sumOmega = np.sum(self.spectrum)
+
+    @staticmethod
+    def fromText(self, specText: str, unit='keV'):
+        '''
+            Parse spectrum text as `Spectrum` class object.
+            
+            Refer to the document for spectrum text format. @see https://github.com/z0gSh1u/crip            
+        '''
         cripAssert(inArray(unit, ['MeV', 'keV', 'eV']), f'Invalid unit: {unit}')
         self.unit = unit
 
-        self.spectrum = np.zeros(DiagEnergyLen, dtype=DefaultFloatDType)
-        if specText is not None:
-            self._read()
+        self.omega = np.zeros(DiagEnergyLen, dtype=DefaultFloatDType)
 
-        self.sumOmega = np.sum(self.spectrum)
-
-    def _read(self):
         # split content into list, and ignore all lines starting with non-digit
         content = list(
             filter(lambda y: len(y) > 0 and str.isdigit(y[0]),
                    list(map(lambda x: x.strip(),
-                            self.specText.replace('\r\n', '\n').split('\n')))))
+                            specText.replace('\r\n', '\n').split('\n')))))
 
         def procSpectrumLine(line: str):
             tup = tuple(map(float, re.split(r'\s+', line)))
@@ -70,17 +75,9 @@ class Spectrum:
         cripAssert(inRange(startEnergy, DiagEnergyRange), '`startEnergy` is out of `DiagEnergyRange`.')
         cripAssert(inRange(cutOffEnergy, DiagEnergyRange), '`cutOffEnergy` is out of `DiagEnergyRange`.')
 
-        self.spectrum[startEnergy:cutOffEnergy + 1] = specOmega[:]
+        self.omega[startEnergy:cutOffEnergy + 1] = specOmega[:]
 
-    @staticmethod
-    def fromOmegaArray(omega: np.ndarray, unit='keV'):
-        cripAssert(len(omega) == DiagEnergyLen, 'omega array should have same length as DiagEnergyLen.')
-
-        spec = Spectrum(None, unit)
-        spec.spectrum = omega
-        spec.sumOmega = np.sum(spec.spectrum)
-
-        return spec
+        self.sumOmega = np.sum(self.omega)
 
 
 class Atten:

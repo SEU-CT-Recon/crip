@@ -6,7 +6,7 @@
 
 import numpy as np
 from .shared import *
-from .typing import *
+from ._typing import *
 from .utils import *
 
 
@@ -74,7 +74,7 @@ def cropCircleFOV(recon, radiusOrRatio, fill=0):
 
 
 @ConvertListNDArray
-def MuToHU(image: Or[ReconSlice, ReconList, ReconVolume], muWater: float) -> Or[ReconSlice, ReconVolume]:
+def MuToHU(image: TwoOrThreeD, muWater: float):
     '''
         Convert \mu map to HU.
         
@@ -86,7 +86,7 @@ def MuToHU(image: Or[ReconSlice, ReconList, ReconVolume], muWater: float) -> Or[
 
 
 @ConvertListNDArray
-def HUToMu(image: Or[ReconSlice, ReconList, ReconVolume], muWater: float) -> Or[ReconSlice, ReconVolume]:
+def HUToMu(image: TwoOrThreeD, muWater: float):
     '''
         Convert HU to mu. (Invert of `MuToHU`.)
     '''
@@ -96,9 +96,7 @@ def HUToMu(image: Or[ReconSlice, ReconList, ReconVolume], muWater: float) -> Or[
 
 
 @ConvertListNDArray
-def HUNoRescale(image: Or[ReconSlice, ReconList, ReconVolume],
-                b: float = -1000,
-                k: float = 1) -> Or[ReconSlice, ReconVolume]:
+def HUNoRescale(image: TwoOrThreeD, b: float = -1000, k: float = 1):
     '''
         Invert the rescale-slope (y = kx + b) of HU value to get linear relationship between HU and mu.
     '''
@@ -107,9 +105,16 @@ def HUNoRescale(image: Or[ReconSlice, ReconList, ReconVolume],
     return (image - b) / k
 
 
-def postlogToProj():
+from typing import *
+from nptyping import NDArray
+
+
+def postlogToProj(f: NDArray[(Any, Any, Any), Any]) -> NDArray[(Any, Any, Any), Any]:
     # TODO
     pass
+
+
+postlogToProj()
 
 
 def transpose(vol: np.ndarray, order: tuple):

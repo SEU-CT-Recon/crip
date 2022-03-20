@@ -6,19 +6,19 @@
 
 import numpy as np
 from .shared import *
-from .typing import *
+from ._typing import *
 from .utils import *
 
 
 @ConvertListNDArray
-def averageProjections(projections: Or[ProjList, ProjStack]):
+def averageProjections(projections: TwoOrThreeD):
     '''
         Average projections. For example, to calculate the flat field.
         Projections can be either `(views, H, W)` shaped numpy array, or
         `views * (H, W)` Python List.
     '''
     cripAssert(is3D(projections), '`projections` should be 3D array.')
-    projections = ensureFloatArray(projections)
+    projections = asFloat(projections)
 
     res = projections.sum(axis=0) / projections.shape[0]
 
@@ -26,10 +26,10 @@ def averageProjections(projections: Or[ProjList, ProjStack]):
 
 
 @ConvertListNDArray
-def flatDarkFieldCorrection(projections: Or[Proj, ProjList, ProjStack],
-                            flat: Or[Proj, float],
+def flatDarkFieldCorrection(projections: TwoOrThreeD,
+                            flat: Or[TwoD, float],
                             coeff: float = 1,
-                            dark: Or[Proj, float] = 0):
+                            dark: Or[TwoD, float] = 0):
     '''
         Perform flat field (air) and dark field correction to get post-log value.
 
@@ -37,10 +37,10 @@ def flatDarkFieldCorrection(projections: Or[Proj, ProjList, ProjStack],
     '''
     sampleProjection = projections if is2D(projections) else projections[0]
 
-    if isType(flat, Proj):
-        cripAssert(haveSameShape(sampleProjection, flat), "`projection` and `flat` should have same shape.")
-    if isType(dark, Proj):
-        cripAssert(haveSameShape(sampleProjection, dark), "`projection` and `dark` should have same shape.")
+    if isType(flat, TwoD):
+        cripAssert(isOfSameShape(sampleProjection, flat), "`projection` and `flat` should have same shape.")
+    if isType(dark, TwoD):
+        cripAssert(isOfSameShape(sampleProjection, dark), "`projection` and `dark` should have same shape.")
 
     res = -np.log((projections - dark) / (coeff * flat - dark))
     res[res == np.inf] = 0
@@ -49,7 +49,7 @@ def flatDarkFieldCorrection(projections: Or[Proj, ProjList, ProjStack],
     return res
 
 
-def flatDarkFieldCorrectionStandalone(projection: Proj):
+def flatDarkFieldCorrectionStandalone(projection: TwoD):
     '''
         Perform flat field and dark field correction without actual field image.
 
@@ -62,15 +62,14 @@ def flatDarkFieldCorrectionStandalone(projection: Proj):
 
 
 @ConvertListNDArray
-def injectGaussianNoise(projections: Or[Proj, ProjList, ProjStack], sigma: float, mu: float = 0):
+def injectGaussianNoise(projections: TwoOrThreeD, sigma: float, mu: float = 0):
     '''
         Inject Gaussian noise which obeys distribution `N(\mu, \sigma^2)`.
     '''
     cripAssert(is2or3D(projections), '`projections` should be 2D or 3D.')
+    cripAssert(sigma > 0, 'sigma should > 0.')
 
-    def injectOne(img):
-        noise = np.random.randn(*img.shape) * sigma + mu
-        return img + noise
+    injectOne = lambda img: (np.random.randn(*img.shape) * sigma + mu) + img
 
     if is3D(projections):
         res = np.zeros_like(projections)
@@ -82,14 +81,13 @@ def injectGaussianNoise(projections: Or[Proj, ProjList, ProjStack], sigma: float
     return res
 
 
-def injectPoissonNoise(projections: Or[Proj, ProjList, ProjStack]):
+def injectPoissonNoise(projections: TwoOrThreeD):
     '''
         Inject Poisson noise which obeys distribution `P(\lamda)`.
     '''
     cripAssert(is2or3D(projections), '`projections` should be 2D or 3D.')
 
-    def injectOne(img):
-        return np.random.poisson(img)
+    injectOne = lambda img: np.random.poisson(img)
 
     if is3D(projections):
         res = np.zeros_like(projections)
@@ -101,13 +99,16 @@ def injectPoissonNoise(projections: Or[Proj, ProjList, ProjStack]):
     return res
 
 
-def limitedAngle(projections, srcDeg, dstDeg, startDeg=0):
+def limitAngle(projections: ThreeD, total: float, start: float, dst: float):
     '''
-        Sample limited angle projections from `startDeg` to `startDeg + dstDeg`.
+        Sample limited angle projections from `start` [DEG] to `dst`.
         
-        The original total angle is `srcDeg`.
+        The original total angle is `total`.
     '''
+    cripAssert(inRange(total, (0, 360 + 1)) and total > 0, 'total should be in interval (0, 360]')
+
     assert startDeg + dstDeg <= srcDeg
+
     nProjPerDeg = float(projections.shape[0]) / srcDeg
     startLoc = int(startDeg * nProjPerDeg)
     dstLen = int(dstDeg * nProjPerDeg)
@@ -115,7 +116,7 @@ def limitedAngle(projections, srcDeg, dstDeg, startDeg=0):
     return np.array(projections[startLoc:startLoc + dstLen, :, :])
 
 
-def limitedView(projections, ratio):
+def limitView(projections, ratio):
     '''
         Sample projections uniformly with `::ratio` to get sparse views projections. \\
         The second returning is the number of remaining projections.
@@ -197,15 +198,3 @@ def padSinogram(sgm, padding, mode='symmetric', smootherDecay=False):
 
 def correctBeamHardeningPolynomial(postlog, coeffs, bias=True):
     pass
-
-
-@ConvertListNDArray
-def binning(projection: Or[Proj, ProjList, ProjStack], binning=(1, 1), mode='skip'):
-    '''
-        Perform binning on row and col directions. `binning=(row, col)`.
-    '''
-    # TODO
-    # skip, average, min, max, median, sum
-    res = np.array(projection[..., ::binning[0], ::binning[1]])
-    return res
-

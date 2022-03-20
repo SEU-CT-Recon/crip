@@ -8,7 +8,7 @@ from typing import List
 import numpy as np
 
 from .utils import cripAssert, inArray, isType
-from .typing import DefaultFloatDType, Or
+from ._typing import DefaultFloatDType, Or
 from .physics import Atten, DiagEnergyRange, Spectrum
 
 
@@ -50,7 +50,7 @@ def calcAttenSpec(spec: Spectrum, atten: Or[Atten, List[Atten]], L: Or[float, Li
     if isType(L, float):
         L = [L]
     cripAssert(len(atten) == len(L), 'atten should have same length as L.')
-
+ 
     N = len(L)
     # FIXME this is wrong. no \int E.
     # TODO use matrix form

@@ -24,11 +24,7 @@ except:
     FloatLike = Union[np.float16, np.float32, np.float64, float]
 
 ListNDArray = List[np.ndarray]
-
-Proj = np.ndarray
-ProjList = List[Proj]
-ProjStack = np.ndarray
-
-ReconSlice = np.ndarray
-ReconList = List[ReconSlice]
-ReconVolume = np.ndarray
+NDArray = np.ndarray
+TwoD = NDArray
+ThreeD = Or[NDArray, ListNDArray]
+TwoOrThreeD = Or[TwoD, ThreeD]
