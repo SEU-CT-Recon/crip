@@ -39,19 +39,18 @@ class Spectrum:
 
         self.unit = unit
         self.omega = np.array(omega)
-        self.sumOmega = np.sum(self.spectrum)
+        self.sumOmega = np.sum(self.omega)
 
     @staticmethod
-    def fromText(self, specText: str, unit='keV'):
+    def fromText(specText: str, unit='keV'):
         '''
             Parse spectrum text as `Spectrum` class object.
             
             Refer to the document for spectrum text format. @see https://github.com/z0gSh1u/crip            
         '''
         cripAssert(inArray(unit, ['MeV', 'keV', 'eV']), f'Invalid unit: {unit}')
-        self.unit = unit
-
-        self.omega = np.zeros(DiagEnergyLen, dtype=DefaultFloatDType)
+        
+        omega = np.zeros(DiagEnergyLen, dtype=DefaultFloatDType)
 
         # split content into list, and ignore all lines starting with non-digit
         content = list(
@@ -69,15 +68,15 @@ class Spectrum:
         specEnergy, specOmega = content.T
 
         # to keV
-        specEnergy = cvtEnergyUnit(specEnergy, self.unit, DefaultEnergyUnit)
+        specEnergy = cvtEnergyUnit(specEnergy, unit, DefaultEnergyUnit)
 
         startEnergy, cutOffEnergy = int(specEnergy[0]), int(specEnergy[-1])
         cripAssert(inRange(startEnergy, DiagEnergyRange), '`startEnergy` is out of `DiagEnergyRange`.')
         cripAssert(inRange(cutOffEnergy, DiagEnergyRange), '`cutOffEnergy` is out of `DiagEnergyRange`.')
 
-        self.omega[startEnergy:cutOffEnergy + 1] = specOmega[:]
+        omega[startEnergy:cutOffEnergy + 1] = specOmega[:]
 
-        self.sumOmega = np.sum(self.omega)
+        return Spectrum(omega, unit)
 
 
 class Atten:
@@ -199,4 +198,4 @@ def calcMu(atten: Atten, spec: Spectrum, energyConversion: Or[str, float, int, C
     else:
         cripAssert(False, 'Invalid `energyConversion`.')
 
-    return np.sum(spec.spectrum * eff * mus) / np.sum(spec.spectrum * eff)
+    return np.sum(spec.omega * eff * mus) / np.sum(spec.omega * eff)

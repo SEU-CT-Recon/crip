@@ -25,22 +25,46 @@ def rotate(img: TwoOrThreeD, deg: int):
     return np.rot90(img, -k, axes)
 
 
-def verticalFlip(img: TwoOrThreeD):
+def verticalFlip(img: TwoOrThreeD, copy=False):
     '''
         Vertical flip one image, or each image in a volume.
+
+        Set `copy = True` to get a copy of array, otherwise a view only.
     '''
     cripAssert(is2or3D(img), 'img should be 2D or 3D.')
 
-    return img[..., ::-1, :]
+    if copy:
+        return np.array(img[..., ::-1, :], copy=True)
+    else:
+        return img[..., ::-1, :]
 
 
-def horizontalFlip(img: TwoOrThreeD):
+def horizontalFlip(img: TwoOrThreeD, copy=False):
     '''
         Horizontal flip one image, or each image in a volume.
+        
+        Set `copy = True` to get a copy of array, otherwise a view only.
     '''
     cripAssert(is2or3D(img), 'img should be 2D or 3D.')
 
-    return img[..., ::-1]
+    if copy:
+        return np.array(img[..., ::-1], copy=True)
+    else:
+        return img[..., ::-1]
+
+
+def stackFlip(img: ThreeD, copy=False):
+    '''
+        Flip a stack in z-axis, i.e., reverse slices.
+
+        Set `copy = True` to get a copy of array, otherwise a view only.
+    '''
+    cripAssert(is3D(img), 'img should be 3D.')
+
+    if copy:
+        return np.array(np.flip(img, axis=0), copy=True)
+    else:
+        return np.flip(img, axis=0)
 
 
 def resize(img: TwoOrThreeD, dsize: Tuple[int] = None, scale: Tuple[Or[float, int]] = None, interp: str = 'bicubic'):
@@ -147,3 +171,43 @@ def binning(img: TwoOrThreeD, rate: int = 1, axis='y', mode='sample'):
 
 def unBinning():
     pass  # TODO
+
+
+@ConvertListNDArray
+def transpose(vol: TwoOrThreeD, order: tuple):
+    '''
+        Transpose vol with axes swapping `order`.
+    '''
+    if is2D(vol):
+        cripAssert(len(order) == 2, 'order should have length 2 for 2D input.')
+    if is3D(vol):
+        cripAssert(len(order) == 3, 'order should have length 3 for 3D input.')
+
+    return vol.transpose(order)
+
+
+@ConvertListNDArray
+def permute(vol: ThreeD, from_: str, to: str):
+    '''
+        Permute axes (transpose) from `from_` to `to`, reslicing the reconstructed volume.
+
+        Valid directions are: 'sagittal', 'coronal', 'transverse'.
+    '''
+    dirs = ['sagittal', 'coronal', 'transverse']
+
+    cripAssert(from_ in dirs, f'Invalid direction string: {from_}')
+    cripAssert(to in dirs, f'Invalid direction string: {to}')
+
+    dirFrom = dirs.index(from_)
+    dirTo = dirs.index(to)
+
+    orders = [
+        # to sag       cor         tra      # from
+        [(0, 1, 2), (2, 0, 1), (2, 0, 1)],  # sag
+        [(1, 2, 0), (0, 1, 2), (0, 2, 1)],  # cor
+        [(2, 0, 1), (0, 2, 1), (0, 1, 2)],  # tra
+    ]
+
+    order = orders[dirFrom][dirTo]
+
+    return transpose(vol, order)

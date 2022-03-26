@@ -100,38 +100,22 @@ def injectPoissonNoise(projections: TwoOrThreeD):
 
 
 def limitAngle(projections: ThreeD, total: float, start: float, dst: float):
-    '''
-        Sample limited angle projections from `start` [DEG] to `dst`.
-        
-        The original total angle is `total`.
-    '''
-    cripAssert(inRange(total, (0, 360 + 1)) and total > 0, 'total should be in interval (0, 360]')
-
-    assert startDeg + dstDeg <= srcDeg
-
-    nProjPerDeg = float(projections.shape[0]) / srcDeg
-    startLoc = int(startDeg * nProjPerDeg)
-    dstLen = int(dstDeg * nProjPerDeg)
-
-    return np.array(projections[startLoc:startLoc + dstLen, :, :])
+    cripAssert(False, 'Unimplemented.')  # TODO
 
 
 def limitView(projections, ratio):
-    '''
-        Sample projections uniformly with `::ratio` to get sparse views projections. \\
-        The second returning is the number of remaining projections.
-    '''
-    dstLen = projections.shape[0] / ratio
-    assert dstLen == int(dstLen), "Cannot achieve uniform sampling."
-
-    return np.array(projections[::ratio, :, :]), projections.shape[0] % ratio - 1
+    cripAssert(False, 'Unimplemented.')  # TODO
 
 
 @ConvertListNDArray
-def projectionsToSinograms(projections: Or[ProjList, ProjStack]):
+def projectionsToSinograms(projections: ThreeD):
     '''
         Permute projections to sinograms by axes swapping `(views, h, w) -> (h, views, w)`.
+
+        Note that the width direction is along detector channels of one line.
     '''
+    cripAssert(is3D(projections), 'projections should be 3D.')
+
     (views, h, w) = projections.shape
     sinograms = np.zeros((h, views, w), dtype=projections.dtype)
     for i in range(views):
@@ -141,10 +125,14 @@ def projectionsToSinograms(projections: Or[ProjList, ProjStack]):
 
 
 @ConvertListNDArray
-def sinogramsToProjections(sinograms: Or[ProjList, ProjStack]):
+def sinogramsToProjections(sinograms: ThreeD):
     '''
         Permute sinograms back to projections by axes swapping `(h, views, w) -> (views, h, w)`.
+
+        Note that the width direction is along detector channels of one line.
     '''
+    cripAssert(is3D(sinograms), 'projections should be 3D.')
+
     (h, views, w) = sinograms.shape
     projections = np.zeros((views, h, w), dtype=sinograms.dtype)
     for i in range(views):
@@ -153,16 +141,19 @@ def sinogramsToProjections(sinograms: Or[ProjList, ProjStack]):
     return projections
 
 
-def padImage(proj, padding, mode='symmetric', smootherDecay=False):
+def padImage(img: TwoOrThreeD,
+             padding: Tuple[int, int, int, int],
+             mode: str = 'symmetric',
+             decay: Or[str, None] = None):
     '''
         Pad the image on four directions using symmetric `padding` (Up, Right, Down, Left) \\
-        and descending cosine window decay. `mode` can be `symmetric` or `edge`.
+        and descending cosine window decay. `mode` can be `symmetric` or `edge`.`
     '''
-    h, w = proj.shape
+    h, w = img.shape
     nPadU, nPadR, nPadD, nPadL = padding
     padH = h + nPadU + nPadD
     padW = w + nPadL + nPadR
-    xPad = np.pad(proj, ((nPadU, nPadD), (nPadL, nPadR)), mode=mode)
+    xPad = np.pad(img, ((nPadU, nPadD), (nPadL, nPadR)), mode=mode)
 
     CommonCosineDecay = lambda ascend, dot: np.cos(
         np.linspace(-np.pi / 2, 0, dot) if ascend else np.linspace(0, np.pi / 2, dot))

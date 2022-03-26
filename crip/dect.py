@@ -18,11 +18,11 @@ def singleMatMuDecompose(src: Atten,
                          method='coeff',
                          energyRange=DiagEnergyRange) -> np.ndarray:
     '''
-        Decompose material `src`'s attenuation onto `basis1` and `basis2`.
+        Decompose single material `src`'s attenuation onto `basis1` and `basis2`.
 
         Return decomposing coefficients when `method = 'coeff'`, or proportion when `method = 'prop'`.
     '''
-    cripAssert(inArray(method, ['coeff', 'prop']), 'Invalid method.')
+    cripAssert(method in ['coeff', 'prop'], 'Invalid method.')
 
     range_ = np.array(energyRange)
     attenMu = src.mu[range_]
@@ -39,26 +39,28 @@ def singleMatMuDecompose(src: Atten,
     return res
 
 
-def calcAttenSpec(spec: Spectrum, atten: Or[Atten, List[Atten]], L: Or[float, List[float]]):
+def calcAttenSpec(spec: Spectrum, attens: Or[Atten, List[Atten]], Ls: Or[float, List[float]]):
     '''
-        Calculate the attenuated spectrum using polychromatic Beer-Lambert law.
+        Calculate the attenuated spectrum using polychromatic Beer-Lambert law. Supports multiple materials.
 
-        I.e., `\Omega(E) \exp (- \int_E \mu(E) L)`. L in mm.
+        I.e., `\Omega(E) \exp (- \mu(E) L) \\through all E`. L in mm.
     '''
-    if isType(atten, Atten):
-        atten = [atten]
-    if isType(L, float):
-        L = [L]
-    cripAssert(len(atten) == len(L), 'atten should have same length as L.')
- 
-    N = len(L)
-    # FIXME this is wrong. no \int E.
-    # TODO use matrix form
-    linearAttens = [atten.mu[i] * L[i] for i in range(N)]
-    exp = -np.exp(np.array(linearAttens).sum())
-    omega = spec.spectrum * exp
+    if isType(attens, Atten):
+        attens = [attens]
+    if isType(Ls, float):
+        Ls = [Ls]
+    cripAssert(len(attens) == len(Ls), 'atten should have same length as L.')
 
-    return Spectrum.fromOmegaArray(omega, spec.unit)
+    N = len(attens)
+    omega = np.array(spec.omega, copy=True)
+    for i in range(N):  # materials
+        atten = attens[i]
+        L = Ls[i]
+
+        for E in DiagEnergyRange:  # energies
+            omega[E] *= np.exp(-atten.mu[E] * L)
+
+    return Spectrum(omega, spec.unit)
 
 
 def calcPostLog(spec: Spectrum, atten: Or[Atten, List[Atten]], L: Or[float, List[float]]):

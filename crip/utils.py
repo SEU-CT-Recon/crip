@@ -196,3 +196,17 @@ def radToDeg(x):
 
 def degToRad(x):
     return x / 180 * np.pi
+
+
+import sys
+
+
+def sysPlatform():
+    platform = sys.platform
+
+    if platform.find('win32') != -1:
+        return 'Windows'
+    elif platform.find('linux') != -1:
+        return 'Linux'
+
+    cripAssert(False, f'Unsupported platform: {platform}.')

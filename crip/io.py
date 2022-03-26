@@ -15,20 +15,26 @@ import natsort
 from .utils import *
 
 
-def listDirectory(folder: str, sort='nat', joinFolder=False, reverse=False):
+def listDirectory(folder: str, sort='nat', joinFolder=False, appendBasename=False, reverse=False):
     '''
         List files under `folder` and `sort` using `"nat"` (natural) or \\
         `"dict"` (dictionary) order. Set `joinFolder` to True to get paths, \\
-        otherwise filenames only.
+        otherwise filenames only. Set `appendBasename` to True to get an extra basename in returned tuple.
     '''
-    cripAssert(inArray(sort, ['nat', 'dict']), 'Invalid `sort` method.')
+    cripAssert(sort in ['nat', 'dict'], 'Invalid `sort` method.')
+    cripAssert(not ((not joinFolder) and appendBasename), 'appendBasename is invalid when joinFolder is False.')
 
     files = os.listdir(folder)
     files = sorted(files, reverse=reverse) if sort == 'dict' else natsort.natsorted(files, reverse=reverse)
-    if joinFolder:
-        files = [os.path.join(folder, file) for file in files]
 
-    return files
+    if joinFolder:
+        joined = [os.path.join(folder, file) for file in files]
+        if appendBasename:
+            return joined, files
+        else:
+            return joined
+    else:
+        return files
 
 
 def imreadDicom(path: str, dtype=None):
