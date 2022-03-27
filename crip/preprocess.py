@@ -73,7 +73,7 @@ def injectGaussianNoise(projections: TwoOrThreeD, sigma: float, mu: float = 0):
 
     if is3D(projections):
         res = np.zeros_like(projections)
-        for c in projections.shape[0]:
+        for c in range(projections.shape[0]):
             res[c, ...] = injectOne(projections[c, ...])
     else:
         res = injectOne(projections)
@@ -81,30 +81,29 @@ def injectGaussianNoise(projections: TwoOrThreeD, sigma: float, mu: float = 0):
     return res
 
 
-def injectPoissonNoise(projections: TwoOrThreeD):
+@ConvertListNDArray
+def injectPoissonNoise(projections: TwoOrThreeD, nPhoton: int):
     '''
         Inject Poisson noise which obeys distribution `P(\lamda)`.
+        `nPhoton` is the number of photon hitting per detector element.
     '''
     cripAssert(is2or3D(projections), '`projections` should be 2D or 3D.')
 
-    injectOne = lambda img: np.random.poisson(img)
+    def injectOne(img):
+        I0 = np.max(img)
+        proj = nPhoton * np.exp(-img / I0)
+        proj = np.random.poisson(proj)
+        proj = -np.log(img / nPhoton) * I0
+        return proj
 
     if is3D(projections):
         res = np.zeros_like(projections)
-        for c in projections.shape[0]:
-            res[c, ...] = injectOne(projections[c, ...])
+        for i in range(projections.shape[0]):
+            res[i, ...] = injectOne(projections[i, ...])
     else:
         res = injectOne(projections)
 
     return res
-
-
-def limitAngle(projections: ThreeD, total: float, start: float, dst: float):
-    cripAssert(False, 'Unimplemented.')  # TODO
-
-
-def limitView(projections, ratio):
-    cripAssert(False, 'Unimplemented.')  # TODO
 
 
 @ConvertListNDArray
@@ -141,51 +140,88 @@ def sinogramsToProjections(sinograms: ThreeD):
     return projections
 
 
+@ConvertListNDArray
 def padImage(img: TwoOrThreeD,
              padding: Tuple[int, int, int, int],
              mode: str = 'symmetric',
              decay: Or[str, None] = None):
     '''
-        Pad the image on four directions using symmetric `padding` (Up, Right, Down, Left) \\
-        and descending cosine window decay. `mode` can be `symmetric` or `edge`.`
+        Pad the image on four directions using symmetric `padding` (Up, Right, Down, Left). \\
+        `mode` determines the border value, can be `symmetric`, `edge`, `constant` (zero), `reflect`. \\
+        `decay` can be None, `cosine`, `smoothCosine` to perform a decay on padded border.
     '''
-    h, w = img.shape
+    cripAssert(mode in ['symmetric', 'edge', 'constant', 'reflect'], f'Invalid mode: {mode}.')
+    cripAssert(decay in [None, 'cosine', 'smoothCosine'], f'Invalid decay: {decay}.')
+
+    decays = {
+        'cosine':
+        lambda ascend, dot: np.cos(np.linspace(-np.pi / 2, 0, dot) if ascend else np.linspace(0, np.pi / 2, dot)),
+        'smoothCosine':
+        lambda ascend, dot: 0.5 * np.cos(np.linspace(-np.pi, 0, dot)) + 0.5
+        if ascend else 0.5 * np.cos(np.linspace(0, np.pi, dot)) + 0.5
+    }
+
+    h, w = getHW(img)
     nPadU, nPadR, nPadD, nPadL = padding
     padH = h + nPadU + nPadD
     padW = w + nPadL + nPadR
-    xPad = np.pad(img, ((nPadU, nPadD), (nPadL, nPadR)), mode=mode)
 
-    CommonCosineDecay = lambda ascend, dot: np.cos(
-        np.linspace(-np.pi / 2, 0, dot) if ascend else np.linspace(0, np.pi / 2, dot))
-    SmootherCosineDecay = lambda ascend, dot: 0.5 * np.cos(np.linspace(
-        -np.pi, 0, dot)) + 0.5 if ascend else 0.5 * np.cos(np.linspace(0, np.pi, dot)) + 0.5
-
-    decay = SmootherCosineDecay if smootherDecay else CommonCosineDecay
-
-    def decayLR(xPad, w, nPadL, nPadR):
+    def decayLR(xPad, w, nPadL, nPadR, decay):
         xPad[:, 0:nPadL] *= decay(True, nPadL)[:]
         xPad[:, w - nPadR:w] *= decay(False, nPadR)[:]
         return xPad
 
-    xPad = decayLR(xPad, padW, nPadL, nPadR)
-    xPad = decayLR(xPad.T, padH, nPadU, nPadD)
-    xPad = xPad.T
+    def procOne(img):
+        xPad = np.pad(img, ((nPadU, nPadD), (nPadL, nPadR)), mode=mode)
+        if decay is not None:
+            xPad = decayLR(xPad, padW, nPadL, nPadR, decays[decay])
+            xPad = decayLR(xPad.T, padH, nPadU, nPadD, decays[decay])
+            xPad = xPad.T
+        return xPad
 
-    return xPad
+    if is3D(img):
+        res = []
+        c = img.shape[0]
+        for i in range(c):
+            res.append(procOne(img[i, ...]))
+        return np.array(res)
+    else:
+        return procOne(img)
 
 
-def padSinogram(sgm, padding, mode='symmetric', smootherDecay=False):
+@ConvertListNDArray
+def padSinogram(sgms: TwoOrThreeD, padding: Or[int, Tuple[int, int]], mode='symmetric', decay='smoothCosine'):
     '''
-        'Truncated Artifact Correction' specialized function.
-        Extend the projection on horizontal directions using symmetric `padding` (single, or (Right, Left))
-        and descending cosine window decay. `mode` can be `symmetric` or `edge`.
+        Pad sinograms in width direction (same line detector elements) using `mode` and `decay`\\
+        with `padding` (single int, or (right, left)).
+
+        @see padImage for parameter details.
     '''
-    if type(padding) == int:
+    if isType(padding, int):
         padding = (padding, padding)
+
     l, r = padding
 
-    return padImage(sgm, (0, r, 0, l), mode, smootherDecay)
+    return padImage(sgms, (0, r, 0, l), mode, decay)
 
 
-def correctBeamHardeningPolynomial(postlog, coeffs, bias=True):
-    pass
+@ConvertListNDArray
+def correctBeamHardeningPolynomial(postlog: TwoOrThreeD, coeffs: Or[Tuple, np.poly1d], bias=True):
+    '''
+        Apply the polynomial (\mu L vs. PostLog fit) on postlog to perform basic beam hardening correction.
+        `coeffs` can be either `tuple` or `np.poly1d`. Set `bias=True` if your coeffs includes the bias term.
+    '''
+    cripWarning(isType(coeffs, np.poly1d) and bias is False, 'When using np.poly1d as coeffs, bias is always True.')
+    if isType(coeffs, Tuple):
+        if bias is False:
+            coeffs = np.poly1d([*coeffs, 0])
+
+    return coeffs(postlog)
+
+
+def limitAngle(projections: ThreeD, total: float, start: float, dst: float):
+    cripAssert(False, 'Unimplemented.')  # TODO
+
+
+def limitView(projections: ThreeD, ratio: float):
+    cripAssert(False, 'Unimplemented.')  # TODO

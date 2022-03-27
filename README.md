@@ -34,21 +34,6 @@ See [example](./example) here.
 
 crip is still under development. More features will be added in the future.
 
-- [ ] Get attenuation coefficient.
-- [ ] Enhance Read Spectrum.
-- [ ] Dual-Energy Decompose (Projection-domain, Image-domain).
-- [ ] Polynomial Beam Hardening correction. (Up to 2 masses, with fitter).
-- [ ] Enhance Binning with different mode.
-- [ ] HU and mu value two-way converter.
-- [ ] Consider ita(E) (Energy Conversion Efficiency) in integral. (PCD, EID)
-- [ ] Integrate reconstruction and forward projection tools. (mangoct, CRI)
-- [ ] Poisson noise injection.
-- [ ] Unit tests.
-- [ ] Examples.
-- [ ] Docs.
-- [ ] Logo.
-- [ ] Typings.
-
 ## Opensource License
 
 MIT

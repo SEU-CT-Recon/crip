@@ -8,6 +8,8 @@ import os
 import logging
 import math
 import numpy as np
+import sys
+
 from ._typing import *
 
 
@@ -198,9 +200,6 @@ def degToRad(x):
     return x / 180 * np.pi
 
 
-import sys
-
-
 def sysPlatform():
     platform = sys.platform
 
@@ -210,3 +209,13 @@ def sysPlatform():
         return 'Linux'
 
     cripAssert(False, f'Unsupported platform: {platform}.')
+
+
+def getHW(img: np.ndarray):
+    if is3D(img):
+        _, h, w = img.shape
+    elif is2D(img):
+        h, w = img.shape
+    else:
+        raise
+    return h, w
