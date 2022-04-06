@@ -1,8 +1,12 @@
 '''
     Dual-Energy CT module of crip.
 
+    [NOTE] This module is still under development and cannot be imported.
+
     https://github.com/z0gSh1u/crip
 '''
+
+__all__ = []
 
 from typing import List
 import numpy as np

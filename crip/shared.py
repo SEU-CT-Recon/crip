@@ -4,6 +4,11 @@
     https://github.com/z0gSh1u/crip
 '''
 
+__all__ = [
+    'rotate', 'verticalFlip', 'horizontalFlip', 'stackFlip', 'resize', 'gaussianSmooth', 'stackImages', 'splitImages',
+    'binning', 'transpose', 'permute'
+]
+
 import numpy as np
 import cv2  # TODO: remove this in the future.
 
@@ -12,7 +17,7 @@ from ._typing import *
 
 
 @ConvertListNDArray
-def rotate(img: TwoOrThreeD, deg: int):
+def rotate(img: TwoOrThreeD, deg: int) -> TwoOrThreeD:
     '''
         Rotate the image or each image in a volume by deg [DEG] (multiple of 90) clockwise.
     '''
@@ -25,7 +30,7 @@ def rotate(img: TwoOrThreeD, deg: int):
     return np.rot90(img, -k, axes)
 
 
-def verticalFlip(img: TwoOrThreeD, copy=False):
+def verticalFlip(img: TwoOrThreeD, copy=False) -> TwoOrThreeD:
     '''
         Vertical flip one image, or each image in a volume.
 
@@ -39,7 +44,7 @@ def verticalFlip(img: TwoOrThreeD, copy=False):
         return img[..., ::-1, :]
 
 
-def horizontalFlip(img: TwoOrThreeD, copy=False):
+def horizontalFlip(img: TwoOrThreeD, copy=False) -> TwoOrThreeD:
     '''
         Horizontal flip one image, or each image in a volume.
         
@@ -53,9 +58,9 @@ def horizontalFlip(img: TwoOrThreeD, copy=False):
         return img[..., ::-1]
 
 
-def stackFlip(img: ThreeD, copy=False):
+def stackFlip(img: ThreeD, copy=False) -> ThreeD:
     '''
-        Flip a stack in z-axis, i.e., reverse slices.
+        Flip a stack w.r.t. z-axis, i.e., reverse slices.
 
         Set `copy = True` to get a copy of array, otherwise a view only.
     '''
@@ -67,7 +72,10 @@ def stackFlip(img: ThreeD, copy=False):
         return np.flip(img, axis=0)
 
 
-def resize(img: TwoOrThreeD, dsize: Tuple[int] = None, scale: Tuple[Or[float, int]] = None, interp: str = 'bicubic'):
+def resize(img: TwoOrThreeD,
+           dsize: Tuple[int] = None,
+           scale: Tuple[Or[float, int]] = None,
+           interp: str = 'bicubic') -> TwoOrThreeD:
     '''
         Resize the image or each image in a volume to `dsize = (H, W)` (if dsize is not None) or scale 
         by `scale = (facH, facW)` using `interp` (bicubic, linear, nearest available).
@@ -113,7 +121,7 @@ def gaussianSmooth(img: TwoOrThreeD, sigma: Or[float, int, Tuple[Or[float, int]]
 
 
 @ConvertListNDArray
-def stackImages(imgList: ListNDArray, dtype=None):
+def stackImages(imgList: ListNDArray, dtype=None) -> NDArray:
     '''
         Stack seperate image into one numpy array. I.e., views * (h, w) -> (views, h, w).
 
@@ -125,7 +133,7 @@ def stackImages(imgList: ListNDArray, dtype=None):
     return imgList
 
 
-def splitImages(imgs: ThreeD, dtype=None):
+def splitImages(imgs: ThreeD, dtype=None) -> List[NDArray]:
     '''
         Split stacked image into seperate numpy arrays. I.e., (views, h, w) -> views * (h, w).
 
@@ -140,41 +148,26 @@ def splitImages(imgs: ThreeD, dtype=None):
 
 
 @ConvertListNDArray
-def binning(img: TwoOrThreeD, rate: int = 1, axis='y', mode='sample'):
+def binning(img: TwoOrThreeD, rate: int = 1, axis='y') -> TwoOrThreeD:
     '''
-        Perform binning on certain `axis` with `rate` and `mode`.
+        Perform binning on certain `axis` with `rate`.
     '''
     cripAssert(isInt(rate) and rate > 0, 'rate should be positive int.')
     cripAssert(inArray(axis, ['x', 'y', 'z']), 'Invalid axis.')
-    cripAssert(inArray(mode, ['sample', 'min', 'max', 'sum', 'mean']))
-
-    axis = ['z', 'y', 'x'].index(axis)
 
     if is2D(img):
         cripAssert(axis != 'z', 'img is 2D, while axis is z.')
-        axis -= 1
 
-    if mode == 'sample':  # sample per `rate` frames
-        # TODO make it nicer.
-        if axis == 0:
-            return img[..., ::rate]
-        if axis == 1:
-            return img[..., ::rate, :]
-        if axis == 2:
-            return img[::rate, ...]
-
-    else:
-        reducer = eval(f'np.{mode}')  # min, max, sum, mean
-        # Tricky. Is it right?
-        return reducer(np.reshape(img, (-1, rate)), axis)
-
-
-def unBinning():
-    pass  # TODO
+    if axis == 'x':
+        return img[..., ::rate]
+    if axis == 'y':
+        return img[..., ::rate, :]
+    if axis == 'z':
+        return img[::rate, ...]
 
 
 @ConvertListNDArray
-def transpose(vol: TwoOrThreeD, order: tuple):
+def transpose(vol: TwoOrThreeD, order: tuple) -> TwoOrThreeD:
     '''
         Transpose vol with axes swapping `order`.
     '''
@@ -187,7 +180,7 @@ def transpose(vol: TwoOrThreeD, order: tuple):
 
 
 @ConvertListNDArray
-def permute(vol: ThreeD, from_: str, to: str):
+def permute(vol: ThreeD, from_: str, to: str) -> ThreeD:
     '''
         Permute axes (transpose) from `from_` to `to`, reslicing the reconstructed volume.
 
@@ -207,7 +200,6 @@ def permute(vol: ThreeD, from_: str, to: str):
         [(1, 2, 0), (0, 1, 2), (0, 2, 1)],  # cor
         [(2, 0, 1), (0, 2, 1), (0, 1, 2)],  # tra
     ]
-
     order = orders[dirFrom][dirTo]
 
     return transpose(vol, order)

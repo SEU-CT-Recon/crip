@@ -13,28 +13,31 @@ import pydicom
 import natsort
 
 from .utils import *
+from ._typing import *
 
 
-def listDirectory(folder: str, sort='nat', joinFolder=False, appendBasename=False, reverse=False):
+def listDirectory(folder: str, sort='nat', style='filename', natAlg='default', reverse=False):
     '''
-        List files under `folder` and `sort` using `"nat"` (natural) or \\
-        `"dict"` (dictionary) order. Set `joinFolder` to True to get paths, \\
-        otherwise filenames only. Set `appendBasename` to True to get an extra basename in returned tuple.
+        List files under `folder` and sort using `"nat"` (natural) or \\
+        `"dict"` (dictionary) order. The return `style` can be `filename`, `fullpath` or `both`.
     '''
-    cripAssert(sort in ['nat', 'dict'], 'Invalid `sort` method.')
-    cripAssert(not ((not joinFolder) and appendBasename), 'appendBasename is invalid when joinFolder is False.')
+    cripAssert(sort in ['nat', 'dict'], 'Invalid sort.')
+    cripAssert(style in ['filename', 'fullpath', 'both'], 'Invalid style.')
+    cripAssert(natAlg in ['default', 'locale'], 'Invalid natAlg.')
 
     files = os.listdir(folder)
-    files = sorted(files, reverse=reverse) if sort == 'dict' else natsort.natsorted(files, reverse=reverse)
+    files = sorted(files, reverse=reverse) if sort == 'dict' else natsort.natsorted(
+        files, reverse=reverse, alg={
+            'default': natsort.ns.DEFAULT,
+            'locale': natsort.ns.LOCALE
+        }[natAlg])
 
-    if joinFolder:
-        joined = [os.path.join(folder, file) for file in files]
-        if appendBasename:
-            return joined, files
-        else:
-            return joined
-    else:
+    if style == 'filename':
         return files
+    elif style == 'fullpath':
+        return [os.path.join(folder, file) for file in files]
+    elif style == 'both':
+        return [os.path.join(folder, file) for file in files], files
 
 
 def imreadDicom(path: str, dtype=None):
@@ -92,8 +95,7 @@ def imwriteTiff(img: TwoOrThreeD, path: str, dtype=None):
     '''
     if dtype is not None:
         img = img.astype(dtype)
-
     if isFloatDtype(img.dtype):
-        img = img.astype(np.float32)
+        img = img.astype(np.float32)  # always use float32 for floating image.
 
     tifffile.imwrite(path, img)

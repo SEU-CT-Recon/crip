@@ -11,7 +11,7 @@ from .utils import *
 
 
 @ConvertListNDArray
-def averageProjections(projections: TwoOrThreeD):
+def averageProjections(projections: TwoOrThreeD) -> TwoD:
     '''
         Average projections. For example, to calculate the flat field.
         Projections can be either `(views, H, W)` shaped numpy array, or
@@ -29,7 +29,7 @@ def averageProjections(projections: TwoOrThreeD):
 def flatDarkFieldCorrection(projections: TwoOrThreeD,
                             flat: Or[TwoD, float],
                             coeff: float = 1,
-                            dark: Or[TwoD, float] = 0):
+                            dark: Or[TwoD, float] = 0) -> TwoOrThreeD:
     '''
         Perform flat field (air) and dark field correction to get post-log value.
 
@@ -49,7 +49,7 @@ def flatDarkFieldCorrection(projections: TwoOrThreeD,
     return res
 
 
-def flatDarkFieldCorrectionStandalone(projection: TwoD):
+def flatDarkFieldCorrectionStandalone(projection: TwoD) -> TwoD:
     '''
         Perform flat field and dark field correction without actual field image.
 
@@ -62,7 +62,7 @@ def flatDarkFieldCorrectionStandalone(projection: TwoD):
 
 
 @ConvertListNDArray
-def injectGaussianNoise(projections: TwoOrThreeD, sigma: float, mu: float = 0):
+def injectGaussianNoise(projections: TwoOrThreeD, sigma: float, mu: float = 0) -> TwoOrThreeD:
     '''
         Inject Gaussian noise which obeys distribution `N(\mu, \sigma^2)`.
     '''
@@ -82,7 +82,7 @@ def injectGaussianNoise(projections: TwoOrThreeD, sigma: float, mu: float = 0):
 
 
 @ConvertListNDArray
-def injectPoissonNoise(projections: TwoOrThreeD, nPhoton: int):
+def injectPoissonNoise(projections: TwoOrThreeD, nPhoton: int) -> TwoOrThreeD:
     '''
         Inject Poisson noise which obeys distribution `P(\lamda)`.
         `nPhoton` is the number of photon hitting per detector element.
@@ -91,15 +91,14 @@ def injectPoissonNoise(projections: TwoOrThreeD, nPhoton: int):
 
     def injectOne(img):
         I0 = np.max(img)
+        cripAssert(I0 != 0, 'The maximum of img is 0.')
         proj = nPhoton * np.exp(-img / I0)
         proj = np.random.poisson(proj)
         proj = -np.log(img / nPhoton) * I0
         return proj
 
     if is3D(projections):
-        res = np.zeros_like(projections)
-        for i in range(projections.shape[0]):
-            res[i, ...] = injectOne(projections[i, ...])
+        res = np.zeros_like(list(map(injectOne, projections)))
     else:
         res = injectOne(projections)
 
@@ -180,10 +179,7 @@ def padImage(img: TwoOrThreeD,
         return xPad
 
     if is3D(img):
-        res = []
-        c = img.shape[0]
-        for i in range(c):
-            res.append(procOne(img[i, ...]))
+        res = [procOne(img[i, ...]) for i in range(img.shape[0])]
         return np.array(res)
     else:
         return procOne(img)
@@ -209,9 +205,10 @@ def padSinogram(sgms: TwoOrThreeD, padding: Or[int, Tuple[int, int]], mode='symm
 def correctBeamHardeningPolynomial(postlog: TwoOrThreeD, coeffs: Or[Tuple, np.poly1d], bias=True):
     '''
         Apply the polynomial (\mu L vs. PostLog fit) on postlog to perform basic beam hardening correction.
-        `coeffs` can be either `tuple` or `np.poly1d`. Set `bias=True` if your coeffs includes the bias term.
+        `coeffs` can be either `tuple` or `np.poly1d`. Set `bias=True` if your coeffs includes the bias (order 0) term.
     '''
     cripWarning(isType(coeffs, np.poly1d) and bias is False, 'When using np.poly1d as coeffs, bias is always True.')
+
     if isType(coeffs, Tuple):
         if bias is False:
             coeffs = np.poly1d([*coeffs, 0])

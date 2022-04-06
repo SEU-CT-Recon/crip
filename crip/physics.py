@@ -39,6 +39,9 @@ class Spectrum:
 
         self.unit = unit
         self.omega = np.array(omega)
+        self.update()
+
+    def update(self):
         self.sumOmega = np.sum(self.omega)
 
     @staticmethod
@@ -49,7 +52,7 @@ class Spectrum:
             Refer to the document for spectrum text format. @see https://github.com/z0gSh1u/crip            
         '''
         cripAssert(inArray(unit, ['MeV', 'keV', 'eV']), f'Invalid unit: {unit}')
-        
+
         omega = np.zeros(DiagEnergyLen, dtype=DefaultFloatDType)
 
         # split content into list, and ignore all lines starting with non-digit
@@ -58,13 +61,13 @@ class Spectrum:
                    list(map(lambda x: x.strip(),
                             specText.replace('\r\n', '\n').split('\n')))))
 
-        def procSpectrumLine(line: str):
+        def procSpecLine(line: str):
             tup = tuple(map(float, re.split(r'\s+', line)))
             cripAssert(len(tup) == 2, f'Invalid line in spectrum: \n{line}\n')
             return tup  # (energy, omega)
 
         # parse the spectrum text
-        content = np.array(list(map(procSpectrumLine, content)), dtype=DefaultFloatDType)
+        content = np.array(list(map(procSpecLine, content)), dtype=DefaultFloatDType)
         specEnergy, specOmega = content.T
 
         # to keV
@@ -96,8 +99,8 @@ class Atten:
         cripAssert(rho > 0, '`rho` should > 0.')
 
         self.attenText = attenText
-        self.rho = rho
         self.energyUnit = energyUnit
+        self.rho = rho
 
         self.mu = np.zeros(DiagEnergyLen, dtype=DefaultFloatDType)
         self._read()

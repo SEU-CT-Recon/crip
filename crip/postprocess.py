@@ -10,17 +10,20 @@ from ._typing import *
 from .utils import *
 
 
-def drawCircle(rec_img, r, center=None):
+def drawCircle(slice: TwoD, radius: int, center=None) -> Tuple[NDArray, NDArray]:
     '''
-        'Truncated Artifact Correction' specialized function.
-        Draw circle before crop
+        Return points of a circle on `center` (slice center if `None`) with `radius`.
+
+        This function can be used for preview FOV crop.
     '''
+    cripAssert(radius >= 1, 'radius should >= 1.')
+
     theta = np.arange(0, 2 * np.pi, 0.01)
     if center is None:
-        center = (rec_img.shape[0] // 2, rec_img.shape[1] // 2)
+        center = (slice.shape[0] // 2, slice.shape[1] // 2)
 
-    x = center[0] + r * np.cos(theta)
-    y = center[1] + r * np.sin(theta)
+    x = center[0] + radius * np.cos(theta)
+    y = center[1] + radius * np.sin(theta)
 
     return x, y
 
@@ -56,7 +59,7 @@ def fovCropRadius(SOD: float, SDD: float, detWidth: float, reconPixSize: float):
 
 
 @ConvertListNDArray
-def fovCrop(volume: ThreeD, radius: int, fill=0):
+def fovCrop(volume: ThreeD, radius: int, fill=0) -> ThreeD:
     '''
         Crop a circle FOV on reconstructed image `volume` with `radius` (pixel) \\
         and `fill` value for outside FOV.
@@ -67,9 +70,9 @@ def fovCrop(volume: ThreeD, radius: int, fill=0):
     _, N, M = volume.shape
     x = np.array(range(N), dtype=DefaultFloatDType) - N / 2 - 0.5
     y = np.array(range(M), dtype=DefaultFloatDType) - M / 2 - 0.5
-    XX, YY = np.meshgrid(x, y)
+    xx, yy = np.meshgrid(x, y)
 
-    outside = XX**2 + YY**2 > radius**2
+    outside = xx**2 + yy**2 > radius**2
     cropped = np.array(volume)
     cropped[:, outside] = fill
 
@@ -77,7 +80,7 @@ def fovCrop(volume: ThreeD, radius: int, fill=0):
 
 
 @ConvertListNDArray
-def muToHU(image: TwoOrThreeD, muWater: float, b=1000):
+def muToHU(image: TwoOrThreeD, muWater: float, b=1000) -> TwoOrThreeD:
     '''
         Convert \mu map to HU.
         
@@ -89,7 +92,7 @@ def muToHU(image: TwoOrThreeD, muWater: float, b=1000):
 
 
 @ConvertListNDArray
-def huToMu(image: TwoOrThreeD, muWater: float, b=1000):
+def huToMu(image: TwoOrThreeD, muWater: float, b=1000) -> TwoOrThreeD:
     '''
         Convert HU to mu. (Invert of `MuToHU`.)
     '''
@@ -99,7 +102,7 @@ def huToMu(image: TwoOrThreeD, muWater: float, b=1000):
 
 
 @ConvertListNDArray
-def huNoRescale(image: TwoOrThreeD, b: float = -1000, k: float = 1):
+def huNoRescale(image: TwoOrThreeD, b: float = -1000, k: float = 1) -> TwoOrThreeD:
     '''
         Invert the rescale-slope (y = kx + b) of HU value to get linear relationship between HU and mu.
     '''
@@ -108,6 +111,10 @@ def huNoRescale(image: TwoOrThreeD, b: float = -1000, k: float = 1):
     return (image - b) / k
 
 
-def postlogToProj(postlog: TwoOrThreeD):
-    # TODO
-    pass
+def postlogToProj(postlog: TwoOrThreeD, air: TwoD) -> TwoOrThreeD:
+    '''
+        Invert postlog image to the original projection.
+    '''
+    res = np.exp(-postlog) * air
+
+    return res

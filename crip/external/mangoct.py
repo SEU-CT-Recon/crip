@@ -1,6 +1,8 @@
 '''
     MangoCT integration of crip.
 
+    [TODO] We are going to transfer `external` module to CRI. @see https://github.com/z0gSh1u/cri .
+
     https://github.com/z0gSh1u/crip
 '''
 

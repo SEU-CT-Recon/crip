@@ -5,8 +5,6 @@
     by z0gSh1u @ https://github.com/z0gSh1u/crip
 '''
 
-from . import _importcrip
-
 import os
 import numpy as np
 from crip.io import imreadTiff, imwriteTiff, imreadRaw

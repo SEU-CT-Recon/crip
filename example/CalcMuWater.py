@@ -4,9 +4,6 @@
     by z0gSh1u @ https://github.com/z0gSh1u/crip
 '''
 
-import sys
-sys.path.insert(0, '../')
-
 from crip.physics import calcMu, Atten, Spectrum
 
 # A sample spectrum file.
@@ -18,5 +15,5 @@ Energy (eV)    Omega
 
 spec = Spectrum.fromText(SpectrumFile, 'eV')
 atten = Atten.fromBuiltIn('Water', 1.0)
-mu = calcMu(atten, spec, lambda x: 1)
+mu = calcMu(atten, spec, 'PCD')
 print(f'\\mu = {mu} mm-1.')

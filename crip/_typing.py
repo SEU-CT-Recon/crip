@@ -23,8 +23,8 @@ try:
 except:
     FloatLike = Union[np.float16, np.float32, np.float64, float]
 
-ListNDArray = List[np.ndarray]
 NDArray = np.ndarray
+ListNDArray = List[NDArray]
 TwoD = NDArray
 ThreeD = Or[NDArray, ListNDArray]
 TwoOrThreeD = Or[TwoD, ThreeD]
