@@ -23,7 +23,6 @@
 </header>
 <section id="section-intro">
 <p>Low Dose CT (LDCT) module of crip.</p>
-<p>[NOTE] This module is still under development and cannot be imported now.</p>
 <p><a href="https://github.com/z0gSh1u/crip">https://github.com/z0gSh1u/crip</a></p>
 <details class="source">
 <summary>
@@ -32,12 +31,10 @@
 <pre><code class="python">&#39;&#39;&#39;
     Low Dose CT (LDCT) module of crip.
 
-    [NOTE] This module is still under development and cannot be imported now.
-
     https://github.com/z0gSh1u/crip
 &#39;&#39;&#39;
 
-__all__ = [&#39;limitAngle&#39;, &#39;limitView&#39;, &#39;injectGaussianNoise&#39;, &#39;injectPoissonNoise&#39;]
+__all__ = [&#39;limitAngle&#39;, &#39;limitView&#39;, &#39;injectGaussianNoise&#39;, &#39;injectPoissonNoise&#39;, &#39;totalVariation&#39;]
 
 import numpy as np
 from .shared import *
@@ -92,7 +89,21 @@ def injectPoissonNoise(projections: TwoOrThreeD, nPhoton: int) -&gt; TwoOrThreeD
     else:
         res = injectOne(projections)
 
-    return res</code></pre>
+    return res
+
+
+@ConvertListNDArray
+def totalVariation(img: TwoOrThreeD) -&gt; TwoOrThreeD:
+    &#39;&#39;&#39;
+        Computes the Total Variation (TV) of image or images.
+    &#39;&#39;&#39;
+    cripAssert(is2or3D(img), &#39;img should be 2 or 3D.&#39;)
+
+    vX = img[..., :, 1:] - img[..., :, :-1]
+    vY = img[..., 1:, :] - img[..., :-1, :]
+    tv = np.sum(np.abs(vX) + np.abs(vY), axis=(-2, -1))
+
+    return tv</code></pre>
 </details>
 </section>
 <section>
@@ -189,6 +200,29 @@ def injectPoissonNoise(projections: TwoOrThreeD, nPhoton: int) -&gt; TwoOrThreeD
     cripAssert(False, &#39;Unimplemented.&#39;)</code></pre>
 </details>
 </dd>
+<dt id="crip.lowdose.totalVariation"><code class="name flex">
+<span>def <span class="ident">totalVariation</span></span>(<span>img: Union[numpy.ndarray, List[numpy.ndarray]]) ‑> Union[numpy.ndarray, List[numpy.ndarray]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Computes the Total Variation (TV) of image or images.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@ConvertListNDArray
+def totalVariation(img: TwoOrThreeD) -&gt; TwoOrThreeD:
+    &#39;&#39;&#39;
+        Computes the Total Variation (TV) of image or images.
+    &#39;&#39;&#39;
+    cripAssert(is2or3D(img), &#39;img should be 2 or 3D.&#39;)
+
+    vX = img[..., :, 1:] - img[..., :, :-1]
+    vY = img[..., 1:, :] - img[..., :-1, :]
+    tv = np.sum(np.abs(vX) + np.abs(vY), axis=(-2, -1))
+
+    return tv</code></pre>
+</details>
+</dd>
 </dl>
 </section>
 <section>
@@ -211,6 +245,7 @@ def injectPoissonNoise(projections: TwoOrThreeD, nPhoton: int) -&gt; TwoOrThreeD
 <li><code><a title="crip.lowdose.injectPoissonNoise" href="#crip.lowdose.injectPoissonNoise">injectPoissonNoise</a></code></li>
 <li><code><a title="crip.lowdose.limitAngle" href="#crip.lowdose.limitAngle">limitAngle</a></code></li>
 <li><code><a title="crip.lowdose.limitView" href="#crip.lowdose.limitView">limitView</a></code></li>
+<li><code><a title="crip.lowdose.totalVariation" href="#crip.lowdose.totalVariation">totalVariation</a></code></li>
 </ul>
 </li>
 </ul>

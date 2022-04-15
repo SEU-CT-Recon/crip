@@ -37,7 +37,7 @@
     https://github.com/z0gSh1u/crip
 &#39;&#39;&#39;
 
-__all__ = [&#39;singleMatMuDecompose&#39;, &#39;calcAttenedSpec&#39;, &#39;calcPostLog&#39;, &#39;deDecompGetCoeff&#39;]
+__all__ = [&#39;singleMatMuDecompose&#39;, &#39;calcAttenedSpec&#39;, &#39;calcPostLog&#39;, &#39;deDecompGetCoeff&#39;, &#39;deDecompProj&#39;, &#39;deDecompRecon&#39;]
 
 from typing import Iterable, List
 import numpy as np
@@ -254,6 +254,38 @@ def deDecompRecon():
     return beta, gamma</code></pre>
 </details>
 </dd>
+<dt id="crip.de.deDecompProj"><code class="name flex">
+<span>def <span class="ident">deDecompProj</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Perform dual-energy decompose in projection domain.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def deDecompProj():
+    &#39;&#39;&#39;
+        Perform dual-energy decompose in projection domain.
+    &#39;&#39;&#39;
+    cripAssert(False, &#39;Unimplemented.&#39;)  </code></pre>
+</details>
+</dd>
+<dt id="crip.de.deDecompRecon"><code class="name flex">
+<span>def <span class="ident">deDecompRecon</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Perform dual-energy decompose in reconstruction domain.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def deDecompRecon():
+    &#39;&#39;&#39;
+        Perform dual-energy decompose in reconstruction domain.
+    &#39;&#39;&#39;
+    cripAssert(False, &#39;Unimplemented.&#39;)  </code></pre>
+</details>
+</dd>
 <dt id="crip.de.singleMatMuDecompose"><code class="name flex">
 <span>def <span class="ident">singleMatMuDecompose</span></span>(<span>src: <a title="crip.physics.Atten" href="physics.html#crip.physics.Atten">Atten</a>, basis1: <a title="crip.physics.Atten" href="physics.html#crip.physics.Atten">Atten</a>, basis2: <a title="crip.physics.Atten" href="physics.html#crip.physics.Atten">Atten</a>, method='coeff', energyRange=range(0, 151)) ‑> numpy.ndarray</span>
 </code></dt>
@@ -313,6 +345,8 @@ def deDecompRecon():
 <li><code><a title="crip.de.calcAttenedSpec" href="#crip.de.calcAttenedSpec">calcAttenedSpec</a></code></li>
 <li><code><a title="crip.de.calcPostLog" href="#crip.de.calcPostLog">calcPostLog</a></code></li>
 <li><code><a title="crip.de.deDecompGetCoeff" href="#crip.de.deDecompGetCoeff">deDecompGetCoeff</a></code></li>
+<li><code><a title="crip.de.deDecompProj" href="#crip.de.deDecompProj">deDecompProj</a></code></li>
+<li><code><a title="crip.de.deDecompRecon" href="#crip.de.deDecompRecon">deDecompRecon</a></code></li>
 <li><code><a title="crip.de.singleMatMuDecompose" href="#crip.de.singleMatMuDecompose">singleMatMuDecompose</a></code></li>
 </ul>
 </li>

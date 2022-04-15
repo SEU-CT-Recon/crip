@@ -1,12 +1,10 @@
 '''
     Low Dose CT (LDCT) module of crip.
 
-    [NOTE] This module is still under development and cannot be imported now.
-
     https://github.com/z0gSh1u/crip
 '''
 
-__all__ = ['limitAngle', 'limitView', 'injectGaussianNoise', 'injectPoissonNoise']
+__all__ = ['limitAngle', 'limitView', 'injectGaussianNoise', 'injectPoissonNoise', 'totalVariation']
 
 import numpy as np
 from .shared import *
@@ -62,3 +60,17 @@ def injectPoissonNoise(projections: TwoOrThreeD, nPhoton: int) -> TwoOrThreeD:
         res = injectOne(projections)
 
     return res
+
+
+@ConvertListNDArray
+def totalVariation(img: TwoOrThreeD) -> TwoOrThreeD:
+    '''
+        Computes the Total Variation (TV) of image or images.
+    '''
+    cripAssert(is2or3D(img), 'img should be 2 or 3D.')
+
+    vX = img[..., :, 1:] - img[..., :, :-1]
+    vY = img[..., 1:, :] - img[..., :-1, :]
+    tv = np.sum(np.abs(vX) + np.abs(vY), axis=(-2, -1))
+
+    return tv

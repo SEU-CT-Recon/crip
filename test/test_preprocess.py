@@ -1,6 +1,8 @@
 import unittest
 from unittest import TestCase
 
+import numpy as np
+
 from crip.preprocess import *
 from crip.utils import isOfSameShape
 

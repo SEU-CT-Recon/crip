@@ -23,7 +23,6 @@
 </header>
 <section id="section-intro">
 <p>Deep Learning module of crip.</p>
-<p>[NOTE] This module is still under development and cannot be imported now.</p>
 <p><a href="https://github.com/z0gSh1u/crip">https://github.com/z0gSh1u/crip</a></p>
 <details class="source">
 <summary>
@@ -32,10 +31,23 @@
 <pre><code class="python">&#39;&#39;&#39;
     Deep Learning module of crip.
     
-    [NOTE] This module is still under development and cannot be imported now.
-
     https://github.com/z0gSh1u/crip
-&#39;&#39;&#39;</code></pre>
+&#39;&#39;&#39;
+
+__all__ = [&#39;TotalVariation&#39;]
+
+import torch
+import torch.nn as nn
+
+from .lowdose import totalVariation
+
+
+class TotalVariation(nn.Module):
+    def __init__(self) -&gt; None:
+        super().__init__()
+
+    def forward(self, x):
+        return torch.from_numpy(totalVariation(x.numpy()))</code></pre>
 </details>
 </section>
 <section>
@@ -45,6 +57,87 @@
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="crip.dl.TotalVariation"><code class="flex name class">
+<span>class <span class="ident">TotalVariation</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Base class for all neural network modules.</p>
+<p>Your models should also subclass this class.</p>
+<p>Modules can also contain other Modules, allowing to nest them in
+a tree structure. You can assign the submodules as regular attributes::</p>
+<pre><code>import torch.nn as nn
+import torch.nn.functional as F
+
+class Model(nn.Module):
+    def __init__(self):
+        super(Model, self).__init__()
+        self.conv1 = nn.Conv2d(1, 20, 5)
+        self.conv2 = nn.Conv2d(20, 20, 5)
+
+    def forward(self, x):
+        x = F.relu(self.conv1(x))
+        return F.relu(self.conv2(x))
+</code></pre>
+<p>Submodules assigned in this way will be registered, and will have their
+parameters converted too when you call :meth:<code>to</code>, etc.</p>
+<p>:ivar training: Boolean represents whether this module is in training or
+evaluation mode.
+:vartype training: bool</p>
+<p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TotalVariation(nn.Module):
+    def __init__(self) -&gt; None:
+        super().__init__()
+
+    def forward(self, x):
+        return torch.from_numpy(totalVariation(x.numpy()))</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>torch.nn.modules.module.Module</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="crip.dl.TotalVariation.dump_patches"><code class="name">var <span class="ident">dump_patches</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="crip.dl.TotalVariation.training"><code class="name">var <span class="ident">training</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="crip.dl.TotalVariation.forward"><code class="name flex">
+<span>def <span class="ident">forward</span></span>(<span>self, x) ‑> Callable[..., Any]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the :class:<code>Module</code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def forward(self, x):
+    return torch.from_numpy(totalVariation(x.numpy()))</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -56,6 +149,18 @@
 <li><h3>Super-module</h3>
 <ul>
 <li><code><a title="crip" href="index.html">crip</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="crip.dl.TotalVariation" href="#crip.dl.TotalVariation">TotalVariation</a></code></h4>
+<ul class="">
+<li><code><a title="crip.dl.TotalVariation.dump_patches" href="#crip.dl.TotalVariation.dump_patches">dump_patches</a></code></li>
+<li><code><a title="crip.dl.TotalVariation.forward" href="#crip.dl.TotalVariation.forward">forward</a></code></li>
+<li><code><a title="crip.dl.TotalVariation.training" href="#crip.dl.TotalVariation.training">training</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

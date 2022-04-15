@@ -1,14 +1,15 @@
 <p align="center">
   <img src="crip.png" />
 </p>
-
-A all-in-one tool for Cone-Beam CT Data IO, Pre/Post-process, and Physics, Dual Energy, Low Dose, Deep Learning researches and everything only except Reconstruction.
+*A all-in-one tool for Cone-Beam CT Data IO, Pre/Post-process, and Physics, Dual Energy, Low Dose, Deep Learning researches and everything only except Reconstruction.*
 
 ## Install
 
 - Via PyPI
 
-  In the future.
+  ```sh
+  pip install crip
+  ```
 
 - Via Wheel
 
@@ -22,21 +23,24 @@ A all-in-one tool for Cone-Beam CT Data IO, Pre/Post-process, and Physics, Dual 
 
 All functions are with clear documentation by comments. Just consider the function name and explore the source code, or refer to examples to start.
 
-- `crip.io` for file input and output (RAW, DICOM and TIFF supported.)
-- `crip.physics` for CT physics calculation.
+- `crip.de` for Dual-Energy CT.
+- `crip.dl` for Deep Learning.
+
+- `crip.io` for file read/write (RAW, DICOM and TIFF supported), and enhanced `listdir`.
+- `crip.physics` for attenuation, spectrum, \mu calculation, etc.
 - `crip.postprocess` for data post-processing.
-- `crip.preprocess` for data pre-processing.
-- `crip.shared` for common operations.
+- `crip.preprocess` for data pre-processing, like flat field correction.
+- `crip.shared` for other common operations.
 
-## Example
+crip is still under development. More features will be added in the future. And contributions are strongly welcomed.
 
-See [example](./example) here.
+## Documentation and Example
 
-## Roadmap
+- [Official documentation](https://z0gsh1u.github.io/crip/)
+- [Official example](./example)
+- [ArtifactReduction](https://github.com/CandleHouse/ArtifactReduction) using crip
+- Ask everything in [issue](https://github.com/z0gSh1u/crip/issues)
 
-crip is still under development. More features will be added in the future.
-
-## Opensource License
+## License
 
 MIT
-

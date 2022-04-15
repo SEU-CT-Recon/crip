@@ -6,7 +6,7 @@
     https://github.com/z0gSh1u/crip
 '''
 
-__all__ = ['singleMatMuDecompose', 'calcAttenedSpec', 'calcPostLog', 'deDecompGetCoeff']
+__all__ = ['singleMatMuDecompose', 'calcAttenedSpec', 'calcPostLog', 'deDecompGetCoeff', 'deDecompProj', 'deDecompRecon']
 
 from typing import Iterable, List
 import numpy as np

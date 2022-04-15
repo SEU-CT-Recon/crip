@@ -120,6 +120,7 @@ def resize(img: TwoOrThreeD,
         cripAssert(scale is None, &#39;scale should not be set when dsize is set.&#39;)
         # OpenCV dsize is in (W, H) form, so we reverse it.
         dsize = dsize[::-1]
+        fH = fW = None
 
     interp_ = {&#39;bicubic&#39;: cv2.INTER_CUBIC, &#39;linear&#39;: cv2.INTER_LINEAR, &#39;nearest&#39;: cv2.INTER_NEAREST}
 
@@ -389,6 +390,7 @@ by <code>scale = (facH, facW)</code> using <code>interp</code> (bicubic, linear,
         cripAssert(scale is None, &#39;scale should not be set when dsize is set.&#39;)
         # OpenCV dsize is in (W, H) form, so we reverse it.
         dsize = dsize[::-1]
+        fH = fW = None
 
     interp_ = {&#39;bicubic&#39;: cv2.INTER_CUBIC, &#39;linear&#39;: cv2.INTER_LINEAR, &#39;nearest&#39;: cv2.INTER_NEAREST}
 
