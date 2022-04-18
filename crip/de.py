@@ -1,85 +1,53 @@
 '''
     Dual-Energy CT module of crip.
 
-    [NOTE] This module is still under development and cannot be imported now.
-
     https://github.com/z0gSh1u/crip
 '''
 
-__all__ = ['singleMatMuDecompose', 'calcAttenedSpec', 'calcPostLog', 'deDecompGetCoeff', 'deDecompProj', 'deDecompRecon']
+__all__ = [
+    'singleMatMuDecompose', 'calcAttenedSpec', 'calcPostLog', 'deDecompGetCoeff', 'deDecompProj', 'deDecompRecon'
+]
 
-from typing import Iterable, List
+from typing import Iterable, Tuple
 import numpy as np
 
-from .utils import cripAssert, isType
-from ._typing import DefaultFloatDType, Or, NDArray
-from .physics import Atten, DiagEnergyRange, Spectrum
+from .utils import ConvertListNDArray, cripAssert, getHW, is2D, isOfSameShape
+from ._typing import DefaultFloatDType, Or, NDArray, TwoOrThreeD, ThreeD
+from .physics import Atten, DiagEnergyRange, Spectrum, calcAttenedSpec, calcPostLog
 
 
 def singleMatMuDecompose(src: Atten,
-                         basis1: Atten,
-                         basis2: Atten,
+                         base1: Atten,
+                         base2: Atten,
                          method='coeff',
                          energyRange=DiagEnergyRange) -> NDArray:
     '''
-        Decompose single material `src`'s attenuation onto `basis1` and `basis2`.
+        Decompose single material `src`'s attenuation onto `base1` and `base2`.
 
-        Return decomposing coefficients when `method = 'coeff'`, or proportion when `method = 'prop'`.
+        Return decomposing coefficients along energies when `method = 'coeff'`, or proportion when `method = 'prop'`.
     '''
     cripAssert(method in ['coeff', 'prop'], 'Invalid method.')
 
     range_ = np.array(energyRange)
-    attenMu = src.mu[range_]
-    attenMu1 = basis1.mu[range_]
-    attenMu2 = basis2.mu[range_]
+    srcMu = src.mu[range_]
+    baseMu1 = base1.mu[range_]
+    baseMu2 = base2.mu[range_]
 
-    M = np.array([attenMu1, attenMu2], dtype=DefaultFloatDType).T
+    M = np.array([baseMu1, baseMu2], dtype=DefaultFloatDType).T
 
     if method == 'prop':
-        M /= attenMu
-        attenMu = np.ones_like(attenMu)
+        M /= srcMu
+        srcMu = np.ones_like(srcMu)
 
-    res = np.linalg.pinv(M) @ (attenMu.T)
+    res = np.linalg.pinv(M) @ (srcMu.T)
 
     return res
 
 
-def calcAttenedSpec(spec: Spectrum, attens: Or[Atten, List[Atten]], Ls: Or[float, List[float]]) -> Spectrum:
-    '''
-        Calculate the attenuated spectrum using polychromatic Beer-Lambert law. Supports multiple materials.
-
-        I.e., `\\Omega(E) \\exp (- \\mu(E) L) \\through all E`. L in mm.
-    '''
-    if isType(attens, Atten):
-        attens = [attens]
-    if isType(Ls, float):
-        Ls = [Ls]
-    cripAssert(len(attens) == len(Ls), 'atten should have same length as L.')
-
-    N = len(attens)
-    omega = np.array(spec.omega, copy=True)
-    for i in range(N):  # materials
-        atten = attens[i]
-        L = Ls[i]
-        for E in DiagEnergyRange:  # energies
-            omega[E] *= np.exp(-atten.mu[E] * L)
-
-    return Spectrum(omega, spec.unit)
-
-
-def calcPostLog(spec: Spectrum, atten: Or[Atten, List[Atten]], L: Or[float, List[float]]) -> float:
-    '''
-        Calculate post-log value after attenuation of `L` length `atten`. L in mm.
-    '''
-    attenSpec = calcAttenedSpec(spec, atten, L)
-
-    return -np.log(attenSpec.sumOmega / spec.sumOmega)
-
-
-def deDecompGetCoeff(lowSpec: Spectrum, highSpec: Spectrum, basis1: Atten, len1: Or[NDArray, Iterable], basis2: Atten,
+def deDecompGetCoeff(lowSpec: Spectrum, highSpec: Spectrum, base1: Atten, len1: Or[NDArray, Iterable], base2: Atten,
                      len2: Or[NDArray, Iterable]):
     '''
-        Calculate the decomposing coefficient (Order 2) of two spectra onto to material bases.
+        Calculate the decomposing coefficient (Order 2 with bias term) of two spectra onto two material bases.
     '''
     lenCombo = []
     postlogLow = []
@@ -87,11 +55,8 @@ def deDecompGetCoeff(lowSpec: Spectrum, highSpec: Spectrum, basis1: Atten, len1:
     for i in len1:
         for j in len2:
             lenCombo.append([i, j])
-            postlogLow.append(calcPostLog(lowSpec, [basis1, basis2], [i, j]))
-            postlogHigh.append(calcPostLog(highSpec, [basis1, basis2], [i, j]))
-    lenCombo = np.array(lenCombo)
-    postlogLow = np.array(postlogLow)
-    postlogHigh = np.array(postlogHigh)
+            postlogLow.append(calcPostLog(lowSpec, [base1, base2], [i, j]))
+            postlogHigh.append(calcPostLog(highSpec, [base1, base2], [i, j]))
 
     def deCalcBetaGamma(A1, A2, LComb):
         A1Square = A1.T**2
@@ -104,20 +69,48 @@ def deDecompGetCoeff(lowSpec: Spectrum, highSpec: Spectrum, basis1: Atten, len1:
 
         return np.linalg.pinv(A) @ LComb
 
-    beta, gamma = deCalcBetaGamma(postlogLow, postlogHigh, lenCombo)
+    beta, gamma = deCalcBetaGamma(np.array(postlogLow), np.array(postlogHigh), np.array(lenCombo))
 
     return beta, gamma
 
 
-def deDecompProj():
+@ConvertListNDArray
+def deDecompProj(lowProj: TwoOrThreeD, highProj: TwoOrThreeD, coeff1: NDArray,
+                 coeff2: NDArray) -> Tuple[TwoOrThreeD, TwoOrThreeD]:
     '''
-        Perform dual-energy decompose in projection domain.
+        Perform dual-energy decompose in projection domain point-by-point using coeffs.
+
+        Coefficients can be generated using @see `deDecompGetCoeff`.
     '''
-    cripAssert(False, 'Unimplemented.')  
+    cripAssert(isOfSameShape(lowProj, highProj), 'Two projection sets should have same shape.')
+    cripAssert(
+        len(coeff1) == 5 and len(coeff2) == 5,
+        'Decomposing coefficients should have length 5 (2 variable, order 2 with bias).')
+
+    def applyPolyV2L2(coeff, A1, A2):
+        return coeff[0] * A1**2 + coeff[1] * A2**2 + coeff[2] * A1 * A2 + coeff[3] * A1 + coeff[4] * A2 + coeff[5]
+
+    return applyPolyV2L2(coeff1, lowProj, highProj), applyPolyV2L2(coeff2, lowProj, highProj)
 
 
-def deDecompRecon():
+@ConvertListNDArray
+def deDecompRecon(low: ThreeD, high: ThreeD, muBase1Low: float, muBase1High: float, muBase2Low: float,
+                  muBase2High: float):
     '''
-        Perform dual-energy decompose in reconstruction domain.
+        Perform dual-energy decompose in reconstruction domain. \\mu values can be calculated using @see `calcMu`.
+
+        The values of input volumes should be \\mu value. The outputs are decomposing coefficients.
     '''
-    cripAssert(False, 'Unimplemented.')  
+    cripAssert(isOfSameShape(low, high), 'Two volumes should have same shape.')
+
+    M = np.linalg.pinv(np.array([[muBase1Low, muBase2Low], [muBase1High, muBase2High]]))
+
+    def decompOne(low, high):
+        c1 = M[0, 0] * low + M[0, 1] * high
+        c2 = M[1, 0] * low + M[1, 1] * high
+        return c1, c2
+
+    if is2D(low):
+        return decompOne(low, high)
+    else:
+        return np.array(list(map(lambda args: decompOne(*args), zip(low, high))))

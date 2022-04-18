@@ -12,7 +12,7 @@ import json
 import re
 import numpy as np
 from os import path
-from typing import Callable
+from typing import Callable, List
 
 from ._typing import BuiltInAttenEnergyUnit, DefaultEnergyUnit, DefaultFloatDType, DefaultMuUnit, Or, Dict
 from .utils import cvtEnergyUnit, cvtMuUnit, inArray, cripAssert, getChildFolder, inRange, isNumber, isType, readFileText
@@ -148,7 +148,7 @@ class Atten:
         return json.loads(_attenList)
 
     @staticmethod
-    def builtInAttenText(materialName: str, dataSource='NIST'):
+    def _builtInAttenText(materialName: str, dataSource='NIST'):
         '''
             Get the built-in atten file content of `materialName`.
 
@@ -175,7 +175,7 @@ class Atten:
             
             \\rho: g/cm^3.
         '''
-        return Atten(Atten.builtInAttenText(materialName, dataSource), rho, BuiltInAttenEnergyUnit)
+        return Atten(Atten._builtInAttenText(materialName, dataSource), rho, BuiltInAttenEnergyUnit)
 
 
 def calcMu(atten: Atten, spec: Spectrum, energyConversion: Or[str, float, int, Callable]) -> float:
@@ -201,3 +201,52 @@ def calcMu(atten: Atten, spec: Spectrum, energyConversion: Or[str, float, int, C
         cripAssert(False, 'Invalid `energyConversion`.')
 
     return np.sum(spec.omega * eff * mus) / np.sum(spec.omega * eff)
+
+
+def getClassicDensity(materialName: str, dataSource='NIST'):
+    '''
+        Get the classic value of density of a specified material (g/cm^3) from built-in dataset.
+    '''
+    cripAssert(inArray(dataSource, ['NIST', 'ICRP']), f'Invalid dataSource: {dataSource}')
+
+    _classicRhoPath = path.join(getChildFolder('_atten'), './_classicRho.json')
+    _classicRho = readFileText(_classicRhoPath)
+    rhoObject = json.loads(_classicRho)
+
+    dataSourcePostfix = {'NIST': '', 'ICRP': '_ICRP'}[dataSource]
+    key = '{}{}'.format(materialName, dataSourcePostfix)
+    cripAssert(key in rhoObject, f'Record not found: {key}')
+
+    return rhoObject[key]
+
+
+def calcAttenedSpec(spec: Spectrum, attens: Or[Atten, List[Atten]], Ls: Or[float, List[float]]) -> Spectrum:
+    '''
+        Calculate the attenuated spectrum using polychromatic Beer-Lambert law. Supports multiple materials.
+
+        I.e., `\\Omega(E) \\exp (- \\mu(E) L) \\through all E`. L in mm.
+    '''
+    if isType(attens, Atten):
+        attens = [attens]
+    if isType(Ls, float):
+        Ls = [Ls]
+    cripAssert(len(attens) == len(Ls), 'atten should have same length as L.')
+
+    N = len(attens)
+    omega = np.array(spec.omega, copy=True)
+    for i in range(N):  # materials
+        atten = attens[i]
+        L = Ls[i]
+        for E in DiagEnergyRange:  # energies
+            omega[E] *= np.exp(-atten.mu[E] * L)
+
+    return Spectrum(omega, spec.unit)
+
+
+def calcPostLog(spec: Spectrum, atten: Or[Atten, List[Atten]], L: Or[float, List[float]]) -> float:
+    '''
+        Calculate post-log value after attenuation of `L` length `atten`. L in mm.
+    '''
+    attenSpec = calcAttenedSpec(spec, atten, L)
+
+    return -np.log(attenSpec.sumOmega / spec.sumOmega)

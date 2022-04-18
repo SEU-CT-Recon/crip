@@ -13,6 +13,9 @@ from .lowdose import totalVariation
 
 
 class TotalVariation(nn.Module):
+    '''
+        PyTorch module that calculates TV for images.
+    '''
     def __init__(self) -> None:
         super().__init__()
 
