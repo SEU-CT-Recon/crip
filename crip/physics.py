@@ -5,7 +5,7 @@
 '''
 
 __all__ = [
-    'Spectrum', 'Atten', 'calcMu', 'RhoWater', 'DiagEnergyLow', 'DiagEnergyHigh', 'DiagEnergyRange', 'DiagEnergyLen'
+    'Spectrum', 'Atten', 'calcMu', 'RhoWater', 'DiagEnergyLow', 'DiagEnergyHigh', 'DiagEnergyRange', 'DiagEnergyLen', 'getClassicDensity'
 ]
 
 import json
