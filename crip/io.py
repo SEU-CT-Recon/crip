@@ -37,7 +37,7 @@ def listDirectory(folder: str, sort='nat', style='filename', natAlg='default', r
     elif style == 'fullpath':
         return [os.path.join(folder, file) for file in files]
     elif style == 'both':
-        return [os.path.join(folder, file) for file in files], files
+        return zip([os.path.join(folder, file) for file in files], files)
 
 
 def imreadDicom(path: str, dtype=None):
