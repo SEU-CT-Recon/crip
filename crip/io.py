@@ -64,26 +64,34 @@ def readDicom(path: str) -> pydicom.Dataset:
     return pydicom.read_file(path)
 
 
-def imreadRaw(path: str, h: int, w: int, dtype=DefaultFloatDType, nSlice: int = 1, offset: int = 0) -> np.ndarray:
+def imreadRaw(path: str, h: int, w: int, dtype=DefaultFloatDType, nSlice: int = 1, offset: int = 0, order='CHW') -> np.ndarray:
     '''
         Read binary raw file. Return numpy array with shape `(nSlice, h, w)`. `offset` in bytes.
     '''
+    cripAssert(order in ['CHW', 'HWC'], 'Invalid order.')
+
     with open(path, 'rb') as fp:
         fp.seek(offset)
         arr = np.frombuffer(fp.read(), dtype=dtype).reshape((nSlice, h, w)).squeeze()
+        if order == 'HWC':
+            arr = np.transpose(arr, (2, 0, 1))
 
     return arr
 
 
 @ConvertListNDArray
-def imwriteRaw(img: TwoOrThreeD, path: str, dtype=None):
+def imwriteRaw(img: TwoOrThreeD, path: str, dtype=None, order='CHW'):
     '''
         Write raw file. Convert dtype with `dtype != None`.
     '''
+    cripAssert(order in ['CHW', 'HWC'], 'Invalid order.')
+
     if dtype is not None:
         img = img.astype(dtype)
 
     with open(path, 'wb') as fp:
+        if order == 'HWC':
+            img = np.transpose(img, (1, 2, 0))
         fp.write(img.flatten().tobytes())
 
 
