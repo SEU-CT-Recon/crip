@@ -10,6 +10,7 @@ __all__ = [
 ]
 
 import os
+from typing import Any
 import numpy as np
 import tifffile
 import pydicom
@@ -43,13 +44,17 @@ def listDirectory(folder: str, sort='nat', style='filename', natAlg='default', r
         return zip([os.path.join(folder, file) for file in files], files)
 
 
-def imreadDicom(path: str, dtype=None) -> np.ndarray:
+def imreadDicom(path: str, dtype=None, attrs: Or[None, Dict[str, Any]] = None) -> np.ndarray:
     '''
         Read DICOM file. Return numpy array.
 
         Convert dtype with `dtype != None`.
     '''
-    dcm = pydicom.read_file(path)
+    dcm = pydicom.dcmread(path)
+    
+    if attrs is not None:
+        for key in attrs:
+            dcm.__setattr__(key, attrs[key])
 
     if dtype is not None:
         return np.array(dcm.pixel_array).astype(dtype)
@@ -64,7 +69,13 @@ def readDicom(path: str) -> pydicom.Dataset:
     return pydicom.read_file(path)
 
 
-def imreadRaw(path: str, h: int, w: int, dtype=DefaultFloatDType, nSlice: int = 1, offset: int = 0, order='CHW') -> np.ndarray:
+def imreadRaw(path: str,
+              h: int,
+              w: int,
+              dtype=DefaultFloatDType,
+              nSlice: int = 1,
+              offset: int = 0,
+              order='CHW') -> np.ndarray:
     '''
         Read binary raw file. Return numpy array with shape `(nSlice, h, w)`. `offset` in bytes.
     '''
