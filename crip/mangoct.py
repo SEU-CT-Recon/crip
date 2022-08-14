@@ -1,8 +1,6 @@
 '''
     MangoCT integration of crip.
 
-    [TODO] We are going to transfer `external` module to CRI. @see https://github.com/z0gSh1u/cri .
-
     https://github.com/z0gSh1u/crip
 '''
 
@@ -10,7 +8,6 @@ __all__ = ['Mgfbp', 'Mgfpj']
 
 import os
 import sys
-import subprocess
 from crip.utils import cripAssert, sysPlatform
 from crip._typing import *
 

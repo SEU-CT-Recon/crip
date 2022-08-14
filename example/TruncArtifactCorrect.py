@@ -5,12 +5,11 @@
     by CandleHouse @ https://github.com/z0gSh1u/crip
 '''
 
+import numpy as np
 import matplotlib.pyplot as plt
 from crip.preprocess import *
 from crip.io import *
 from crip.postprocess import *
-
-from crip.io import li
 
 # related directory and file path
 proj_folder = ''

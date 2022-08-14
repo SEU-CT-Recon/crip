@@ -1,7 +1,7 @@
 <p align="center">
   <img src="crip.png" />
 </p>
-A all-in-one tool for Cone-Beam CT Data IO, Pre/Post-process, and Physics, Dual Energy, Low Dose, Deep Learning researches and everything only except Reconstruction.
+An all-in-one tool for Cone-Beam CT Data IO, Pre/Post-process, and Physics, Dual Energy, Low Dose, Deep Learning researches and everything only except Reconstruction.
 
 ## Install
 

@@ -22,7 +22,7 @@ from ._typing import *
 
 def listDirectory(folder: str, sort='nat', style='filename', natAlg='default', reverse=False):
     '''
-        List files under `folder` and sort using `"nat"` (natural) or \\
+        List files under `folder` and sort using `"nat"` (natural) or
         `"dict"` (dictionary) order. The return `style` can be `filename`, `fullpath` or `both`.
     '''
     cripAssert(sort in ['nat', 'dict'], 'Invalid sort.')

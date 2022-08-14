@@ -15,7 +15,7 @@ from .shared import *
 from ._typing import *
 from .utils import *
 from .lowdose import injectGaussianNoise, injectPoissonNoise
-from .io import imreadRaw
+
 
 @ConvertListNDArray
 def averageProjections(projections: TwoOrThreeD) -> TwoD:
@@ -177,8 +177,3 @@ def correctBeamHardeningPolynomial(postlog: TwoOrThreeD, coeffs: Or[Tuple, np.po
             coeffs = np.poly1d([*coeffs, 0])
 
     return coeffs(postlog)
-
-
-# def pMatrix(filepath: str, nView: int):
-#     pm = imreadRaw(filepath, 3, 4, nSlice=nView) # (nView, 3, 4)
-    

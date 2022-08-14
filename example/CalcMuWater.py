@@ -4,16 +4,19 @@
     by z0gSh1u @ https://github.com/z0gSh1u/crip
 '''
 
-from crip.physics import calcMu, Atten, Spectrum
+from crip.physics import calcMu, Atten, Spectrum, getClassicDensity
 
 # A sample spectrum file.
 SpectrumFile = '''
-Energy (eV)    Omega
-5000  6.629919e-195
+48000  100
+49000  50
 50000  -1
-'''.strip()
+'''
+
+WaterDensity = getClassicDensity('Water')
+print(f'rho_water = {WaterDensity} g/cm^3')
 
 spec = Spectrum.fromText(SpectrumFile, 'eV')
-atten = Atten.fromBuiltIn('Water', 1.0)
+atten = Atten.fromBuiltIn('Water', WaterDensity)
 mu = calcMu(atten, spec, 'PCD')
-print(f'\\mu = {mu} mm-1.')
+print(f'mu = {mu} mm-1.')

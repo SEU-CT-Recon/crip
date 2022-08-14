@@ -5,7 +5,8 @@
 '''
 
 __all__ = [
-    'Spectrum', 'Atten', 'calcMu', 'RhoWater', 'DiagEnergyLow', 'DiagEnergyHigh', 'DiagEnergyRange', 'DiagEnergyLen', 'getClassicDensity'
+    'Spectrum', 'Atten', 'calcMu', 'RhoWater', 'DiagEnergyLow', 'DiagEnergyHigh', 'DiagEnergyRange', 'DiagEnergyLen',
+    'getClassicDensity'
 ]
 
 import json
@@ -20,8 +21,8 @@ from .utils import cvtEnergyUnit, cvtMuUnit, inArray, cripAssert, getChildFolder
 ## Constants ##
 
 RhoWater = 1.0  # g/cm^3
-DiagEnergyLow = 0
-DiagEnergyHigh = 150
+DiagEnergyLow = 0  # keV
+DiagEnergyHigh = 150  # keV
 DiagEnergyRange = range(DiagEnergyLow, DiagEnergyHigh + 1)  # [low, high)
 DiagEnergyLen = DiagEnergyHigh - DiagEnergyLow + 1
 
@@ -71,6 +72,7 @@ class Spectrum:
         # parse the spectrum text
         content = np.array(list(map(procSpecLine, content)), dtype=DefaultFloatDType)
         specEnergy, specOmega = content.T
+        specOmega[specOmega < 0] = 0
 
         # to keV
         specEnergy = cvtEnergyUnit(specEnergy, unit, DefaultEnergyUnit)
@@ -78,10 +80,18 @@ class Spectrum:
         startEnergy, cutOffEnergy = int(specEnergy[0]), int(specEnergy[-1])
         cripAssert(inRange(startEnergy, DiagEnergyRange), '`startEnergy` is out of `DiagEnergyRange`.')
         cripAssert(inRange(cutOffEnergy, DiagEnergyRange), '`cutOffEnergy` is out of `DiagEnergyRange`.')
+        cripAssert(cutOffEnergy + 1 - startEnergy == len(specOmega), 'The spectrum is not continous by 1 keV from start to cutoff.')
 
         omega[startEnergy:cutOffEnergy + 1] = specOmega[:]
 
         return Spectrum(omega, unit)
+
+    @staticmethod
+    def fromFile(path: str, unit='keV'):
+        with open(path, 'r') as fp:
+            spec = fp.read()
+
+        return Spectrum.fromText(spec, unit)
 
 
 class Atten:

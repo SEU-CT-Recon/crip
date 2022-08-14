@@ -4,20 +4,12 @@
     https://github.com/z0gSh1u/crip
 '''
 
-__all__ = ['limitAngle', 'limitView', 'injectGaussianNoise', 'injectPoissonNoise', 'totalVariation']
+__all__ = ['injectGaussianNoise', 'injectPoissonNoise', 'totalVariation']
 
 import numpy as np
 from .shared import *
 from ._typing import *
 from .utils import *
-
-
-def limitAngle(projections: ThreeD, total: float, start: float, dst: float):
-    cripAssert(False, 'Unimplemented.')
-
-
-def limitView(projections: ThreeD, ratio: float):
-    cripAssert(False, 'Unimplemented.')
 
 
 @ConvertListNDArray

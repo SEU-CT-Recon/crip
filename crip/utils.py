@@ -171,7 +171,11 @@ def cvtEnergyUnit(arr, from_, to):
 
     a = 1000
     b = 1 / a
-    mat = np.array([[1, b, b**2], [a, 1, b], [a**2, a, 1]])  # mat[from, to]
+    mat = np.array([
+        [1, b, b**2],
+        [a, 1, b],
+        [a**2, a, 1],
+    ])  # mat[from, to]
 
     return arr * mat[from_, to]
 
@@ -184,8 +188,12 @@ def cvtLengthUnit(arr, from_, to):
     from_ = units.index(from_)
     to = units.index(to)
 
-    mat = np.array([[1, 1e-3, 1e-4, 1e-6], [1e3, 1, 1e-1, 1e-3], [1e4, 1e1, 1, 1e-2], [1e6, 1e3, 1e2,
-                                                                                       1]])  # mat[from, to]
+    mat = np.array([
+        [1, 1e-3, 1e-4, 1e-6],
+        [1e3, 1, 1e-1, 1e-3],
+        [1e4, 1e1, 1, 1e-2],
+        [1e6, 1e3, 1e2, 1],
+    ])  # mat[from, to]
 
     return arr * mat[from_, to]
 
