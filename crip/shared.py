@@ -150,22 +150,25 @@ def splitImages(imgs: ThreeD, dtype=None) -> List[NDArray]:
 
 
 @ConvertListNDArray
-def binning(img: TwoOrThreeD, rate: int = 1, axis='y') -> TwoOrThreeD:
+def binning(img: TwoOrThreeD, rates=(1, 1)) -> TwoOrThreeD:
     '''
-        Perform binning on certain `axis` with `rate`.
+        Perform binning with `rates = (c, h, w)`.
     '''
-    cripAssert(isInt(rate) and rate > 0, 'rate should be positive int.')
-    cripAssert(inArray(axis, ['x', 'y', 'z']), 'Invalid axis.')
-
+    for rate in rates:
+        cripAssert(isInt(rate) and rate > 0, 'rates should be positive int.')
     if is2D(img):
-        cripAssert(axis != 'z', 'img is 2D, while axis is z.')
-
-    if axis == 'x':
-        return img[..., ::rate]
-    if axis == 'y':
-        return img[..., ::rate, :]
-    if axis == 'z':
-        return img[::rate, ...]
+        cripAssert(len(rates) == 2, 'img is 2D, while rates is 3D.')
+    if is3D(img):
+        cripAssert(len(rates) == 3, 'img is 3D, while rates is 2D.')
+    
+    if rates[-1] != 1:
+        img = img[..., ::rate]
+    if rates[-2] != 1:
+        img = img[..., ::rate, :]
+    if len(rates) == 3 and rates[0] != 1:
+        img = img[::rate, ...]
+    
+    return img
 
 
 @ConvertListNDArray

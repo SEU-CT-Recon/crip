@@ -4,9 +4,12 @@
     https://github.com/z0gSh1u/crip
 '''
 
-__all__ = ['drawCircle', 'fovCropRadius', 'fovCrop', 'muToHU', 'huToMu', 'huNoRescale', 'postlogToProj']
+__all__ = [
+    'drawCircle', 'fovCropRadius', 'fovCrop', 'muToHU', 'huToMu', 'huNoRescale', 'postlogsToProjections', 'binning'
+]
 
 import numpy as np
+
 from .shared import *
 from ._typing import *
 from .utils import *
@@ -35,10 +38,10 @@ def fovCropRadius(SOD: float, SDD: float, detWidth: float, reconPixSize: float) 
         Get the radius (in pixel) of the circle valid FOV of the reconstructed volume.
 
         Geometry:
-            SOD: Source Object Distance.
-            SDD: Source Detector Distance.
-            detWidth: Width of the detector, i.e., nElements * detElementWidth.
-            reconPixSize: Pixel size of the reconstructed image.
+            - SOD: Source Object Distance.
+            - SDD: Source Detector Distance.
+            - detWidth: Width of the detector, i.e., nElements * detElementWidth.
+            - reconPixSize: Pixel size of the reconstructed image.
         
         Note that all these lengths should have same unit, like (mm) as recommended.
     '''
@@ -113,10 +116,10 @@ def huNoRescale(image: TwoOrThreeD, b: float = -1000, k: float = 1) -> TwoOrThre
     return (image - b) / k
 
 
-def postlogToProj(postlog: TwoOrThreeD, air: TwoD) -> TwoOrThreeD:
+def postlogsToProjections(postlogs: TwoOrThreeD, flat: TwoD) -> TwoOrThreeD:
     '''
-        Invert postlog image to the original projection.
+        Invert postlog images to the original projections.
     '''
-    res = np.exp(-postlog) * air
+    res = np.exp(-postlogs) * flat
 
     return res

@@ -234,4 +234,5 @@ def getHW(img: np.ndarray):
         h, w = img.shape
     else:
         raise
+    
     return h, w

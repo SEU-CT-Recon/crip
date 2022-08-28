@@ -31,7 +31,7 @@ def injectGaussianNoise(projections: TwoOrThreeD, sigma: float, mu: float = 0) -
 
 
 @ConvertListNDArray
-def injectPoissonNoise(projections: TwoOrThreeD, nPhoton: int) -> TwoOrThreeD:
+def injectPoissonNoise(projections: TwoOrThreeD, nPhoton: int, flat: Or[TwoD, float, None] = None) -> TwoOrThreeD:
     '''
         Inject Poisson noise which obeys distribution `P(\\lambda)`.
         `nPhoton` is the number of photon hitting per detector element.
@@ -39,11 +39,16 @@ def injectPoissonNoise(projections: TwoOrThreeD, nPhoton: int) -> TwoOrThreeD:
     cripAssert(is2or3D(projections), '`projections` should be 2D or 3D.')
 
     def injectOne(img):
-        I0 = np.max(img)
-        cripAssert(I0 != 0, 'The maximum of img is 0.')
+        if flat is not None:
+            I0 = flat
+        else:
+            I0 = np.max(img)
+        cripAssert(I0 > 0, 'The maximum of img <= 0.')
+
         proj = nPhoton * np.exp(-img / I0)
         proj = np.random.poisson(proj)
         proj = -np.log(img / nPhoton) * I0
+
         return proj
 
     if is3D(projections):

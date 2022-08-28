@@ -5,9 +5,8 @@
 '''
 
 __all__ = [
-    'averageProjections', 'flatDarkFieldCorrection', 'flatDarkFieldCorrectionStandalone', 'projectionsToSinograms',
-    'sinogramsToProjections', 'padImage', 'padSinogram', 'correctBeamHardeningPolynomial', 'injectGaussianNoise',
-    'injectPoissonNoise'
+    'averageProjections', 'flatDarkFieldCorrection', 'projectionsToSinograms', 'sinogramsToProjections', 'padImage',
+    'padSinogram', 'correctBeamHardeningPolynomial', 'injectGaussianNoise', 'injectPoissonNoise', 'binning'
 ]
 
 import numpy as np
@@ -34,13 +33,12 @@ def averageProjections(projections: TwoOrThreeD) -> TwoD:
 
 @ConvertListNDArray
 def flatDarkFieldCorrection(projections: TwoOrThreeD,
-                            flat: Or[TwoD, float],
-                            coeff: float = 1,
+                            flat: Or[TwoD, float, None] = None,
                             dark: Or[TwoD, float] = 0) -> TwoOrThreeD:
     '''
         Perform flat field (air) and dark field correction to get post-log value.
-
-        I.e., `- log [(X - D) / (C * F - D)]`. Multi projections accepted.
+        I.e., `- log [(X - D) / (F - D)]`. Multi projections accepted.
+        If flat is None, air is estimated using the brightest pixel by default.
     '''
     sampleProjection = projections if is2D(projections) else projections[0]
 
@@ -48,24 +46,14 @@ def flatDarkFieldCorrection(projections: TwoOrThreeD,
         cripAssert(isOfSameShape(sampleProjection, flat), "`projection` and `flat` should have same shape.")
     if isType(dark, TwoD):
         cripAssert(isOfSameShape(sampleProjection, dark), "`projection` and `dark` should have same shape.")
+    if flat is None:
+        flat = np.max(projections)
 
-    res = -np.log((projections - dark) / (coeff * flat - dark))
+    res = -np.log((projections - dark) / (flat - dark))
     res[res == np.inf] = 0
     res[res == np.nan] = 0
 
     return res
-
-
-def flatDarkFieldCorrectionStandalone(projection: TwoD) -> TwoD:
-    '''
-        Perform flat field and dark field correction without actual field image.
-
-        Air is estimated using the brightest pixel by default.
-    '''
-    # We support 2D only in standalone version, since `flat` for each projection might differ.
-    cripAssert(is2D(projection), '`projection` should be 2D.')
-
-    return flatDarkFieldCorrection(projection, np.max(projection), 1, 0)
 
 
 @ConvertListNDArray
@@ -73,7 +61,7 @@ def projectionsToSinograms(projections: ThreeD):
     '''
         Permute projections to sinograms by axes swapping `(views, h, w) -> (h, views, w)`.
 
-        Note that the width direction is along detector channels of one line.
+        Note that the width direction is along detector channels of a row.
     '''
     cripAssert(is3D(projections), 'projections should be 3D.')
 
@@ -90,7 +78,7 @@ def sinogramsToProjections(sinograms: ThreeD):
     '''
         Permute sinograms back to projections by axes swapping `(h, views, w) -> (views, h, w)`.
 
-        Note that the width direction is along detector channels of one line.
+        Note that the width direction is along detector channels of a row.
     '''
     cripAssert(is3D(sinograms), 'projections should be 3D.')
 

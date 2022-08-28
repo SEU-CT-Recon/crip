@@ -24,8 +24,6 @@ An all-in-one tool for Cone-Beam CT Data IO, Pre/Post-process, and Physics, Dual
 All functions are with clear documentation by comments. Just consider the function name and explore the source code, or refer to examples to start.
 
 - `crip.de` for Dual-Energy CT.
-- `crip.dl` for Deep Learning.
-
 - `crip.io` for file read/write (RAW, DICOM and TIFF supported), and enhanced `listdir`.
 - `crip.physics` for attenuation, spectrum, \mu calculation, etc.
 - `crip.postprocess` for data post-processing.

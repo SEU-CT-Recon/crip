@@ -1,6 +1,3 @@
-
-
-
 __title__ = 'crip'
 __author__ = 'z0gSh1u'
 __license__ = 'MIT License'

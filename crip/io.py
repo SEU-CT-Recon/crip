@@ -10,7 +10,6 @@ __all__ = [
 ]
 
 import os
-from typing import Any
 import numpy as np
 import tifffile
 import pydicom
@@ -23,7 +22,7 @@ from ._typing import *
 def listDirectory(folder: str, sort='nat', style='filename', natAlg='default', reverse=False):
     '''
         List files under `folder` and sort using `"nat"` (natural) or
-        `"dict"` (dictionary) order. The return `style` can be `filename`, `fullpath` or `both`.
+        `"dict"` (dictionary) order. The return `style` can be `filename`, `fullpath` or `both` (path, file).
     '''
     cripAssert(sort in ['nat', 'dict'], 'Invalid sort.')
     cripAssert(style in ['filename', 'fullpath', 'both'], 'Invalid style.')
@@ -46,7 +45,7 @@ def listDirectory(folder: str, sort='nat', style='filename', natAlg='default', r
 
 def imreadDicom(path: str, dtype=None, attrs: Or[None, Dict[str, Any]] = None) -> np.ndarray:
     '''
-        Read DICOM file. Return numpy array.
+        Read DICOM file. Return numpy array. Use `attrs` to supplement DICOM tags for non-standard images.
 
         Convert dtype with `dtype != None`.
     '''
@@ -187,7 +186,7 @@ CTPARAMS = {
 
 def fetchCTParam(dicom: pydicom.Dataset, key: str):
     '''
-        Fetch CT related parameter from DICOM file.
+        Fetch CT related parameter from DICOM file. Use `readDicom` to get DICOM Dataset.
 
         @See CTPARAMS in the source code for available keys.
     '''

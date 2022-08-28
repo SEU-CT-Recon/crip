@@ -8,11 +8,10 @@ __all__ = [
     'singleMatMuDecompose', 'calcAttenedSpec', 'calcPostLog', 'deDecompGetCoeff', 'deDecompProj', 'deDecompRecon'
 ]
 
-from typing import Iterable, Tuple
 import numpy as np
 
-from .utils import ConvertListNDArray, cripAssert, getHW, is2D, isOfSameShape
-from ._typing import DefaultFloatDType, Or, NDArray, TwoOrThreeD, ThreeD
+from .utils import ConvertListNDArray, cripAssert, is2D, isOfSameShape
+from ._typing import *
 from .physics import Atten, DiagEnergyRange, Spectrum, calcAttenedSpec, calcPostLog
 
 

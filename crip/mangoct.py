@@ -1,5 +1,8 @@
 '''
-    MangoCT integration of crip.
+    MangoCT integration of crip. See
+    https://gitee.com/njjixu/mangoct
+    https://github.com/z0gSh1u/mangoct
+    https://github.com/CandleHouse/mandoct
 
     https://github.com/z0gSh1u/crip
 '''
@@ -7,25 +10,35 @@
 __all__ = ['Mgfbp', 'Mgfpj']
 
 import os
-import sys
-from crip.utils import cripAssert, sysPlatform
-from crip._typing import *
+
+from .utils import sysPlatform
+from ._typing import *
 
 
-class MgFBP:
-    def __init__(self, exe: str, cudaDevice=0):
+# TODO
+class MgfbpConfig:
+    def __init__(self):
+        raise 'Not implemented.'
+
+
+# TODO
+class MgfpjConfig:
+    def __init__(self):
+        raise 'Not implemented.'
+
+
+class Mgfbp:
+    def __init__(self, exe: str = 'mgfbp', cudaDevice=0):
         '''
             Initialize a handler object to use the FBP tool in mangoct.
             `exe` is the path to the executable.
         '''
         self.exe = exe
         self.cudaDevice = cudaDevice
-        self.confPath = None
+        self.cmd = []
         self._buildCmd()
 
     def _buildCmd(self):
-        self.cmd = []
-
         platform = sysPlatform()
 
         if platform == 'Windows':
@@ -35,32 +48,34 @@ class MgFBP:
 
         self.cmd.append(f'"{self.exe}" "<1>"')
 
-    def exec(self, confPath: Or[str, None]):
-        self.confPath = confPath
-        cripAssert(self.confPath is not None, 'confPath for MgFBP is None.')
-
+    def exec(self, confPath: str):
         for cmd in self.cmd:
-            cmd = cmd.replace('<1>', '{}'.format(self.confPath))
+            cmd = cmd.replace('<1>', confPath)
             os.system(cmd)
 
 
-class MgFPJ:
-    def __init__(self, exe, cudaDevice=0) -> None:
+class Mgfpj:
+    def __init__(self, exe: str = 'mgfpj', cudaDevice=0) -> None:
+        '''
+            Initialize a handler object to use the FPJ tool in mangoct.
+            `exe` is the path to the executable.
+        '''
         self.exe = exe
         self.cudaDevice = cudaDevice
         self.cmd = None
-        self.buildCmd()
+        self._buildCmd()
 
-    def buildCmd(self):
-        platform = sys.platform
-        if platform.find('win32') != -1:
-            self.cmd = ['set CUDA_VISIBLE_DEVICES={}'.format(self.cudaDevice), '"{}" <1>'.format(self.exe)]
-        elif platform.find('linux') != -1:
-            self.cmd = ['CUDA_VISIBLE_DEVICES={} "{}" <1>'.format(self.cudaDevice, self.exe)]
-        else:
-            cripAssert(False, 'Unsupported platform for Mgfpj calling.')
+    def _buildCmd(self):
+        platform = sysPlatform()
 
-    def exec(self, conf):
+        if platform == 'Windows':
+            self.cmd.append(f'set CUDA_VISIBLE_DEVICES={self.cudaDevice}')
+        elif platform == 'Linux':
+            self.cmd.append(f'export CUDA_VISIBLE_DEVICES={self.cudaDevice}')
+
+        self.cmd.append(f'"{self.exe}" "<1>"')
+
+    def exec(self, confPath: str):
         for cmd in self.cmd:
-            cmd = cmd.replace('<1>', '{}'.format(conf))
+            cmd = cmd.replace('<1>', confPath)
             os.system(cmd)
