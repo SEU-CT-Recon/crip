@@ -50,7 +50,7 @@ def imreadDicom(path: str, dtype=None, attrs: Or[None, Dict[str, Any]] = None) -
         Convert dtype with `dtype != None`.
     '''
     dcm = pydicom.dcmread(path)
-    
+
     if attrs is not None:
         for key in attrs:
             dcm.__setattr__(key, attrs[key])
@@ -74,17 +74,28 @@ def imreadRaw(path: str,
               dtype=DefaultFloatDType,
               nSlice: int = 1,
               offset: int = 0,
+              gap: int = 0,
               order='CHW') -> np.ndarray:
     '''
-        Read binary raw file. Return numpy array with shape `(nSlice, h, w)`. `offset` in bytes.
+        Read binary raw file. Return numpy array with shape `(nSlice, h, w)`. `offset` from head in bytes.
+        `gap` between images in bytes.
     '''
     cripAssert(order in ['CHW', 'HWC'], 'Invalid order.')
 
     with open(path, 'rb') as fp:
         fp.seek(offset)
-        arr = np.frombuffer(fp.read(), dtype=dtype).reshape((nSlice, h, w)).squeeze()
-        if order == 'HWC':
-            arr = np.transpose(arr, (2, 0, 1))
+        if gap == 0:
+            arr = np.frombuffer(fp.read(), dtype=dtype).reshape((nSlice, h, w)).squeeze()
+        else:
+            cripAssert(order == 'CHW', 'gap is only availble in CHW order.')
+            imageBytes = h * w * np.dtype(dtype).itemsize
+            arr = np.zeros((nSlice, h, w), dtype=dtype)
+            for i in range(nSlice):
+                arr[i, ...] = np.frombuffer(fp.read(imageBytes), dtype=dtype).reshape((h, w)).squeeze()
+                fp.seek(gap, os.SEEK_CUR)
+
+    if order == 'HWC':
+        arr = np.transpose(arr, (2, 0, 1))
 
     return arr
 
