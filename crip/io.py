@@ -19,16 +19,21 @@ from .utils import *
 from ._typing import *
 
 
-def listDirectory(folder: str, sort='nat', style='filename', natAlg='default', reverse=False):
+def listDirectory(folder: str, sort='nat', style='filename', natAlg='default', extFilter: str = None, reverse=False):
     '''
         List files under `folder` and sort using `"nat"` (natural) or
         `"dict"` (dictionary) order. The return `style` can be `filename`, `fullpath` or `both` (path, file).
+        `
     '''
     cripAssert(sort in ['nat', 'dict'], 'Invalid sort.')
     cripAssert(style in ['filename', 'fullpath', 'both'], 'Invalid style.')
     cripAssert(natAlg in ['default', 'locale'], 'Invalid natAlg.')
 
     files = os.listdir(folder)
+    if extFilter is not None:
+        extFilter.replace('.', '')
+        files = list(filter(lambda x: os.path.splitext(x) == extFilter, files))
+
     files = sorted(files, reverse=reverse) if sort == 'dict' else natsort.natsorted(
         files, reverse=reverse, alg={
             'default': natsort.ns.DEFAULT,
