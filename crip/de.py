@@ -68,7 +68,7 @@ def deDecompGetCoeff(lowSpec: Spectrum, highSpec: Spectrum, base1: Atten, len1: 
 
         return np.linalg.pinv(A) @ LComb
 
-    beta, gamma = deCalcBetaGamma(np.array(postlogLow), np.array(postlogHigh), np.array(lenCombo))
+    beta, gamma = deCalcBetaGamma(np.array(postlogLow), np.array(postlogHigh), np.array(lenCombo)).T
 
     return beta, gamma
 
@@ -83,8 +83,8 @@ def deDecompProj(lowProj: TwoOrThreeD, highProj: TwoOrThreeD, coeff1: NDArray,
     '''
     cripAssert(isOfSameShape(lowProj, highProj), 'Two projection sets should have same shape.')
     cripAssert(
-        len(coeff1) == 5 and len(coeff2) == 5,
-        'Decomposing coefficients should have length 5 (2 variable, order 2 with bias).')
+        len(coeff1) == 6 and len(coeff2) == 6,
+        'Decomposing coefficients should have length 6 (2 variable, order 2 with bias).')
 
     def applyPolyV2L2(coeff, A1, A2):
         return coeff[0] * A1**2 + coeff[1] * A2**2 + coeff[2] * A1 * A2 + coeff[3] * A1 + coeff[4] * A2 + coeff[5]
