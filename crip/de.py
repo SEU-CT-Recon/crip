@@ -4,22 +4,16 @@
     https://github.com/z0gSh1u/crip
 '''
 
-__all__ = [
-    'singleMatMuDecompose', 'calcAttenedSpec', 'calcPostLog', 'deDecompGetCoeff', 'deDecompProj', 'deDecompRecon'
-]
+__all__ = ['singleMatMuDecomp', 'calcAttenedSpec', 'calcPostLog', 'deDecompGetCoeff', 'deDecompProj', 'deDecompRecon']
 
 import numpy as np
 
 from .utils import ConvertListNDArray, cripAssert, is2D, isOfSameShape
 from ._typing import *
-from .physics import Atten, DiagEnergyLen, DiagEnergyRange, Spectrum, calcAttenedSpec, calcPostLog
+from .physics import Atten, DiagEnergyRange, Spectrum, calcAttenedSpec, calcPostLog
 
 
-def singleMatMuDecompose(src: Atten,
-                         base1: Atten,
-                         base2: Atten,
-                         method='coeff',
-                         energyRange=DiagEnergyRange) -> NDArray:
+def singleMatMuDecomp(src: Atten, base1: Atten, base2: Atten, method='coeff', energyRange=DiagEnergyRange) -> NDArray:
     '''
         Decompose single material `src`'s attenuation onto `base1` and `base2`.
 
@@ -113,30 +107,3 @@ def deDecompRecon(low: ThreeD, high: ThreeD, muBase1Low: float, muBase1High: flo
         return decompOne(low, high)
     else:
         return np.array(list(map(lambda args: decompOne(*args), zip(low, high))))
-
-
-def forwardProjectWithSpectrum(lengths: List[TwoD], materials: List[Atten], spec: Spectrum, energyConversion: str):
-    '''
-        `lengths` is a list of corresponding length [mm] images 
-        (projection or sinogram) for materials.
-    '''
-    cripAssert(len(lengths) == len(materials), 'Lengths and materials should correspond.')
-    cripAssert(all([isOfSameShape(lengths[0], x) for x in lengths]), 'Lengths map should have same shape.')
-    cripAssert(energyConversion in ['PCD', 'EID'], 'Invalid energyConversion.')
-
-    efficiency = 1 if energyConversion == 'PCD' else np.array(DiagEnergyRange)
-    effectiveOmega = spec.omega * efficiency
-
-    if len(lengths) == 0:  # we are computing the flat field
-        flat = np.sum(effectiveOmega)
-        return flat
-
-    resultShape = lengths[0].shape
-    # a[h, w] = [vector of attenuation in that energy bin]
-    attenuations = np.zeros((*resultShape, DiagEnergyLen), dtype=DefaultFloatDType)
-    for length, material in zip(lengths, materials):
-        attenuations += np.outer(length, material.mu).reshape((*resultShape, DiagEnergyLen))
-
-    attened = spec.omega * np.exp(-attenuations) * efficiency  # the attenuated image
-
-    return np.sum(attened, axis=-1)

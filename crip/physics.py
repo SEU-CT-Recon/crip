@@ -15,7 +15,7 @@ import numpy as np
 from os import path
 
 from ._typing import *
-from .utils import cvtEnergyUnit, cvtMuUnit, inArray, cripAssert, getChildFolder, inRange, isNumber, isType, readFileText
+from .utils import cvtEnergyUnit, cvtMuUnit, inArray, cripAssert, getChildFolder, inRange, isNumber, isOfSameShape, isType, readFileText
 
 ## Constants ##
 
@@ -79,7 +79,8 @@ class Spectrum:
         startEnergy, cutOffEnergy = int(specEnergy[0]), int(specEnergy[-1])
         cripAssert(inRange(startEnergy, DiagEnergyRange), '`startEnergy` is out of `DiagEnergyRange`.')
         cripAssert(inRange(cutOffEnergy, DiagEnergyRange), '`cutOffEnergy` is out of `DiagEnergyRange`.')
-        cripAssert(cutOffEnergy + 1 - startEnergy == len(specOmega), 'The spectrum is not continous by 1 keV from start to cutoff.')
+        cripAssert(cutOffEnergy + 1 - startEnergy == len(specOmega),
+                   'The spectrum is not continous by 1 keV from start to cutoff.')
 
         omega[startEnergy:cutOffEnergy + 1] = specOmega[:]
 
@@ -176,7 +177,7 @@ class Atten:
         return content
 
     @staticmethod
-    def fromBuiltIn(materialName: str, rho: float, dataSource='NIST'):
+    def fromBuiltIn(materialName: str, rho: Or[float, None] = None, dataSource='NIST'):
         '''
             Get the built-in atten object.
 
@@ -184,6 +185,9 @@ class Atten:
             
             \\rho: g/cm^3.
         '''
+        if rho is None:
+            rho = getClassicDensity(materialName, dataSource)
+
         return Atten(Atten._builtInAttenText(materialName, dataSource), rho, BuiltInAttenEnergyUnit)
 
 
@@ -259,3 +263,36 @@ def calcPostLog(spec: Spectrum, atten: Or[Atten, List[Atten]], L: Or[float, List
     attenSpec = calcAttenedSpec(spec, atten, L)
 
     return -np.log(attenSpec.sumOmega / spec.sumOmega)
+
+
+def forwardProjectWithSpectrum(lengths: List[TwoD],
+                               materials: List[Atten],
+                               spec: Spectrum,
+                               energyConversion: str,
+                               fastSkip: bool = False):
+    '''
+        Perform forward projection using `spec`. `lengths` is a list of corresponding length [mm] images 
+        (projection or sinogram) of `materials`. Set `lengths` and `materials` to empty lists to compute the flat field.
+    '''
+    cripAssert(len(lengths) == len(materials), 'Lengths and materials should correspond.')
+    cripAssert(all([isOfSameShape(lengths[0], x) for x in lengths]), 'Lengths map should have same shape.')
+    cripAssert(energyConversion in ['PCD', 'EID'], 'Invalid energyConversion.')
+
+    efficiency = 1 if energyConversion == 'PCD' else np.array(DiagEnergyRange)
+    effectiveOmega = spec.omega * efficiency
+
+    resultShape = lengths[0].shape
+
+    if len(lengths) == 0 or fastSkip:  # we need to compute the flat field
+        flat_ = np.ones(resultShape, dtype=DefaultFloatDType) * np.sum(effectiveOmega)
+    if len(lengths) == 0 or (fastSkip and (all([np.sum(x) == 0 for x in lengths]))):
+        return flat_
+
+    # a[h, w] = [vector of attenuation in that energy bin]
+    attenuations = np.zeros((*resultShape, DiagEnergyLen), dtype=DefaultFloatDType)
+    for length, material in zip(lengths, materials):
+        attenuations += np.outer(length, material.mu).reshape((*resultShape, DiagEnergyLen))
+
+    attened = spec.omega * np.exp(-attenuations) * efficiency  # the attenuated image
+
+    return np.sum(attened, axis=-1)

@@ -64,7 +64,7 @@ def fovCropRadius(SOD: float, SDD: float, detWidth: float, reconPixSize: float) 
 
 
 @ConvertListNDArray
-def fovCrop(volume: ThreeD, radius: int, fill=0) -> ThreeD:
+def fovCrop(volume: ThreeD, radius: int, fill: Or[int, float] = 0) -> ThreeD:
     '''
         Crop a circle FOV on reconstructed image `volume` with `radius` (pixel) \\
         and `fill` value for outside FOV.

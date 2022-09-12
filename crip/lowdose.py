@@ -31,32 +31,18 @@ def injectGaussianNoise(projections: TwoOrThreeD, sigma: float, mu: float = 0) -
 
 
 @ConvertListNDArray
-def injectPoissonNoise(projections: TwoOrThreeD, nPhoton: int, flat: Or[TwoD, float, None] = None) -> TwoOrThreeD:
+def injectPoissonNoise(projections: TwoOrThreeD) -> TwoOrThreeD:
     '''
-        Inject Poisson noise which obeys distribution `P(\\lambda)`.
-        `nPhoton` is the number of photon hitting per detector element.
+        Inject Poisson noise which obeys distribution `P(\\lambda)` where \\lambda is the ground-truth quanta in `projections`.
+        `projections` must have int type whose value stands for the photon quanta in some way. Floating projections
+        should be manually properly rescaled ahead and scale back as you need since Poisson Distribution only deals with
+        positive integers.
     '''
     cripAssert(is2or3D(projections), '`projections` should be 2D or 3D.')
+    cripAssert(isIntDtype(projections), '`projections` should have int dtype.')
+    cripAssert(np.min(projections >= 0), '`projections` should not contain negative values.0')
 
-    def injectOne(img):
-        if flat is not None:
-            I0 = flat
-        else:
-            I0 = np.max(img)
-        cripAssert(I0 > 0, 'The maximum of img <= 0.')
-
-        proj = nPhoton * np.exp(-img / I0)
-        proj = np.random.poisson(proj)
-        proj = -np.log(img / nPhoton) * I0
-
-        return proj
-
-    if is3D(projections):
-        res = np.array(list(map(injectOne, projections)))
-    else:
-        res = injectOne(projections)
-
-    return res
+    return np.random.poisson(projections)
 
 
 @ConvertListNDArray
