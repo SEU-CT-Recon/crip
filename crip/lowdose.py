@@ -31,7 +31,7 @@ def injectGaussianNoise(projections: TwoOrThreeD, sigma: float, mu: float = 0) -
 
 
 @ConvertListNDArray
-def injectPoissonNoise(projections: TwoOrThreeD) -> TwoOrThreeD:
+def injectPoissonNoise(projections: TwoOrThreeD, rescale: Or[int, float] = 1) -> TwoOrThreeD:
     '''
         Inject Poisson noise which obeys distribution `P(\\lambda)` where \\lambda is the ground-truth quanta in `projections`.
         `projections` must have int type whose value stands for the photon quanta in some way. Floating projections
@@ -39,10 +39,15 @@ def injectPoissonNoise(projections: TwoOrThreeD) -> TwoOrThreeD:
         positive integers.
     '''
     cripAssert(is2or3D(projections), '`projections` should be 2D or 3D.')
-    cripAssert(isIntDtype(projections), '`projections` should have int dtype.')
-    cripAssert(np.min(projections >= 0), '`projections` should not contain negative values.0')
+    cripAssert(np.min(projections >= 0), '`projections` should not contain negative values.')
+    cripWarning(isIntType(projections), '`projections` should have int dtype. It will be floored after rescaling.')
 
-    return np.random.poisson(projections)
+    img = projections * rescale
+    img = np.random.poisson(img.astype(np.uint32)).astype(DefaultFloatDType)
+    img[img <= 0] = 1
+    img /= rescale
+
+    return img
 
 
 @ConvertListNDArray

@@ -269,25 +269,28 @@ def forwardProjectWithSpectrum(lengths: List[TwoD],
                                materials: List[Atten],
                                spec: Spectrum,
                                energyConversion: str,
-                               fastSkip: bool = False):
+                               fastSkip: bool = False,
+                               flat: float = None):
     '''
         Perform forward projection using `spec`. `lengths` is a list of corresponding length [mm] images 
         (projection or sinogram) of `materials`. Set `lengths` and `materials` to empty lists to compute the flat field.
+        This function would simulate attenuation and Beam Hardening but no scatter.
     '''
     cripAssert(len(lengths) == len(materials), 'Lengths and materials should correspond.')
     cripAssert(all([isOfSameShape(lengths[0], x) for x in lengths]), 'Lengths map should have same shape.')
     cripAssert(energyConversion in ['PCD', 'EID'], 'Invalid energyConversion.')
 
     efficiency = 1 if energyConversion == 'PCD' else np.array(DiagEnergyRange)
-    effectiveOmega = spec.omega * efficiency
+
+    if (len(lengths) == 0) or (fastSkip and (all([np.sum(x) == 0 for x in lengths]))):
+        ones = np.ones_like(lengths[0], dtype=DefaultFloatDType) if len(lengths) > 0 else 1
+        if flat is not None:
+            return flat * ones
+        else:
+            effectiveOmega = spec.omega * efficiency
+            return np.sum(effectiveOmega) * ones
 
     resultShape = lengths[0].shape
-
-    if len(lengths) == 0 or fastSkip:  # we need to compute the flat field
-        flat_ = np.ones(resultShape, dtype=DefaultFloatDType) * np.sum(effectiveOmega)
-    if len(lengths) == 0 or (fastSkip and (all([np.sum(x) == 0 for x in lengths]))):
-        return flat_
-
     # a[h, w] = [vector of attenuation in that energy bin]
     attenuations = np.zeros((*resultShape, DiagEnergyLen), dtype=DefaultFloatDType)
     for length, material in zip(lengths, materials):
