@@ -6,7 +6,7 @@
 
 __all__ = [
     'Spectrum', 'Atten', 'calcMu', 'RhoWater', 'DiagEnergyLow', 'DiagEnergyHigh', 'DiagEnergyRange', 'DiagEnergyLen',
-    'getClassicDensity'
+    'getClassicDensity', 'forwardProjectWithSpectrum'
 ]
 
 import json
