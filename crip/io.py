@@ -31,8 +31,9 @@ def listDirectory(folder: str, sort='nat', style='filename', natAlg='default', e
 
     files = os.listdir(folder)
     if extFilter is not None:
-        extFilter.replace('.', '')
-        files = list(filter(lambda x: os.path.splitext(x) == extFilter, files))
+        if not extFilter.startswith('.'):
+            extFilter = '.' + extFilter
+        files = list(filter(lambda x: os.path.splitext(x)[1] == extFilter, files))
 
     files = sorted(files, reverse=reverse) if sort == 'dict' else natsort.natsorted(
         files, reverse=reverse, alg={
