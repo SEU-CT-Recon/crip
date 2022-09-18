@@ -67,6 +67,15 @@ def imreadDicom(path: str, dtype=None, attrs: Or[None, Dict[str, Any]] = None) -
         return np.array(dcm.pixel_array)
 
 
+def imreadDicoms(dir_: str, dtype=None, attrs: Or[None, Dict[str, Any]] = None) -> np.ndarray:
+    '''
+        Read series of DICOM files in directory.
+    '''
+    imgs = [imreadDicom(x, dtype, attrs) for x in listDirectory(dir_, style='fullpath')]
+
+    return np.array(imgs)
+
+
 def readDicom(path: str) -> pydicom.Dataset:
     '''
         Read DICOM file as pydicom object.
@@ -106,6 +115,22 @@ def imreadRaw(path: str,
     return arr
 
 
+def imreadRaws(dir_: str,
+               h: int,
+               w: int,
+               dtype=DefaultFloatDType,
+               nSlice: int = 1,
+               offset: int = 0,
+               gap: int = 0,
+               order='CHW'):
+    '''
+        Read series of raw images in directory.
+    '''
+    imgs = [imreadRaw(x, h, w, dtype, nSlice, offset, gap, order) for x in listDirectory(dir_, style='fullpath')]
+
+    return np.array(imgs)
+
+
 @ConvertListNDArray
 def imwriteRaw(img: TwoOrThreeD, path: str, dtype=None, order='CHW'):
     '''
@@ -130,6 +155,15 @@ def imreadTiff(path: str, dtype=None):
         return np.array(tifffile.imread(path)).astype(dtype)
     else:
         return np.array(tifffile.imread(path))
+
+
+def imreadTiffs(dir_: str, dtype=None):
+    '''
+        Read series of tiff images in directory.
+    '''
+    imgs = [imreadTiff(x, dtype) for x in listDirectory(dir_, style='fullpath')]
+
+    return np.array(imgs)
 
 
 @ConvertListNDArray
