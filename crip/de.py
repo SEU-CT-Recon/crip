@@ -106,4 +106,4 @@ def deDecompRecon(low: ThreeD, high: ThreeD, muBase1Low: float, muBase1High: flo
     if is2D(low):
         return decompOne(low, high)
     else:
-        return np.array(list(map(lambda args: decompOne(*args), zip(low, high))))
+        return np.array(list(map(lambda args: decompOne(*args), zip(low, high)))).transpose((1, 0, 2, 3))
