@@ -31,9 +31,18 @@ class _MgConfig(object):
 
         return json.dumps(dict_, indent=2)
 
-    def dumpJSONFile(self, path):
+    def dumpJSONFile(self, path: str):
         with open(path, 'w') as fp:
             fp.write(self.dumpJSON())
+
+    def fromJSON(self, json_: str):
+        obj = json.loads(json_)
+        for key in obj:
+            self[key] = obj
+
+    def fromJSONFile(self, path: str):
+        with open(path, 'r') as fp:
+            self.fromJSON(fp.read())
 
 
 class MgfbpConfig(_MgConfig):
