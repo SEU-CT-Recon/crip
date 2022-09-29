@@ -196,14 +196,17 @@ def permute(vol: ThreeD, from_: str, to: str) -> ThreeD:
     cripAssert(from_ in dirs, f'Invalid direction string: {from_}')
     cripAssert(to in dirs, f'Invalid direction string: {to}')
 
+    if from_ == to:
+        return vol
+
     dirFrom = dirs.index(from_)
     dirTo = dirs.index(to)
-
+    
     orders = [
         # to sag       cor         tra      # from
-        [(0, 1, 2), (2, 0, 1), (2, 0, 1)],  # sag
-        [(1, 2, 0), (0, 1, 2), (0, 2, 1)],  # cor
-        [(2, 0, 1), (0, 2, 1), (0, 1, 2)],  # tra
+        [(0, 1, 2), (1, 2, 0), (2, 1, 0)],  # sag
+        [(1, 2, 0), (0, 1, 2), (1, 0, 2)],  # cor
+        [(2, 1, 0), (1, 0, 2), (0, 1, 2)],  # tra
     ]
     order = orders[dirFrom][dirTo]
 
