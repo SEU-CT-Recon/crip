@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="pdoc 12.1.0"/>
+    <meta name="generator" content="pdoc 12.2.0"/>
     <title>crip.physics API documentation</title>
 
     <style>/*! * Bootstrap Reboot v5.0.0 (https://getbootstrap.com/) * Copyright 2011-2021 The Bootstrap Authors * Copyright 2011-2021 Twitter, Inc. * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE) * Forked from Normalize.css, licensed MIT (https://github.com/necolas/normalize.css/blob/master/LICENSE.md) */*,::after,::before{box-sizing:border-box}@media (prefers-reduced-motion:no-preference){:root{scroll-behavior:smooth}}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";font-size:1rem;font-weight:400;line-height:1.5;color:#212529;background-color:#fff;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}hr{margin:1rem 0;color:inherit;background-color:currentColor;border:0;opacity:.25}hr:not([size]){height:1px}h1,h2,h3,h4,h5,h6{margin-top:0;margin-bottom:.5rem;font-weight:500;line-height:1.2}h1{font-size:calc(1.375rem + 1.5vw)}@media (min-width:1200px){h1{font-size:2.5rem}}h2{font-size:calc(1.325rem + .9vw)}@media (min-width:1200px){h2{font-size:2rem}}h3{font-size:calc(1.3rem + .6vw)}@media (min-width:1200px){h3{font-size:1.75rem}}h4{font-size:calc(1.275rem + .3vw)}@media (min-width:1200px){h4{font-size:1.5rem}}h5{font-size:1.25rem}h6{font-size:1rem}p{margin-top:0;margin-bottom:1rem}abbr[data-bs-original-title],abbr[title]{-webkit-text-decoration:underline dotted;text-decoration:underline dotted;cursor:help;-webkit-text-decoration-skip-ink:none;text-decoration-skip-ink:none}address{margin-bottom:1rem;font-style:normal;line-height:inherit}ol,ul{padding-left:2rem}dl,ol,ul{margin-top:0;margin-bottom:1rem}ol ol,ol ul,ul ol,ul ul{margin-bottom:0}dt{font-weight:700}dd{margin-bottom:.5rem;margin-left:0}blockquote{margin:0 0 1rem}b,strong{font-weight:bolder}small{font-size:.875em}mark{padding:.2em;background-color:#fcf8e3}sub,sup{position:relative;font-size:.75em;line-height:0;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}a{color:#0d6efd;text-decoration:underline}a:hover{color:#0a58ca}a:not([href]):not([class]),a:not([href]):not([class]):hover{color:inherit;text-decoration:none}code,kbd,pre,samp{font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:1em;direction:ltr;unicode-bidi:bidi-override}pre{display:block;margin-top:0;margin-bottom:1rem;overflow:auto;font-size:.875em}pre code{font-size:inherit;color:inherit;word-break:normal}code{font-size:.875em;color:#d63384;word-wrap:break-word}a>code{color:inherit}kbd{padding:.2rem .4rem;font-size:.875em;color:#fff;background-color:#212529;border-radius:.2rem}kbd kbd{padding:0;font-size:1em;font-weight:700}figure{margin:0 0 1rem}img,svg{vertical-align:middle}table{caption-side:bottom;border-collapse:collapse}caption{padding-top:.5rem;padding-bottom:.5rem;color:#6c757d;text-align:left}th{text-align:inherit;text-align:-webkit-match-parent}tbody,td,tfoot,th,thead,tr{border-color:inherit;border-style:solid;border-width:0}label{display:inline-block}button{border-radius:0}button:focus:not(:focus-visible){outline:0}button,input,optgroup,select,textarea{margin:0;font-family:inherit;font-size:inherit;line-height:inherit}button,select{text-transform:none}[role=button]{cursor:pointer}select{word-wrap:normal}select:disabled{opacity:1}[list]::-webkit-calendar-picker-indicator{display:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button}[type=button]:not(:disabled),[type=reset]:not(:disabled),[type=submit]:not(:disabled),button:not(:disabled){cursor:pointer}::-moz-focus-inner{padding:0;border-style:none}textarea{resize:vertical}fieldset{min-width:0;padding:0;margin:0;border:0}legend{float:left;width:100%;padding:0;margin-bottom:.5rem;font-size:calc(1.275rem + .3vw);line-height:inherit}@media (min-width:1200px){legend{font-size:1.5rem}}legend+*{clear:left}::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-fields-wrapper,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-minute,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-text,::-webkit-datetime-edit-year-field{padding:0}::-webkit-inner-spin-button{height:auto}[type=search]{outline-offset:-2px;-webkit-appearance:textfield}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-color-swatch-wrapper{padding:0}::file-selector-button{font:inherit}::-webkit-file-upload-button{font:inherit;-webkit-appearance:button}output{display:inline-block}iframe{border:0}summary{display:list-item;cursor:pointer}progress{vertical-align:baseline}[hidden]{display:none!important}</style>
@@ -84,6 +84,9 @@
             <li>
                     <a class="function" href="#getClassicDensity">getClassicDensity</a>
             </li>
+            <li>
+                    <a class="function" href="#forwardProjectWithSpectrum">forwardProjectWithSpectrum</a>
+            </li>
     </ul>
 
 
@@ -105,9 +108,9 @@
 <p><a href="https://github.com/z0gSh1u/crip">https://github.com/z0gSh1u/crip</a></p>
 </div>
 
-                        <input id="physics-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+                        <input id="mod-physics-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 
-                        <label class="view-source-button" for="physics-view-source"><span>View Source</span></label>
+                        <label class="view-source-button" for="mod-physics-view-source"><span>View Source</span></label>
 
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a><span class="sd">    Physics module of crip.</span>
@@ -117,7 +120,7 @@
 </span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a>
 </span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a>    <span class="s1">&#39;Spectrum&#39;</span><span class="p">,</span> <span class="s1">&#39;Atten&#39;</span><span class="p">,</span> <span class="s1">&#39;calcMu&#39;</span><span class="p">,</span> <span class="s1">&#39;RhoWater&#39;</span><span class="p">,</span> <span class="s1">&#39;DiagEnergyLow&#39;</span><span class="p">,</span> <span class="s1">&#39;DiagEnergyHigh&#39;</span><span class="p">,</span> <span class="s1">&#39;DiagEnergyRange&#39;</span><span class="p">,</span> <span class="s1">&#39;DiagEnergyLen&#39;</span><span class="p">,</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a>    <span class="s1">&#39;getClassicDensity&#39;</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a>    <span class="s1">&#39;getClassicDensity&#39;</span><span class="p">,</span> <span class="s1">&#39;forwardProjectWithSpectrum&#39;</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="p">]</span>
 </span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a>
 </span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="kn">import</span> <span class="nn">json</span>
@@ -497,8 +500,10 @@
             <div class="docstring"><p>Construct Spectrum object with omega array of every energy.</p>
 
 <p>Get \omega of certain energy (keV):
-    <div class="pdoc-code codehilite"><pre><span></span><code><span class="n">omega</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">omega</span><span class="p">[</span><span class="n">E</span><span class="p">]</span>
-    </code></pre></div></p>
+    <div class="pdoc-code codehilite">
+    <pre><span></span><code><span class="n">omega</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">omega</span><span class="p">[</span><span class="n">E</span><span class="p">]</span>
+    </code></pre>
+    </div></p>
 </div>
 
 
@@ -746,8 +751,10 @@
 <p>\rho: g/cm^3.</p>
 
 <p>Get \mu of certain energy (keV):
-    <div class="pdoc-code codehilite"><pre><span></span><code><span class="n">mu</span> <span class="o">=</span> <span class="n">atten</span><span class="o">.</span><span class="n">mu</span><span class="p">[</span><span class="n">E</span><span class="p">]</span>
-    </code></pre></div></p>
+    <div class="pdoc-code codehilite">
+    <pre><span></span><code><span class="n">mu</span> <span class="o">=</span> <span class="n">atten</span><span class="o">.</span><span class="n">mu</span><span class="p">[</span><span class="n">E</span><span class="p">]</span>
+    </code></pre>
+    </div></p>
 </div>
 
 
@@ -979,6 +986,61 @@
 
 
             <div class="docstring"><p>Get the classic value of density of a specified material (g/cm^3) from built-in dataset.</p>
+</div>
+
+
+                </section>
+                <section id="forwardProjectWithSpectrum">
+                            <input id="forwardProjectWithSpectrum-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">forwardProjectWithSpectrum</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">lengths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span>,</span><span class="param">	<span class="n">materials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n"><a href="#Atten">crip.physics.Atten</a></span><span class="p">]</span>,</span><span class="param">	<span class="n">spec</span><span class="p">:</span> <span class="n"><a href="#Spectrum">crip.physics.Spectrum</a></span>,</span><span class="param">	<span class="n">energyConversion</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">fastSkip</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>,</span><span class="param">	<span class="n">flat</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="forwardProjectWithSpectrum-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#forwardProjectWithSpectrum"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="forwardProjectWithSpectrum-269"><a href="#forwardProjectWithSpectrum-269"><span class="linenos">269</span></a><span class="k">def</span> <span class="nf">forwardProjectWithSpectrum</span><span class="p">(</span><span class="n">lengths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">TwoD</span><span class="p">],</span>
+</span><span id="forwardProjectWithSpectrum-270"><a href="#forwardProjectWithSpectrum-270"><span class="linenos">270</span></a>                               <span class="n">materials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Atten</span><span class="p">],</span>
+</span><span id="forwardProjectWithSpectrum-271"><a href="#forwardProjectWithSpectrum-271"><span class="linenos">271</span></a>                               <span class="n">spec</span><span class="p">:</span> <span class="n">Spectrum</span><span class="p">,</span>
+</span><span id="forwardProjectWithSpectrum-272"><a href="#forwardProjectWithSpectrum-272"><span class="linenos">272</span></a>                               <span class="n">energyConversion</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="forwardProjectWithSpectrum-273"><a href="#forwardProjectWithSpectrum-273"><span class="linenos">273</span></a>                               <span class="n">fastSkip</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+</span><span id="forwardProjectWithSpectrum-274"><a href="#forwardProjectWithSpectrum-274"><span class="linenos">274</span></a>                               <span class="n">flat</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+</span><span id="forwardProjectWithSpectrum-275"><a href="#forwardProjectWithSpectrum-275"><span class="linenos">275</span></a>    <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="forwardProjectWithSpectrum-276"><a href="#forwardProjectWithSpectrum-276"><span class="linenos">276</span></a><span class="sd">        Perform forward projection using `spec`. `lengths` is a list of corresponding length [mm] images </span>
+</span><span id="forwardProjectWithSpectrum-277"><a href="#forwardProjectWithSpectrum-277"><span class="linenos">277</span></a><span class="sd">        (projection or sinogram) of `materials`. Set `lengths` and `materials` to empty lists to compute the flat field.</span>
+</span><span id="forwardProjectWithSpectrum-278"><a href="#forwardProjectWithSpectrum-278"><span class="linenos">278</span></a><span class="sd">        This function would simulate attenuation and Beam Hardening but no scatter.</span>
+</span><span id="forwardProjectWithSpectrum-279"><a href="#forwardProjectWithSpectrum-279"><span class="linenos">279</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="forwardProjectWithSpectrum-280"><a href="#forwardProjectWithSpectrum-280"><span class="linenos">280</span></a>    <span class="n">cripAssert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">materials</span><span class="p">),</span> <span class="s1">&#39;Lengths and materials should correspond.&#39;</span><span class="p">)</span>
+</span><span id="forwardProjectWithSpectrum-281"><a href="#forwardProjectWithSpectrum-281"><span class="linenos">281</span></a>    <span class="n">cripAssert</span><span class="p">(</span><span class="nb">all</span><span class="p">([</span><span class="n">isOfSameShape</span><span class="p">(</span><span class="n">lengths</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lengths</span><span class="p">]),</span> <span class="s1">&#39;Lengths map should have same shape.&#39;</span><span class="p">)</span>
+</span><span id="forwardProjectWithSpectrum-282"><a href="#forwardProjectWithSpectrum-282"><span class="linenos">282</span></a>    <span class="n">cripAssert</span><span class="p">(</span><span class="n">energyConversion</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;PCD&#39;</span><span class="p">,</span> <span class="s1">&#39;EID&#39;</span><span class="p">],</span> <span class="s1">&#39;Invalid energyConversion.&#39;</span><span class="p">)</span>
+</span><span id="forwardProjectWithSpectrum-283"><a href="#forwardProjectWithSpectrum-283"><span class="linenos">283</span></a>
+</span><span id="forwardProjectWithSpectrum-284"><a href="#forwardProjectWithSpectrum-284"><span class="linenos">284</span></a>    <span class="n">efficiency</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">energyConversion</span> <span class="o">==</span> <span class="s1">&#39;PCD&#39;</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">DiagEnergyRange</span><span class="p">)</span>
+</span><span id="forwardProjectWithSpectrum-285"><a href="#forwardProjectWithSpectrum-285"><span class="linenos">285</span></a>
+</span><span id="forwardProjectWithSpectrum-286"><a href="#forwardProjectWithSpectrum-286"><span class="linenos">286</span></a>    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">fastSkip</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">all</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lengths</span><span class="p">]))):</span>
+</span><span id="forwardProjectWithSpectrum-287"><a href="#forwardProjectWithSpectrum-287"><span class="linenos">287</span></a>        <span class="n">ones</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">lengths</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DefaultFloatDType</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span>
+</span><span id="forwardProjectWithSpectrum-288"><a href="#forwardProjectWithSpectrum-288"><span class="linenos">288</span></a>        <span class="k">if</span> <span class="n">flat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="forwardProjectWithSpectrum-289"><a href="#forwardProjectWithSpectrum-289"><span class="linenos">289</span></a>            <span class="k">return</span> <span class="n">flat</span> <span class="o">*</span> <span class="n">ones</span>
+</span><span id="forwardProjectWithSpectrum-290"><a href="#forwardProjectWithSpectrum-290"><span class="linenos">290</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="forwardProjectWithSpectrum-291"><a href="#forwardProjectWithSpectrum-291"><span class="linenos">291</span></a>            <span class="n">effectiveOmega</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">omega</span> <span class="o">*</span> <span class="n">efficiency</span>
+</span><span id="forwardProjectWithSpectrum-292"><a href="#forwardProjectWithSpectrum-292"><span class="linenos">292</span></a>            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">effectiveOmega</span><span class="p">)</span> <span class="o">*</span> <span class="n">ones</span>
+</span><span id="forwardProjectWithSpectrum-293"><a href="#forwardProjectWithSpectrum-293"><span class="linenos">293</span></a>
+</span><span id="forwardProjectWithSpectrum-294"><a href="#forwardProjectWithSpectrum-294"><span class="linenos">294</span></a>    <span class="n">resultShape</span> <span class="o">=</span> <span class="n">lengths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+</span><span id="forwardProjectWithSpectrum-295"><a href="#forwardProjectWithSpectrum-295"><span class="linenos">295</span></a>    <span class="c1"># a[h, w] = [vector of attenuation in that energy bin]</span>
+</span><span id="forwardProjectWithSpectrum-296"><a href="#forwardProjectWithSpectrum-296"><span class="linenos">296</span></a>    <span class="n">attenuations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="o">*</span><span class="n">resultShape</span><span class="p">,</span> <span class="n">DiagEnergyLen</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DefaultFloatDType</span><span class="p">)</span>
+</span><span id="forwardProjectWithSpectrum-297"><a href="#forwardProjectWithSpectrum-297"><span class="linenos">297</span></a>    <span class="k">for</span> <span class="n">length</span><span class="p">,</span> <span class="n">material</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">lengths</span><span class="p">,</span> <span class="n">materials</span><span class="p">):</span>
+</span><span id="forwardProjectWithSpectrum-298"><a href="#forwardProjectWithSpectrum-298"><span class="linenos">298</span></a>        <span class="n">attenuations</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">material</span><span class="o">.</span><span class="n">mu</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">*</span><span class="n">resultShape</span><span class="p">,</span> <span class="n">DiagEnergyLen</span><span class="p">))</span>
+</span><span id="forwardProjectWithSpectrum-299"><a href="#forwardProjectWithSpectrum-299"><span class="linenos">299</span></a>
+</span><span id="forwardProjectWithSpectrum-300"><a href="#forwardProjectWithSpectrum-300"><span class="linenos">300</span></a>    <span class="n">attened</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">omega</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">attenuations</span><span class="p">)</span> <span class="o">*</span> <span class="n">efficiency</span>  <span class="c1"># the attenuated image</span>
+</span><span id="forwardProjectWithSpectrum-301"><a href="#forwardProjectWithSpectrum-301"><span class="linenos">301</span></a>
+</span><span id="forwardProjectWithSpectrum-302"><a href="#forwardProjectWithSpectrum-302"><span class="linenos">302</span></a>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">attened</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Perform forward projection using <code>spec</code>. <code>lengths</code> is a list of corresponding length [mm] images 
+(projection or sinogram) of <code>materials</code>. Set <code>lengths</code> and <code>materials</code> to empty lists to compute the flat field.
+This function would simulate attenuation and Beam Hardening but no scatter.</p>
 </div>
 
 

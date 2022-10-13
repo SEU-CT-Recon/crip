@@ -30,7 +30,9 @@ All functions are (or will be) with clear documentation. Just consider the funct
 - `crip.preprocess` for data pre-processing.
 - `crip.shared` for other common operations.
 - `crip.lowdose` for Low-Dose researches.
-- `crip.mangoct` for mangoct reconstruction tool package integration.
+- `crip.mangoct` for [mangoct](https://github.com/CandleHouse/mandoct) reconstruction tool package integration.
+- `crip.metric` for metrics computation.
+- `crip.paplot` for figure drawing.
 
 crip is still under development. More features will be added in the future. And contributions are strongly welcomed.
 
@@ -142,3 +144,5 @@ for i in trange(H):
 ## License
 
 MIT
+
+We are considering publishing crip to [Journal of Open Source Software](https://joss.theoj.org/) and/or apply for a Software Copyright in China in the future.
