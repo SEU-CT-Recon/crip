@@ -43,13 +43,13 @@ def flatDarkFieldCorrection(projections: TwoOrThreeD,
     '''
     sampleProjection = projections if is2D(projections) else projections[0]
 
-    if isType(flat, TwoD):
+    if is2D(flat):
         cripAssert(isOfSameShape(sampleProjection, flat), '`projection` and `flat` should have same shape.')
-    if isType(flat, ThreeD):
+    if is3D(flat):
         cripAssert(isOfSameShape(projections, flat), '`projection` and `flat` should have same shape.')
-    if isType(dark, TwoD):
+    if is2D(dark):
         cripAssert(isOfSameShape(sampleProjection, dark), '`projection` and `dark` should have same shape.')
-    if isType(dark, ThreeD):
+    if is3D(dark):
         cripAssert(isOfSameShape(projections, dark), '`projection` and `dark` should have same shape.')
     if flat is None:
         cripWarning(False, '`flat` is None. Use the maximum value instead.')

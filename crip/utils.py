@@ -88,14 +88,14 @@ def asFloat(arr):
 
 
 def is1D(x: np.ndarray):
-    return len(x.shape) == 1
+    return isType(x, NDArray) and len(x.shape) == 1
 
 def is2D(x: np.ndarray):
-    return len(x.shape) == 2
+    return isType(x, NDArray) and len(x.shape) == 2
 
 
 def is3D(x: np.ndarray):
-    return len(x.shape) == 3
+    return isType(x, NDArray) and len(x.shape) == 3
 
 
 def is2or3D(x: np.ndarray):

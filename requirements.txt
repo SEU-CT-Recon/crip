@@ -4,3 +4,4 @@ tifffile
 pydicom
 natsort
 matplotlib
+scikit-image
