@@ -1,0 +1,21 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: crip
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Xu
+    family-names: ZHUO
+    email: zx.cs@qq.com
+    affiliation: 'Southeast University, China'
+  - given-names: Yuchen
+    family-names: LU
+    affiliation: 'Southeast University, China'
+repository-code: 'https://github.com/z0gSh1u/crip'
+url: 'https://github.com/z0gSh1u/crip'
+repository: 'https://github.com/z0gSh1u/crip'
+license: MIT

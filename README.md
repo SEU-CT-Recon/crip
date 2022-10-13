@@ -145,4 +145,15 @@ for i in trange(H):
 
 MIT
 
+## Cite This
+
+```
+@software{ZHUO_crip,
+  author = {ZHUO, Xu and LU, Yuchen},
+  license = {MIT},
+  title = {{crip}},
+  url = {https://github.com/z0gSh1u/crip}
+}
+```
+
 We are considering publishing crip to [Journal of Open Source Software](https://joss.theoj.org/) and/or apply for a Software Copyright in China in the future.
