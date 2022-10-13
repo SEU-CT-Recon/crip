@@ -33,23 +33,34 @@ def averageProjections(projections: TwoOrThreeD) -> TwoD:
 
 @ConvertListNDArray
 def flatDarkFieldCorrection(projections: TwoOrThreeD,
-                            flat: Or[TwoD, float, None] = None,
-                            dark: Or[TwoD, float] = 0) -> TwoOrThreeD:
+                            flat: Or[TwoD, ThreeD, float, None] = None,
+                            dark: Or[TwoD, ThreeD, float] = 0) -> TwoOrThreeD:
     '''
         Perform flat field (air) and dark field correction to get post-log value.
+        If `flat` is 3D and `projections` is also 3D, the correction will be performed view by view.
         I.e., `- log [(X - D) / (F - D)]`. Multi projections accepted.
         If flat is None, air is estimated using the brightest pixel by default.
     '''
     sampleProjection = projections if is2D(projections) else projections[0]
 
     if isType(flat, TwoD):
-        cripAssert(isOfSameShape(sampleProjection, flat), "`projection` and `flat` should have same shape.")
+        cripAssert(isOfSameShape(sampleProjection, flat), '`projection` and `flat` should have same shape.')
+    if isType(flat, ThreeD):
+        cripAssert(isOfSameShape(projections, flat), '`projection` and `flat` should have same shape.')
     if isType(dark, TwoD):
-        cripAssert(isOfSameShape(sampleProjection, dark), "`projection` and `dark` should have same shape.")
+        cripAssert(isOfSameShape(sampleProjection, dark), '`projection` and `dark` should have same shape.')
+    if isType(dark, ThreeD):
+        cripAssert(isOfSameShape(projections, dark), '`projection` and `dark` should have same shape.')
     if flat is None:
+        cripWarning(False, '`flat` is None. Use the maximum value instead.')
         flat = np.max(projections)
 
-    res = -np.log((projections - dark) / (flat - dark))
+    numerator = projections - dark
+    denominator = flat - dark
+    cripAssert(np.min(numerator > 0), 'Some projections values are not greater than zero.')
+    cripAssert(np.min(denominator > 0), 'Some flat field values are not greater than zero.')
+
+    res = -np.log(numerator / denominator)
     res[res == np.inf] = 0
     res[res == np.nan] = 0
 

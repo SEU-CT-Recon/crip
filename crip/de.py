@@ -8,7 +8,7 @@ __all__ = ['singleMatMuDecomp', 'calcAttenedSpec', 'calcPostLog', 'deDecompGetCo
 
 import numpy as np
 
-from .utils import ConvertListNDArray, cripAssert, is2D, isOfSameShape
+from .utils import ConvertListNDArray, cripAssert, cripWarning, is2D, isOfSameShape
 from ._typing import *
 from .physics import Atten, DiagEnergyRange, Spectrum, calcAttenedSpec, calcPostLog
 
@@ -87,16 +87,20 @@ def deDecompProj(lowProj: TwoOrThreeD, highProj: TwoOrThreeD, coeff1: NDArray,
 
 
 @ConvertListNDArray
-def deDecompRecon(low: ThreeD, high: ThreeD, muBase1Low: float, muBase1High: float, muBase2Low: float,
-                  muBase2High: float):
+def deDecompRecon(low: TwoOrThreeD, high: TwoOrThreeD, muBase1Low: float, muBase1High: float, muBase2Low: float,
+                  muBase2High: float, checkCond: bool = True):
     '''
         Perform dual-energy decompose in reconstruction domain. \\mu values can be calculated using @see `calcMu`.
 
         The values of input volumes should be \\mu value. The outputs are decomposing coefficients.
     '''
     cripAssert(isOfSameShape(low, high), 'Two volumes should have same shape.')
+    COND_TOLERANCE = 1000
 
-    M = np.linalg.pinv(np.array([[muBase1Low, muBase2Low], [muBase1High, muBase2High]]))
+    A = np.array([[muBase1Low, muBase2Low], [muBase1High, muBase2High]])
+    if checkCond:
+        cripWarning(np.linalg.cond(A) <= COND_TOLERANCE, 'The material decomposition matrix possesses high condition number.')
+    M = np.linalg.inv(A)
 
     def decompOne(low, high):
         c1 = M[0, 0] * low + M[0, 1] * high

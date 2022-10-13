@@ -52,7 +52,8 @@ def listDirectory(folder: str, sort='nat', style='filename', natAlg='default', e
 def imreadDicom(path: str, dtype=None, attrs: Or[None, Dict[str, Any]] = None) -> np.ndarray:
     '''
         Read DICOM file. Return numpy array. Use `attrs` to supplement DICOM tags for non-standard images.
-
+        You should be very careful about the whether Rescale Slope is cancelled for CT images.
+    
         Convert dtype with `dtype != None`.
     '''
     dcm = pydicom.dcmread(path)

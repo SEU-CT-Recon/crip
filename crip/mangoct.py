@@ -14,7 +14,7 @@ import json
 import tempfile
 import subprocess
 
-from .utils import cripAssert, isType, sysPlatform
+from .utils import cripAssert, cripWarning, isType
 from ._typing import *
 
 
@@ -227,13 +227,6 @@ class _Mgbin(object):
         self._buildCmd()
 
     def _buildCmd(self):
-        platform = sysPlatform()
-
-        if platform == 'Windows':
-            self.cmd.append([f'set CUDA_VISIBLE_DEVICES={self.cudaDevice}'])
-        elif platform == 'Linux':
-            self.cmd.append([f'export CUDA_VISIBLE_DEVICES={self.cudaDevice}'])
-
         self.cmd.append([f'{self.exe}', '<1>'])
 
     def exec(self, conf: Or[str, _MgConfig]):
@@ -247,6 +240,7 @@ class _Mgbin(object):
             conf = tmp.name
             tmp.close()
 
+        os.environ['CUDA_VISIBLE_DEVICES'] = self.cudaDevice
         for cmd in self.cmd:
             if len(cmd) == 2:  # include args
                 cmd[1] = cmd[1].replace('<1>', conf)

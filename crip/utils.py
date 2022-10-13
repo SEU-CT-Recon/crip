@@ -8,7 +8,7 @@ __all__ = [
     'readFileText', 'CripException', 'cripAssert', 'cripWarning', 'ConvertListNDArray', 'asFloat', 'is2D', 'is3D',
     'is2or3D', 'isInt', 'isIntDtype', 'isFloatDtype', 'isIntType', 'isFloatType', 'isType', 'isNumber', 'isList',
     'isListNDArray', 'isOfSameShape', 'inRange', 'inArray', 'getChildFolder', 'cvtEnergyUnit', 'cvtLengthUnit',
-    'cvtMuUnit', 'radToDeg', 'degToRad', 'sysPlatform', 'getHW'
+    'cvtMuUnit', 'radToDeg', 'degToRad', 'sysPlatform', 'getHW', 'is1D'
 ]
 
 import os
@@ -86,6 +86,9 @@ def asFloat(arr):
         arr = arr.astype(DefaultFloatDType)
     return arr
 
+
+def is1D(x: np.ndarray):
+    return len(x.shape) == 1
 
 def is2D(x: np.ndarray):
     return len(x.shape) == 2

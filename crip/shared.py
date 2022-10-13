@@ -202,6 +202,7 @@ def permute(vol: ThreeD, from_: str, to: str) -> ThreeD:
     dirFrom = dirs.index(from_)
     dirTo = dirs.index(to)
     
+    # TODO check this matrix
     orders = [
         # to sag       cor         tra      # from
         [(0, 1, 2), (1, 2, 0), (2, 1, 0)],  # sag

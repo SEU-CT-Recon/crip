@@ -64,22 +64,26 @@ def fovCropRadius(SOD: float, SDD: float, detWidth: float, reconPixSize: float) 
 
 
 @ConvertListNDArray
-def fovCrop(volume: ThreeD, radius: int, fill: Or[int, float] = 0) -> ThreeD:
+def fovCrop(img: TwoOrThreeD, radius: int, fill: Or[int, float] = 0) -> ThreeD:
     '''
-        Crop a circle FOV on reconstructed image `volume` with `radius` (pixel) \\
+        Crop a circle FOV on reconstructed image `img` with `radius` (pixel) \\
         and `fill` value for outside FOV.
     '''
-    cripAssert(radius >= 1, 'Invalid radius.')
-    cripAssert(is3D(volume), 'volume should be 3D.')
+    cripAssert(radius >= 1 and isInt(radius), 'Invalid radius.')
+    cripAssert(is2or3D(img), 'img should be 2D or 3D.')
 
-    _, N, M = volume.shape
+    N, M = img.shape[:-2]
     x = np.array(range(N), dtype=DefaultFloatDType) - N / 2 - 0.5
     y = np.array(range(M), dtype=DefaultFloatDType) - M / 2 - 0.5
     xx, yy = np.meshgrid(x, y)
 
     outside = xx**2 + yy**2 > radius**2
-    cropped = np.array(volume)
-    cropped[:, outside] = fill
+    cropped = img.copy()
+
+    if is3D(img):
+        cropped[:, outside] = fill
+    else:
+        cropped[outside] = fill
 
     return cropped
 
@@ -116,7 +120,7 @@ def huNoRescale(image: TwoOrThreeD, b: float = -1000, k: float = 1) -> TwoOrThre
     return (image - b) / k
 
 
-def postlogsToProjections(postlogs: TwoOrThreeD, flat: TwoD) -> TwoOrThreeD:
+def postlogsToProjections(postlogs: TwoOrThreeD, flat: Or[TwoD, float]) -> TwoOrThreeD:
     '''
         Invert postlog images to the original projections.
     '''

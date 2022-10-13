@@ -3,3 +3,4 @@ opencv-python
 tifffile
 pydicom
 natsort
+matplotlib
