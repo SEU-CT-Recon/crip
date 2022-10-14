@@ -72,7 +72,7 @@ def fovCrop(img: TwoOrThreeD, radius: int, fill: Or[int, float] = 0) -> ThreeD:
     cripAssert(radius >= 1 and isInt(radius), 'Invalid radius.')
     cripAssert(is2or3D(img), 'img should be 2D or 3D.')
 
-    N, M = img.shape[:-2]
+    N, M = img.shape[-2:]
     x = np.array(range(N), dtype=DefaultFloatDType) - N / 2 - 0.5
     y = np.array(range(M), dtype=DefaultFloatDType) - M / 2 - 0.5
     xx, yy = np.meshgrid(x, y)
