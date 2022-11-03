@@ -240,7 +240,7 @@ class _Mgbin(object):
             conf = tmp.name
             tmp.close()
 
-        os.environ['CUDA_VISIBLE_DEVICES'] = self.cudaDevice
+        os.environ['CUDA_VISIBLE_DEVICES'] = str(self.cudaDevice)
         for cmd in self.cmd:
             if len(cmd) == 2:  # include args
                 cmd[1] = cmd[1].replace('<1>', conf)
