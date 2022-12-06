@@ -24,6 +24,7 @@ DiagEnergyLow = 0  # keV
 DiagEnergyHigh = 150  # keV
 DiagEnergyRange = range(DiagEnergyLow, DiagEnergyHigh + 1)  # [low, high)
 DiagEnergyLen = DiagEnergyHigh - DiagEnergyLow + 1
+ForwardStartMinEnergy = 20  # keV
 
 
 class Spectrum:
@@ -41,10 +42,16 @@ class Spectrum:
 
         self.unit = unit
         self.omega = np.array(omega)
-        self.update()
-
-    def update(self):
         self.sumOmega = np.sum(self.omega)
+
+        self.startEnergy = None
+        self.cutOffEnergy = None
+        for e in DiagEnergyRange:
+            if self.omega[e] > 0:
+                self.startEnergy = e
+            if self.omega[e] <= 0:
+                self.cutOffEnergy = e
+                break
 
     @staticmethod
     def fromText(specText: str, unit='keV'):
@@ -170,7 +177,7 @@ class Atten:
         _attenList = Atten.builtInAttenList()
         _attenPath = getChildFolder('_atten')
         _attenFile = '{}{}.txt'.format(materialName, dataSourcePostfix)
-        _attenFilePath = path.join(_attenPath, f'./{_attenList[materialName]}', f'./{_attenFile}')
+        _attenFilePath = path.join(_attenPath, f'./{_attenList[materialName + dataSourcePostfix]}', f'./{_attenFile}')
         cripAssert(path.exists(_attenFilePath), f'Atten file {_attenFile} does not exist.')
 
         content = readFileText(_attenFilePath)
@@ -198,7 +205,7 @@ def calcMu(atten: Atten, spec: Spectrum, energyConversion: Or[str, float, int, C
         `energyConversion` determines the energy conversion efficiency of the detector.
             - "PCD" (Photon Counting), "EID" (Energy Integrating)
             - a constant value
-            - a callback function (callable) that takes energy in keV and returns the factor
+            - a callback function that takes energy in keV and returns the factor
     '''
     mus = atten.mu
     eff = None
@@ -291,10 +298,19 @@ def forwardProjectWithSpectrum(lengths: List[TwoD],
             return np.sum(effectiveOmega) * ones
 
     resultShape = lengths[0].shape
+
+    # narrow the energy range for outer product
+    start = max(spec.startEnergy, ForwardStartMinEnergy)  # ignore too low energy bins to avoid numerical issues
+    cutOff = spec.cutOffEnergy
+    energyBinLen = cutOff - start
+    cripAssert(
+        energyBinLen >= 1, 'To avoid numerical issues, the spectrum cannot have cut-off smaller than {} keV.'.format(
+            ForwardStartMinEnergy))
+
     # a[h, w] = [vector of attenuation in that energy bin]
-    attenuations = np.zeros((*resultShape, DiagEnergyLen), dtype=DefaultFloatDType)
+    attenuations = np.zeros((*resultShape, energyBinLen), dtype=DefaultFloatDType)
     for length, material in zip(lengths, materials):
-        attenuations += np.outer(length, material.mu).reshape((*resultShape, DiagEnergyLen))
+        attenuations += np.outer(length, material.mu[start:cutOff]).reshape((*resultShape, energyBinLen))
 
     attened = spec.omega * np.exp(-attenuations) * efficiency  # the attenuated image
 

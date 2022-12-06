@@ -33,7 +33,7 @@ def drawCircle(slice: TwoD, radius: int, center=None) -> Tuple[NDArray, NDArray]
     return x, y
 
 
-def fovCropRadius(SOD: float, SDD: float, detWidth: float, reconPixSize: float) -> float:
+def fovCropRadius(SOD: float, SDD: float, detWidth: float, reconPixSize: float, roundOff=True) -> float:
     '''
         Get the radius (in pixel) of the circle valid FOV of the reconstructed volume.
 
@@ -60,7 +60,9 @@ def fovCropRadius(SOD: float, SDD: float, detWidth: float, reconPixSize: float) 
     # So under no circumstances will r1 greater than r2.
     r3 = SOD / (L / halfDW) / reconPixSize
 
-    return min(r1, r2, r3)
+    r = min(r1, r2, r3)
+
+    return round(r) if roundOff else r
 
 
 @ConvertListNDArray
@@ -69,7 +71,7 @@ def fovCrop(img: TwoOrThreeD, radius: int, fill: Or[int, float] = 0) -> ThreeD:
         Crop a circle FOV on reconstructed image `img` with `radius` (pixel) \\
         and `fill` value for outside FOV.
     '''
-    cripAssert(radius >= 1 and isInt(radius), 'Invalid radius.')
+    cripAssert(radius >= 1 and isInt(radius), 'Invalid radius. Radius should be positive int.')
     cripAssert(is2or3D(img), 'img should be 2D or 3D.')
 
     N, M = img.shape[-2:]

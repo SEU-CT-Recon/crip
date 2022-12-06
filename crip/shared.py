@@ -150,9 +150,9 @@ def splitImages(imgs: ThreeD, dtype=None) -> List[NDArray]:
 
 
 @ConvertListNDArray
-def binning(img: TwoOrThreeD, rates=Tuple[int]) -> TwoOrThreeD:
+def binning(img: TwoOrThreeD, rates: Tuple[int]) -> TwoOrThreeD:
     '''
-        Perform binning with `rates = (c, h, w)`.
+        Perform binning with `rates = (c, h, w) / (h, w)`.
     '''
     for rate in rates:
         cripAssert(isInt(rate) and rate > 0, 'rates should be positive int.')
@@ -162,17 +162,17 @@ def binning(img: TwoOrThreeD, rates=Tuple[int]) -> TwoOrThreeD:
         cripAssert(len(rates) == 3, 'img is 3D, while rates is 2D.')
 
     if rates[-1] != 1:
-        img = img[..., ::rate]
+        img = img[..., ::rates[-1]]
     if rates[-2] != 1:
-        img = img[..., ::rate, :]
+        img = img[..., ::rates[-2], :]
     if len(rates) == 3 and rates[0] != 1:
-        img = img[::rate, ...]
+        img = img[::rates[0], ...]
 
     return img
 
 
 @ConvertListNDArray
-def transpose(vol: TwoOrThreeD, order: tuple) -> TwoOrThreeD:
+def transpose(vol: TwoOrThreeD, order: Tuple[int]) -> TwoOrThreeD:
     '''
         Transpose vol with axes swapping `order`.
     '''

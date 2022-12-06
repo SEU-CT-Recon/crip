@@ -9,11 +9,10 @@
 import cv2
 import numpy as np
 from matplotlib import font_manager
-from mpl_toolkits.axes_grid1 import ImageGrid as _ImageGrid
 from ._typing import *
 from .utils import cripAssert, is1D, is2D, isInt
 
-__all__ = ['smooth', 'window', 'average', 'addFont', 'fontdict', 'zoomIn', 'Helper', 'LineProfile', 'ImageGrid']
+__all__ = ['smooth', 'window', 'average', 'addFont', 'fontdict', 'zoomIn', 'Helper', 'LineProfile']
 
 
 def smooth(data: NDArray, winSize: int = 5):
@@ -32,10 +31,10 @@ def smooth(data: NDArray, winSize: int = 5):
     return np.concatenate((start, out0, stop))
 
 
-def window(img: TwoOrThreeD, win: Or[Tuple[int], Tuple[float]], style: str = 'lr', uint8: bool = False):
+def window(img: TwoOrThreeD, win: Or[Tuple[int], Tuple[float]], style: str = 'lr', normalize: Or[str, None] = None):
     '''
         Window `img` using `win` (ww, wl) with style 'wwwl' or (left, right) with style 'lr'.
-        Set `uint8` to True to convert to 8-bit image.
+        Set `normalize` to '0255' to convert to 8-bit image, or '01' to [0, 1] float image.
     '''
     cripAssert(len(win) == 2, '`win` should have length of 2.')
     cripAssert(style in ['wwwl', 'lr'], "`style` should be 'wwwl' or 'lr'")
@@ -51,8 +50,10 @@ def window(img: TwoOrThreeD, win: Or[Tuple[int], Tuple[float]], style: str = 'lr
     res[res > r] = r
     res[res < l] = l
 
-    if uint8:
+    if normalize == '0255':
         res = cv2.normalize(res, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
+    elif normalize == '01':
+        res = (res - l) / (r - l)
 
     return res
 
@@ -155,42 +156,6 @@ class LineProfile(Helper):
             values.append(value)
 
         return values
-
-
-class ImageGrid(Helper):
-    def __init__(self, plt, imgs, hw, topLabels, leftLabels, fontdict, preprocessor, pad=0) -> None:
-        super().__init__(plt)
-
-        h, w = hw
-        cripAssert(len(imgs) == h * w, '`imgs` cannot fill grid with `hw`.')
-        self.imgs = imgs
-        if preprocessor is not None:
-            for i in range(len(self.imgs)):
-                self.imgs[i] = preprocessor(self.imgs[i])
-
-        self.topLabels = topLabels
-        self.leftLabels = leftLabels
-        self.fig = self.plt.figure(figsize=(h * 3, w * 3))
-        self.grid = _ImageGrid(self.fig, 111, nrows_ncols=hw, axes_pad=pad)
-
-        i = 0
-        for ax, im in zip(self.grid, self.imgs):
-            ax.get_yaxis().set_ticks([])
-            ax.get_xaxis().set_ticks([])
-            ax.spines['top'].set_visible(False)
-            ax.spines['right'].set_visible(False)
-            ax.spines['bottom'].set_visible(False)
-            ax.spines['left'].set_visible(False)
-
-            if i < len(self.topLabels):
-                ax.set_title(self.topLabels[i], fontdict=fontdict, loc='center')
-                i += 1
-
-            ax.imshow(im, cmap='gray')
-
-        for idx, label in enumerate(self.leftLabels):
-            self.grid[idx * w].set_ylabel(label, fontdict=fontdict)
-
 
 def fontdict(family, weight, size):
     return {'family': family, 'weight': weight, 'size': size}
