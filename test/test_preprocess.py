@@ -50,8 +50,8 @@ class test_injectPoissonNoise(TestCase):
         testProjsList = [np.array([[1, 2, 3]]), np.array([[4, 5, 6]])]
         testProjsStack = np.array(testProjsList)
 
-        noisy1 = injectPoissonNoise(testProjsList, 1e5)
-        noisy2 = injectPoissonNoise(testProjsStack, 1e5)
+        noisy1 = injectPoissonNoise(testProjsList, 'raw', 1e5)
+        noisy2 = injectPoissonNoise(testProjsStack, 'postlog', 1e5)
 
         self.assertTrue(isOfSameShape(noisy1, testProjsStack))
         self.assertTrue(isOfSameShape(noisy2, testProjsStack))

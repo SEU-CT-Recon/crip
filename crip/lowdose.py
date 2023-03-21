@@ -31,21 +31,31 @@ def injectGaussianNoise(projections: TwoOrThreeD, sigma: float, mu: float = 0) -
 
 
 @ConvertListNDArray
-def injectPoissonNoise(projections: TwoOrThreeD, rescale: Or[int, float] = 1) -> TwoOrThreeD:
+def injectPoissonNoise(projections: TwoOrThreeD, type_: str = 'postlog', nPhoton: Or[int, float] = 1) -> TwoOrThreeD:
     '''
         Inject Poisson noise which obeys distribution `P(\\lambda)` where \\lambda is the ground-truth quanta in `projections`.
         `projections` must have int type whose value stands for the photon quanta in some way. Floating projections
         should be manually properly rescaled ahead and scale back as you need since Poisson Distribution only deals with
-        positive integers.
+        positive integers. `type_` (postlog or raw) gives the content type of `projections`, usually you should use
+        postlog as input. If you input postlog, the output will also be postlog.
     '''
-    cripAssert(is2or3D(projections), '`projections` should be 2D or 3D.')
-    cripAssert(np.min(projections >= 0), '`projections` should not contain negative values.')
-    cripWarning(isIntType(projections), '`projections` should have int dtype. It will be floored after rescaling.')
+    cripAssert(type_ in ['postlog', 'raw'], "type_ should be 'postlog' or 'raw'.")
+    img = projections
+    cripAssert(is2or3D(img), '`projections` should be 2D or 3D.')
 
-    img = projections * rescale
+    if type_ == 'postlog':
+        img = np.exp(-projections).astype(np.int32)
+
+    cripAssert(np.min(img >= 0), '`img` should not contain negative values.')
+    cripWarning(isIntType(img), '`img` should have int dtype. It will be floored after rescaling.')
+
+    img = img * nPhoton  # N0 exp(-\sum \mu L)
     img = np.random.poisson(img.astype(np.uint32)).astype(DefaultFloatDType)
     img[img <= 0] = 1
-    img /= rescale
+    img /= nPhoton
+
+    if type_ == 'postlog':
+        img = -np.log(img)
 
     return img
 

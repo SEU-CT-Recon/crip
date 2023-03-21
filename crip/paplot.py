@@ -17,7 +17,7 @@ __all__ = ['smooth', 'window', 'average', 'addFont', 'fontdict', 'zoomIn', 'Help
 
 def smooth(data: NDArray, winSize: int = 5):
     '''
-        Smooth an 1D array by moving averaging window.
+        Smooth an 1D array by moving averaging window. This name follows MATLAB.
 
         The implementation is from: https://stackoverflow.com/questions/40443020
     '''
@@ -79,6 +79,12 @@ def zoomIn(img, x, y, hw):
         Crop a patch.
     '''
     return img[y:y + hw, x:x + hw]
+
+
+def stddev(img, leftTop, h, w):
+    y, x = leftTop
+    crop = img[x:x + h, y:y + w]
+    return np.std(crop)
 
 
 class Helper():
@@ -156,6 +162,7 @@ class LineProfile(Helper):
             values.append(value)
 
         return values
+
 
 def fontdict(family, weight, size):
     return {'family': family, 'weight': weight, 'size': size}

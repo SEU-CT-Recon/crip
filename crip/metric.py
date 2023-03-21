@@ -11,12 +11,13 @@ from skimage.metrics import structural_similarity, peak_signal_noise_ratio
 
 __all__ = ['calcMAPE', 'calcPSNR', 'calcSSIM', 'calcRMSE']
 
-def calcMAPE(x, y):
+
+def calcMAPE(x, y, eps=1e-6):
     '''
         Compute the Mean Absolution Percentage Error (%) where `x` is the prediction
         and `y` is the ground truth.
     '''
-    return np.mean(np.abs(x - y) / y) * 100
+    return np.mean(np.abs(x - y) / (y + eps)) * 100
 
 
 def calcPSNR(x, y, range_=1):
