@@ -125,6 +125,8 @@ class MgfbpConfig(_MgConfig):
         self.PixelSize = PixelSize
         cripAssert(_Filter in ['HammingFilter', 'QuadraticFilter', 'Polynomial', 'GaussianApodizedRamp'],
                    f'Invalid _Filter: {_Filter}')
+        if _Filter != 'HammingFilter':
+            del self.HammingFilter
         exec(f'self.{_Filter} = _FilterParam')
         self.ImageRotation = ImageRotation
         self.ImageCenter = ImageCenter
