@@ -3,6 +3,10 @@
 </p>
 An all-in-one tool for Cone-Beam CT Data IO, Pre/Post-process, Physics, Dual Energy, Low Dose and everything only except Reconstruction.
 
+## Known Issues
+
+- Material attenuation with K-Edge might not be correctly interpolated.
+
 ## Install
 
 - Via [PyPI](https://pypi.org/project/crip/)
