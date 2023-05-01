@@ -5,7 +5,7 @@
 '''
 
 __all__ = [
-    'Spectrum', 'Atten', 'calcMu', 'RhoWater', 'DiagEnergyLow', 'DiagEnergyHigh', 'DiagEnergyRange', 'DiagEnergyLen',
+    'Spectrum', 'Atten', 'Material', 'calcMu', 'DiagEnergyLow', 'DiagEnergyHigh', 'DiagEnergyRange', 'DiagEnergyLen',
     'getClassicDensity', 'forwardProjectWithSpectrum'
 ]
 
@@ -16,15 +16,23 @@ from os import path
 
 from ._typing import *
 from .utils import cvtEnergyUnit, cvtMuUnit, inArray, cripAssert, getChildFolder, inRange, isNumber, isOfSameShape, isType, readFileText
+from .io import listDirectory
 
 ## Constants ##
 
-RhoWater = 1.0  # g/cm^3
 DiagEnergyLow = 0  # keV
 DiagEnergyHigh = 150  # keV
 DiagEnergyRange = range(DiagEnergyLow, DiagEnergyHigh + 1)  # [low, high)
 DiagEnergyLen = DiagEnergyHigh - DiagEnergyLow + 1
 ForwardStartMinEnergy = 20  # keV
+AttenAliases = {
+    'Gold': 'Au',
+    'Carbon': 'C',
+    'Copper': 'Cu',
+    'Iodine': 'I',
+    'H2O': 'Water',
+    'Gadolinium': 'Gd',
+}
 
 
 class Spectrum:
@@ -153,38 +161,33 @@ class Atten:
         self.mu = mu
 
     @staticmethod
-    def builtInAttenList() -> Dict:
+    def builtInAttenList() -> List:
         '''
             Get the built-in atten list file content.
-
-            Returns `{materialName: materialType}`
         '''
-        _attenListPath = path.join(getChildFolder('_atten'), './_attenList.json')
-        _attenList = readFileText(_attenListPath)
+        attenListPath = path.join(getChildFolder('_atten'), './data')
+        attenList = list(map(lambda x: x.replace('.txt', ''), listDirectory(attenListPath, style='filename')))
 
-        return json.loads(_attenList)
+        return attenList
 
     @staticmethod
-    def _builtInAttenText(materialName: str, dataSource='NIST'):
+    def _builtInAttenText(materialName: str):
         '''
             Get the built-in atten file content of `materialName`.
 
             Available data sources: `NIST`, `ICRP`. Call `getBuiltInAttenList` to get the material list.
         '''
-        cripAssert(inArray(dataSource, ['NIST', 'ICRP']), f'Invalid dataSource: {dataSource}')
-        dataSourcePostfix = {'NIST': '', 'ICRP': '_ICRP'}[dataSource]
+        if materialName in AttenAliases:
+            materialName = AttenAliases[materialName]
 
-        _attenList = Atten.builtInAttenList()
-        _attenPath = getChildFolder('_atten')
-        _attenFile = '{}{}.txt'.format(materialName, dataSourcePostfix)
-        _attenFilePath = path.join(_attenPath, f'./{_attenList[materialName + dataSourcePostfix]}', f'./{_attenFile}')
-        cripAssert(path.exists(_attenFilePath), f'Atten file {_attenFile} does not exist.')
+        attenFilePath = path.join(getChildFolder('_atten'), f'./data/{materialName}.txt')
+        cripAssert(path.exists(attenFilePath), f'Atten file for {materialName} does not exist.')
+        content = readFileText(attenFilePath)
 
-        content = readFileText(_attenFilePath)
         return content
 
     @staticmethod
-    def fromBuiltIn(materialName: str, rho: Or[float, None] = None, dataSource='NIST'):
+    def fromBuiltIn(materialName: str, rho: Or[float, None] = None):
         '''
             Get the built-in atten object.
 
@@ -192,10 +195,20 @@ class Atten:
             
             \\rho: g/cm^3.
         '''
-        if rho is None:
-            rho = getClassicDensity(materialName, dataSource)
+        if materialName in AttenAliases:
+            materialName = AttenAliases[materialName]
 
-        return Atten(Atten._builtInAttenText(materialName, dataSource), rho, BuiltInAttenEnergyUnit)
+        if rho is None:
+            rho = getClassicDensity(materialName)
+
+        return Atten(Atten._builtInAttenText(materialName), rho, BuiltInAttenEnergyUnit)
+
+    @staticmethod
+    def fromText(attenText: str, rho: float, energyUnit='MeV'):
+        return Atten(attenText, rho, energyUnit)
+
+
+Material = Atten
 
 
 def calcMu(atten: Atten, spec: Spectrum, energyConversion: Or[str, float, int, Callable]) -> float:
@@ -223,19 +236,15 @@ def calcMu(atten: Atten, spec: Spectrum, energyConversion: Or[str, float, int, C
     return np.sum(spec.omega * eff * mus) / np.sum(spec.omega * eff)
 
 
-def getClassicDensity(materialName: str, dataSource='NIST'):
+def getClassicDensity(materialName: str):
     '''
         Get the classic value of density of a specified material (g/cm^3) from built-in dataset.
     '''
-    cripAssert(inArray(dataSource, ['NIST', 'ICRP']), f'Invalid dataSource: {dataSource}')
-
-    _classicRhoPath = path.join(getChildFolder('_atten'), './_classicRho.json')
-    _classicRho = readFileText(_classicRhoPath)
+    _classicRho = readFileText(path.join(getChildFolder('_atten'), './_classicRho.json'))
     rhoObject = json.loads(_classicRho)
 
-    dataSourcePostfix = {'NIST': '', 'ICRP': '_ICRP'}[dataSource]
-    key = '{}{}'.format(materialName, dataSourcePostfix)
-    cripAssert(key in rhoObject, f'Record not found: {key}')
+    key = materialName
+    cripAssert(key in rhoObject, f'Record not found for density: {key}')
 
     return rhoObject[key]
 

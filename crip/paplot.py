@@ -12,7 +12,7 @@ from matplotlib import font_manager
 from ._typing import *
 from .utils import cripAssert, is1D, is2D, isInt
 
-__all__ = ['smooth', 'window', 'average', 'addFont', 'fontdict', 'zoomIn', 'Helper', 'LineProfile']
+__all__ = ['smooth', 'window', 'average', 'addFont', 'fontdict', 'zoomIn']
 
 
 def smooth(data: NDArray, winSize: int = 5):
@@ -85,83 +85,6 @@ def stddev(img, leftTop, h, w):
     y, x = leftTop
     crop = img[x:x + h, y:y + w]
     return np.std(crop)
-
-
-class Helper():
-    def __init__(self, plt) -> None:
-        self.plt = plt
-        plt.rc('axes', unicode_minus=False)
-        plt.rc('grid', linestyle="--", color='#D3D3D3')
-
-    def figure(self, figsize: Tuple[int, int]):
-        self.plt.figure(figsize=figsize)
-
-    def xyLabel(self, x: str, y: str):
-        self.plt.xlabel(x)
-        self.plt.ylabel(y)
-
-    def legend(self, legend: List[str], loc='best', style='stack'):
-        if style == 'stack':
-            self.plt.legend(legend, loc=loc)
-        elif style == 'expand':
-            self.plt.legend(legend, loc=loc, mode='expand', ncol=len(legend))
-
-    def grid(self, on=True):
-        self.plt.grid(on)
-
-    def xyLim(self, xlim, ylim):
-        self.plt.xlim(*xlim)
-        self.plt.ylim(*ylim)
-
-    def tight(self):
-        self.plt.tight_layout()
-
-    def save(self, path: str, dpi=100, tight=True):
-        if tight:
-            self.tight()
-        self.plt.savefig(path, dpi=dpi)
-
-    def show(self):
-        self.plt.show()
-
-    def xyNBin(self, xbins, ybins):
-        self.plt.locator_params(nbins=xbins, axis='x')
-        self.plt.locator_params(nbins=ybins, axis='y')
-
-
-class LineProfile(Helper):
-    def __init__(self, plt, imgs: List[TwoOrThreeD], smoother: Or[Callable, None] = None) -> None:
-        super().__init__(plt)
-
-        self.imgs = np.array(imgs)
-        if is2D(imgs[0]):
-            self.imgs = self.imgs[np.newaxis, ...]
-        if len(imgs) == 1:
-            self.imgs = self.imgs[np.newaxis, ...]
-        # Now we have B, C, H, W.
-        self.slice = 0
-        self.startPoint = None
-        self.length = None
-        self.direction = 'x'
-        self.smoother = smoother
-
-    def fetch(self):
-        cripAssert(self.startPoint is not None, '`startPoint` is None.')
-        cripAssert(self.length is not None, '`length` is None.')
-        cripAssert(self.direction in ['x', 'y'], '`direction` should be `x` or `y`.')
-        values = []
-
-        for img in self.imgs:
-            if self.direction == 'x':
-                value = img[self.slice, self.startPoint[0], self.startPoint[1] + self.length]
-            else:
-                value = img[self.slice, self.startPoint[0] + self.length, self.startPoint[1]]
-            if self.smoother is not None:
-                value = self.smoother(value)
-
-            values.append(value)
-
-        return values
 
 
 def fontdict(family, weight, size):
