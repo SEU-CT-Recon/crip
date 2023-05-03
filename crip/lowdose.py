@@ -44,12 +44,13 @@ def injectPoissonNoise(projections: TwoOrThreeD, type_: str = 'postlog', nPhoton
     cripAssert(is2or3D(img), '`projections` should be 2D or 3D.')
 
     if type_ == 'postlog':
-        img = np.exp(-projections).astype(np.int32)
-
-    cripAssert(np.min(img >= 0), '`img` should not contain negative values.')
-    cripWarning(isIntType(img), '`img` should have int dtype. It will be floored after rescaling.')
+        img = np.exp(-projections)
 
     img = img * nPhoton  # N0 exp(-\sum \mu L)
+    
+    cripAssert(np.min(img >= 0), '`img` should not contain negative values.')
+    cripWarning(isIntType(img), '`img` should have int dtype. It will be floored after rescaling.')
+    
     img = np.random.poisson(img.astype(np.uint32)).astype(DefaultFloatDType)
     img[img <= 0] = 1
     img /= nPhoton
