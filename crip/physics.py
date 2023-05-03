@@ -6,7 +6,7 @@
 
 __all__ = [
     'Spectrum', 'Atten', 'Material', 'calcMu', 'DiagEnergyLow', 'DiagEnergyHigh', 'DiagEnergyRange', 'DiagEnergyLen',
-    'getClassicDensity', 'forwardProjectWithSpectrum', 'brewPowderSolution'
+    'getClassicDensity', 'forwardProjectWithSpectrum', 'brewPowderSolution', 'calcContrastHU'
 ]
 
 import json
