@@ -90,6 +90,7 @@ def asFloat(arr):
 def is1D(x: np.ndarray):
     return isType(x, NDArray) and len(x.shape) == 1
 
+
 def is2D(x: np.ndarray):
     return isType(x, NDArray) and len(x.shape) == 2
 
@@ -211,6 +212,23 @@ def cvtMuUnit(arr, from_, to):
     return cvtLengthUnit(arr, to, from_)
 
 
+def cvtConcentrationUnit(arr, from_, to):
+    '''
+        Convert between concentration units. (g/mL, mg/mL)
+    '''
+    units = ['g/mL', 'mg/mL']
+    from_ = units.index(from_)
+    to = units.index(to)
+
+    # g/mL, mg/mL
+    mat = np.array([
+        [1, 1000],  # from g/mL
+        [1 / 1000, 1]  # from mg/mL
+    ])
+
+    return arr * mat[from_, to]
+
+
 def radToDeg(x):
     return x / np.pi * 180
 
@@ -237,5 +255,5 @@ def getHW(img: np.ndarray):
         h, w = img.shape
     else:
         raise
-    
+
     return h, w

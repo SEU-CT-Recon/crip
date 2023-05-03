@@ -6,7 +6,7 @@
 
 __all__ = [
     'Spectrum', 'Atten', 'Material', 'calcMu', 'DiagEnergyLow', 'DiagEnergyHigh', 'DiagEnergyRange', 'DiagEnergyLen',
-    'getClassicDensity', 'forwardProjectWithSpectrum'
+    'getClassicDensity', 'forwardProjectWithSpectrum', 'brewPowderSolution'
 ]
 
 import json
@@ -15,8 +15,9 @@ import numpy as np
 from os import path
 
 from ._typing import *
-from .utils import cvtEnergyUnit, cvtMuUnit, inArray, cripAssert, getChildFolder, inRange, isNumber, isOfSameShape, isType, readFileText
+from .utils import cvtEnergyUnit, cvtMuUnit, inArray, cripAssert, getChildFolder, inRange, isNumber, isOfSameShape, isType, readFileText, cvtConcentrationUnit
 from .io import listDirectory
+from .postprocess import muToHU
 
 ## Constants ##
 
@@ -208,6 +209,7 @@ class Atten:
 
 
 Material = Atten
+WaterAtten = Atten.fromBuiltIn('Water')
 
 
 def calcMu(atten: Atten, spec: Spectrum, energyConversion: Or[str, float, int, Callable]) -> float:
@@ -315,3 +317,38 @@ def forwardProjectWithSpectrum(lengths: List[TwoD],
     attened = spec.omega * np.exp(-attenuations) * efficiency  # the attenuated image
 
     return np.sum(attened, axis=-1)
+
+
+def brewPowderSolution(solute: Atten,
+                       solvent: Atten,
+                       concentration: float,
+                       concentrationUnit='mg/mL',
+                       rhoSolution: Or[float, None] = None) -> Atten:
+    '''
+        Generate the Atten of powder solution with certain concentration (mg/mL by default).
+    '''
+    concentration = cvtConcentrationUnit(concentration, concentrationUnit, 'g/mL')
+    mu = solvent.mu + (solute.mu / solute.rho) * concentration
+    atten = Atten.fromMuArray(mu, rhoSolution)
+
+    return atten
+
+
+def calcContrastHU(contrast: Atten, spec: Spectrum, energyConversion: str, base: Atten = WaterAtten):
+    '''
+        Calculate the contrast difference in HU.
+    '''
+    cripAssert(energyConversion in ['EID', 'PCD'], 'Invalid energyConversion.')
+
+    _calcMu = lambda atten: calcMu(atten, spec, energyConversion)
+
+    muWater = _calcMu(WaterAtten)
+    if base is not WaterAtten:
+        muBase = _calcMu(base)
+    else:
+        muBase = muWater
+    muContrast = _calcMu(contrast)
+
+    contrastHU = muToHU(muContrast, muWater) - muToHU(muBase, muWater)
+
+    return contrastHU
