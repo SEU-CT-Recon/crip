@@ -97,8 +97,6 @@ def muToHU(image: TwoOrThreeD, muWater: float, b=1000) -> TwoOrThreeD:
         
         `HU = (\\mu - \\muWater) / \\muWater * b`
     '''
-    cripAssert(is2or3D(image), '`image` should be 2D or 3D.')
-
     return (image - muWater) / muWater * b
 
 
@@ -107,8 +105,6 @@ def huToMu(image: TwoOrThreeD, muWater: float, b=1000) -> TwoOrThreeD:
     '''
         Convert HU to mu. (Invert of `MuToHU`.)
     '''
-    cripAssert(is2or3D(image), '`image` should be 2D or 3D.')
-
     return image / b * muWater + muWater
 
 

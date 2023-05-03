@@ -36,6 +36,19 @@ AttenAliases = {
 }
 
 
+def getClassicDensity(materialName: str):
+    '''
+        Get the classic value of density of a specified material (g/cm^3) from built-in dataset.
+    '''
+    _classicRho = readFileText(path.join(getChildFolder('_atten'), './_classicRho.json'))
+    rhoObject = json.loads(_classicRho)
+
+    key = materialName
+    cripAssert(key in rhoObject, f'Record not found for density: {key}')
+
+    return rhoObject[key]
+
+
 class Spectrum:
     '''
         Construct Spectrum object with omega array of every energy.
@@ -235,19 +248,6 @@ def calcMu(atten: Atten, spec: Spectrum, energyConversion: Or[str, float, int, C
         cripAssert(False, 'Invalid `energyConversion`.')
 
     return np.sum(spec.omega * eff * mus) / np.sum(spec.omega * eff)
-
-
-def getClassicDensity(materialName: str):
-    '''
-        Get the classic value of density of a specified material (g/cm^3) from built-in dataset.
-    '''
-    _classicRho = readFileText(path.join(getChildFolder('_atten'), './_classicRho.json'))
-    rhoObject = json.loads(_classicRho)
-
-    key = materialName
-    cripAssert(key in rhoObject, f'Record not found for density: {key}')
-
-    return rhoObject[key]
 
 
 def calcAttenedSpec(spec: Spectrum, attens: Or[Atten, List[Atten]], Ls: Or[float, List[float]]) -> Spectrum:
