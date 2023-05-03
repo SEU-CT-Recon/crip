@@ -122,43 +122,12 @@ class Atten:
             mu = atten.mu[E]
         ```
     '''
-    def __init__(self, attenText: str, rho: float, energyUnit='MeV') -> None:
-        cripAssert(rho > 0, '`rho` should > 0.')
-
-        self.attenText = attenText
-        self.energyUnit = energyUnit
+    def __init__(self, muArray: NDArray, rho: Or[None, float] = None) -> None:
+        cripAssert(len(muArray) == DiagEnergyLen, f'muArray should have length of {DiagEnergyLen} energy bins')
+        self.mu = muArray
         self.rho = rho
-
-        self.mu = np.zeros(DiagEnergyLen, dtype=DefaultFloatDType)
-        self._read()
-
-    def _read(self):
-        # split attenText into list, and ignore all lines starting with non-digit
-        content = list(
-            filter(lambda y: len(y) > 0 and str.isdigit(y[0]),
-                   list(map(lambda x: x.strip(),
-                            self.attenText.replace('\r\n', '\n').split('\n')))))
-
-        def procAttenLine(line: str):
-            tup = tuple(map(float, re.split(r'\s+', line)))
-            cripAssert(inArray(len(tup), [2, 3]), f'Invalid line in attenText: {line}')
-            energy, muDivRho = tuple(map(float, re.split(r'\s+', line)))[0:2]
-            return energy, muDivRho
-
-        content = np.array(list(map(procAttenLine, content)), dtype=DefaultFloatDType)
-
-        energy, muDivRho = content.T
-        energy = cvtEnergyUnit(energy, self.energyUnit, DefaultEnergyUnit)  # keV
-
-        # perform log-domain interpolation to fill in `DiagEnergyRange`
-        interpEnergy = np.log(DiagEnergyRange[1:])  # avoid log(0)
-        interpMuDivRho = np.interp(interpEnergy, np.log(energy), np.log(muDivRho))
-
-        # now we have mu for every energy in `DiagEnergyRange`.
-        mu = np.exp(interpMuDivRho) * self.rho  # cm-1
-        mu = cvtMuUnit(mu, 'cm-1', DefaultMuUnit)  # mm-1
-        mu = np.insert(mu, 0, 0, axis=0)  # prepend energy = 0
-        self.mu = mu
+        self.attenText = ''
+        self.energyUnit = 'keV'
 
     @staticmethod
     def builtInAttenList() -> List:
@@ -191,8 +160,6 @@ class Atten:
         '''
             Get the built-in atten object.
 
-            Available data sources: `NIST`, `ICRP`.       
-            
             \\rho: g/cm^3.
         '''
         if materialName in AttenAliases:
@@ -201,11 +168,43 @@ class Atten:
         if rho is None:
             rho = getClassicDensity(materialName)
 
-        return Atten(Atten._builtInAttenText(materialName), rho, BuiltInAttenEnergyUnit)
+        return Atten.fromText(Atten._builtInAttenText(materialName), rho, BuiltInAttenEnergyUnit)
 
     @staticmethod
     def fromText(attenText: str, rho: float, energyUnit='MeV'):
-        return Atten(attenText, rho, energyUnit)
+        cripAssert(rho > 0, '`rho` should > 0.')
+
+        # split attenText into list, and ignore all lines starting with non-digit
+        content = list(
+            filter(lambda y: len(y) > 0 and str.isdigit(y[0]),
+                   list(map(lambda x: x.strip(),
+                            attenText.replace('\r\n', '\n').split('\n')))))
+
+        def procAttenLine(line: str):
+            tup = tuple(map(float, re.split(r'\s+', line)))
+            cripAssert(inArray(len(tup), [2, 3]), f'Invalid line in attenText: {line}')
+            energy, muDivRho = tuple(map(float, re.split(r'\s+', line)))[0:2]
+            return energy, muDivRho
+
+        content = np.array(list(map(procAttenLine, content)), dtype=DefaultFloatDType)
+
+        energy, muDivRho = content.T
+        energy = cvtEnergyUnit(energy, energyUnit, DefaultEnergyUnit)  # keV
+
+        # perform log-domain interpolation to fill in `DiagEnergyRange`
+        interpEnergy = np.log(DiagEnergyRange[1:])  # avoid log(0)
+        interpMuDivRho = np.interp(interpEnergy, np.log(energy), np.log(muDivRho))
+
+        # now we have mu for every energy in `DiagEnergyRange`.
+        mu = np.exp(interpMuDivRho) * rho  # cm-1
+        mu = cvtMuUnit(mu, 'cm-1', DefaultMuUnit)  # mm-1
+        mu = np.insert(mu, 0, 0, axis=0)  # prepend energy = 0
+
+        return Atten(mu, rho)
+
+    @staticmethod
+    def fromMuArray(muArray: NDArray, rho: Or[float, None] = None):
+        return Atten(muArray, rho)
 
 
 Material = Atten
