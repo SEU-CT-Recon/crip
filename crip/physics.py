@@ -12,6 +12,7 @@ __all__ = [
 import json
 import re
 import numpy as np
+from scipy import interpolate
 from os import path
 
 from ._typing import *
@@ -207,7 +208,8 @@ class Atten:
 
         # perform log-domain interpolation to fill in `DiagEnergyRange`
         interpEnergy = np.log(DiagEnergyRange[1:])  # avoid log(0)
-        interpMuDivRho = np.interp(interpEnergy, np.log(energy), np.log(muDivRho))
+        interpF = interpolate.interp1d(np.log(energy), np.log(muDivRho), kind='linear', assume_sorted=False)
+        interpMuDivRho = interpF(interpEnergy)
 
         # now we have mu for every energy in `DiagEnergyRange`.
         mu = np.exp(interpMuDivRho) * rho  # cm-1
