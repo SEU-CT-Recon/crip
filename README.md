@@ -5,7 +5,7 @@ An all-in-one tool for Cone-Beam CT Data IO, Pre/Post-process, Physics, Dual Ene
 
 ## Known Issues
 
-- Material attenuation with K-Edge might not be correctly interpolated.
+- ⚠️ Material attenuation with K-Edge might **STILL** not be correctly interpolated.
 
 ## Install
 
