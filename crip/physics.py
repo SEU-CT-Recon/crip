@@ -208,8 +208,10 @@ class Atten:
 
         # perform log-domain interpolation to fill in `DiagEnergyRange`
         interpEnergy = np.log(DiagEnergyRange[1:])  # avoid log(0)
-        interpF = interpolate.interp1d(np.log(energy), np.log(muDivRho), kind='linear', assume_sorted=False)
-        interpMuDivRho = interpF(interpEnergy)
+        # interpF = interpolate.interp1d(np.log(energy), np.log(muDivRho), kind='linear', assume_sorted=False)
+        # interpMuDivRho = interpF(interpEnergy)
+        interpMuDivRho = np.interp(interpEnergy, np.log(energy), np.log(muDivRho))
+
 
         # now we have mu for every energy in `DiagEnergyRange`.
         mu = np.exp(interpMuDivRho) * rho  # cm-1
