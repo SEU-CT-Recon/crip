@@ -10,7 +10,7 @@ import cv2
 import numpy as np
 from matplotlib import font_manager
 from ._typing import *
-from .utils import cripAssert, is1D, is2D, isInt
+from .utils import cripAssert, is1D, isInt
 
 __all__ = ['smooth', 'window', 'average', 'addFont', 'fontdict', 'zoomIn']
 

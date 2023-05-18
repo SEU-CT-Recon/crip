@@ -26,7 +26,6 @@ DiagEnergyLow = 0  # keV
 DiagEnergyHigh = 150  # keV
 DiagEnergyRange = range(DiagEnergyLow, DiagEnergyHigh + 1)  # [low, high)
 DiagEnergyLen = DiagEnergyHigh - DiagEnergyLow + 1
-ForwardStartMinEnergy = 20  # keV
 AttenAliases = {
     'Gold': 'Au',
     'Carbon': 'C',
@@ -118,10 +117,15 @@ class Spectrum:
 
     @staticmethod
     def fromFile(path: str, unit='keV'):
-        with open(path, 'r') as fp:
-            spec = fp.read()
+        spec = readFileText(path)
 
         return Spectrum.fromText(spec, unit)
+
+    @staticmethod
+    def monochromatic(at: int, unit='keV', omega=10**5):
+        text = '{} {}\n{} -1'.format(str(at), str(omega), str(at + 1))
+
+        return Spectrum.fromText(text, unit)
 
 
 class Atten:
@@ -208,10 +212,7 @@ class Atten:
 
         # perform log-domain interpolation to fill in `DiagEnergyRange`
         interpEnergy = np.log(DiagEnergyRange[1:])  # avoid log(0)
-        # interpF = interpolate.interp1d(np.log(energy), np.log(muDivRho), kind='linear', assume_sorted=False)
-        # interpMuDivRho = interpF(interpEnergy)
         interpMuDivRho = np.interp(interpEnergy, np.log(energy), np.log(muDivRho))
-
 
         # now we have mu for every energy in `DiagEnergyRange`.
         mu = np.exp(interpMuDivRho) * rho  # cm-1
@@ -223,6 +224,12 @@ class Atten:
     @staticmethod
     def fromMuArray(muArray: NDArray, rho: Or[float, None] = None):
         return Atten(muArray, rho)
+
+    @staticmethod
+    def fromFile(path: str, rho: float, energyUnit='MeV'):
+        atten = readFileText(path)
+
+        return Atten.fromText(atten, rho, energyUnit)
 
 
 Material = Atten

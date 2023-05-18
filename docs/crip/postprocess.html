@@ -194,18 +194,16 @@
 </span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a><span class="sd">        Invert the rescale-slope (y = kx + b) of HU value to get linear relationship between HU and mu.</span>
 </span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>    <span class="n">cripAssert</span><span class="p">(</span><span class="n">is2or3D</span><span class="p">(</span><span class="n">image</span><span class="p">),</span> <span class="s1">&#39;`image` should be 2D or 3D.&#39;</span><span class="p">)</span>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>    <span class="k">return</span> <span class="p">(</span><span class="n">image</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">/</span> <span class="n">k</span>
 </span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>
-</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>    <span class="k">return</span> <span class="p">(</span><span class="n">image</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">/</span> <span class="n">k</span>
-</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>
-</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>
-</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a><span class="k">def</span> <span class="nf">postlogsToProjections</span><span class="p">(</span><span class="n">postlogs</span><span class="p">:</span> <span class="n">TwoOrThreeD</span><span class="p">,</span> <span class="n">flat</span><span class="p">:</span> <span class="n">Or</span><span class="p">[</span><span class="n">TwoD</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">TwoOrThreeD</span><span class="p">:</span>
-</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a><span class="sd">        Invert postlog images to the original projections.</span>
-</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>    <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">postlogs</span><span class="p">)</span> <span class="o">*</span> <span class="n">flat</span>
-</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a>
-</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>    <span class="k">return</span> <span class="n">res</span>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a><span class="k">def</span> <span class="nf">postlogsToProjections</span><span class="p">(</span><span class="n">postlogs</span><span class="p">:</span> <span class="n">TwoOrThreeD</span><span class="p">,</span> <span class="n">flat</span><span class="p">:</span> <span class="n">Or</span><span class="p">[</span><span class="n">TwoD</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">TwoOrThreeD</span><span class="p">:</span>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a><span class="sd">        Invert postlog images to the original projections.</span>
+</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>    <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">postlogs</span><span class="p">)</span> <span class="o">*</span> <span class="n">flat</span>
+</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>
+</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>    <span class="k">return</span> <span class="n">res</span>
 </span></pre></div>
 
 
@@ -421,9 +419,7 @@ and <code>fill</code> value for outside FOV.</p>
 </span><span id="huNoRescale-114"><a href="#huNoRescale-114"><span class="linenos">114</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="huNoRescale-115"><a href="#huNoRescale-115"><span class="linenos">115</span></a><span class="sd">        Invert the rescale-slope (y = kx + b) of HU value to get linear relationship between HU and mu.</span>
 </span><span id="huNoRescale-116"><a href="#huNoRescale-116"><span class="linenos">116</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="huNoRescale-117"><a href="#huNoRescale-117"><span class="linenos">117</span></a>    <span class="n">cripAssert</span><span class="p">(</span><span class="n">is2or3D</span><span class="p">(</span><span class="n">image</span><span class="p">),</span> <span class="s1">&#39;`image` should be 2D or 3D.&#39;</span><span class="p">)</span>
-</span><span id="huNoRescale-118"><a href="#huNoRescale-118"><span class="linenos">118</span></a>
-</span><span id="huNoRescale-119"><a href="#huNoRescale-119"><span class="linenos">119</span></a>    <span class="k">return</span> <span class="p">(</span><span class="n">image</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">/</span> <span class="n">k</span>
+</span><span id="huNoRescale-117"><a href="#huNoRescale-117"><span class="linenos">117</span></a>    <span class="k">return</span> <span class="p">(</span><span class="n">image</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">/</span> <span class="n">k</span>
 </span></pre></div>
 
 
@@ -443,13 +439,13 @@ and <code>fill</code> value for outside FOV.</p>
 
     </div>
     <a class="headerlink" href="#postlogsToProjections"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="postlogsToProjections-122"><a href="#postlogsToProjections-122"><span class="linenos">122</span></a><span class="k">def</span> <span class="nf">postlogsToProjections</span><span class="p">(</span><span class="n">postlogs</span><span class="p">:</span> <span class="n">TwoOrThreeD</span><span class="p">,</span> <span class="n">flat</span><span class="p">:</span> <span class="n">Or</span><span class="p">[</span><span class="n">TwoD</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">TwoOrThreeD</span><span class="p">:</span>
-</span><span id="postlogsToProjections-123"><a href="#postlogsToProjections-123"><span class="linenos">123</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-</span><span id="postlogsToProjections-124"><a href="#postlogsToProjections-124"><span class="linenos">124</span></a><span class="sd">        Invert postlog images to the original projections.</span>
-</span><span id="postlogsToProjections-125"><a href="#postlogsToProjections-125"><span class="linenos">125</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="postlogsToProjections-126"><a href="#postlogsToProjections-126"><span class="linenos">126</span></a>    <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">postlogs</span><span class="p">)</span> <span class="o">*</span> <span class="n">flat</span>
-</span><span id="postlogsToProjections-127"><a href="#postlogsToProjections-127"><span class="linenos">127</span></a>
-</span><span id="postlogsToProjections-128"><a href="#postlogsToProjections-128"><span class="linenos">128</span></a>    <span class="k">return</span> <span class="n">res</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="postlogsToProjections-120"><a href="#postlogsToProjections-120"><span class="linenos">120</span></a><span class="k">def</span> <span class="nf">postlogsToProjections</span><span class="p">(</span><span class="n">postlogs</span><span class="p">:</span> <span class="n">TwoOrThreeD</span><span class="p">,</span> <span class="n">flat</span><span class="p">:</span> <span class="n">Or</span><span class="p">[</span><span class="n">TwoD</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">TwoOrThreeD</span><span class="p">:</span>
+</span><span id="postlogsToProjections-121"><a href="#postlogsToProjections-121"><span class="linenos">121</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="postlogsToProjections-122"><a href="#postlogsToProjections-122"><span class="linenos">122</span></a><span class="sd">        Invert postlog images to the original projections.</span>
+</span><span id="postlogsToProjections-123"><a href="#postlogsToProjections-123"><span class="linenos">123</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="postlogsToProjections-124"><a href="#postlogsToProjections-124"><span class="linenos">124</span></a>    <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">postlogs</span><span class="p">)</span> <span class="o">*</span> <span class="n">flat</span>
+</span><span id="postlogsToProjections-125"><a href="#postlogsToProjections-125"><span class="linenos">125</span></a>
+</span><span id="postlogsToProjections-126"><a href="#postlogsToProjections-126"><span class="linenos">126</span></a>    <span class="k">return</span> <span class="n">res</span>
 </span></pre></div>
 
 

@@ -113,8 +113,6 @@ def huNoRescale(image: TwoOrThreeD, b: float = -1000, k: float = 1) -> TwoOrThre
     '''
         Invert the rescale-slope (y = kx + b) of HU value to get linear relationship between HU and mu.
     '''
-    cripAssert(is2or3D(image), '`image` should be 2D or 3D.')
-
     return (image - b) / k
 
 
