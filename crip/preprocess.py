@@ -6,10 +6,15 @@
 
 __all__ = [
     'averageProjections', 'flatDarkFieldCorrection', 'projectionsToSinograms', 'sinogramsToProjections', 'padImage',
-    'padSinogram', 'correctBeamHardeningPolynomial', 'injectGaussianNoise', 'injectPoissonNoise', 'binning'
+    'padSinogram', 'correctBeamHardeningPolynomial', 'injectGaussianNoise', 'injectPoissonNoise', 'binning', 'fan2para'
 ]
 
 import numpy as np
+import warnings
+
+warnings.simplefilter("ignore", DeprecationWarning)
+
+from scipy.interpolate import interp2d
 from .shared import *
 from ._typing import *
 from .utils import *
@@ -176,3 +181,44 @@ def correctBeamHardeningPolynomial(postlog: TwoOrThreeD, coeffs: Or[Tuple, np.po
             coeffs = np.poly1d([*coeffs, 0])
 
     return coeffs(postlog)
+
+
+def fan2para(sgm, gammas, betas, d, oThetas, oLines):
+    '''
+        Re-order Fan-Beam sinogram to Parallel-Beam's.
+        gammas: the fan angles from min to max
+        betas: the rotation angles from min to max
+        d: Source-Isocenter-Distance
+        oThetas: output rotation angle [min, delta, max]
+        oLines: output detector element physical locs [min, delta, max]
+    '''
+    nThetas = np.round((oThetas[2] - oThetas[0]) / oThetas[1]).astype(np.int32)
+    nLines = np.round((oLines[2] - oLines[0]) / oLines[1]).astype(np.int32)
+
+    thetas1 = np.linspace(oThetas[0], oThetas[2], nThetas).reshape((1, -1))
+    R1 = np.linspace(oLines[0], oLines[2], nLines).reshape((1, -1))
+
+    thetas = thetas1.T @ np.ones((1, nLines))
+    Rs = np.ones((nThetas, 1)) @ R1
+
+    oGammas = np.arcsin(Rs / d)
+    oBetas = thetas + oGammas - np.pi / 2
+
+    minBetas, maxBetas = np.min(betas), np.max(betas)
+    inds = oBetas > maxBetas
+    if len(inds) > 0:
+        oBetas[inds] = oBetas[inds] - 2 * np.pi
+    inds = oBetas < minBetas
+    if len(inds) > 0:
+        oBetas[inds] = oBetas[inds] + 2 * np.pi
+    oBetas = np.minimum(oBetas, maxBetas)
+
+    func = interp2d(gammas, betas, sgm, 'linear', fill_value=0)
+
+    h, w = oGammas.shape
+    out = np.zeros_like(oGammas)
+    for i in range(h):
+        for j in range(w):
+            out[i, j] = func(oGammas[i, j], oBetas[i, j])
+
+    return out
