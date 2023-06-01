@@ -226,12 +226,9 @@ class _Mgbin(object):
         self.cudaDevice = cudaDevice
         self.tempDir = tempDir
         self.cmd = []
-        self._buildCmd()
-
-    def _buildCmd(self):
         self.cmd.append([f'{self.exe}', '<1>'])
 
-    def exec(self, conf: Or[str, _MgConfig]):
+    def exec(self, conf: Or[str, _MgConfig], verbose=True):
         if isType(conf, _MgConfig):
             tmp = tempfile.NamedTemporaryFile('w',
                                               prefix='crip_mangoct_',
@@ -243,10 +240,12 @@ class _Mgbin(object):
             tmp.close()
 
         os.environ['CUDA_VISIBLE_DEVICES'] = str(self.cudaDevice)
+        stdout = stderr = None if verbose else subprocess.DEVNULL
+
         for cmd in self.cmd:
             if len(cmd) == 2:  # include args
                 cmd[1] = cmd[1].replace('<1>', conf)
-                subprocess.run(cmd)
+                subprocess.run(cmd, stdout=stdout, stderr=stderr)
             else:
                 os.system(cmd[0])
 
