@@ -7,7 +7,9 @@
 __all__ = ['singleMatMuDecomp', 'calcAttenedSpec', 'calcPostLog', 'deDecompGetCoeff', 'deDecompProj', 'deDecompRecon']
 
 import numpy as np
+from scipy.ndimage import uniform_filter
 
+from .postprocess import gaussianSmooth
 from .utils import ConvertListNDArray, cripAssert, cripWarning, is2D, isOfSameShape
 from ._typing import *
 from .physics import Atten, DiagEnergyRange, Spectrum, calcAttenedSpec, calcPostLog
@@ -87,8 +89,13 @@ def deDecompProj(lowProj: TwoOrThreeD, highProj: TwoOrThreeD, coeff1: NDArray,
 
 
 @ConvertListNDArray
-def deDecompRecon(low: TwoOrThreeD, high: TwoOrThreeD, muBase1Low: float, muBase1High: float, muBase2Low: float,
-                  muBase2High: float, checkCond: bool = True):
+def deDecompRecon(low: TwoOrThreeD,
+                  high: TwoOrThreeD,
+                  muBase1Low: float,
+                  muBase1High: float,
+                  muBase2Low: float,
+                  muBase2High: float,
+                  checkCond: bool = True):
     '''
         Perform dual-energy decompose in reconstruction domain. \\mu values can be calculated using @see `calcMu`.
 
@@ -99,7 +106,8 @@ def deDecompRecon(low: TwoOrThreeD, high: TwoOrThreeD, muBase1Low: float, muBase
 
     A = np.array([[muBase1Low, muBase2Low], [muBase1High, muBase2High]])
     if checkCond:
-        cripWarning(np.linalg.cond(A) <= COND_TOLERANCE, 'The material decomposition matrix possesses high condition number.')
+        cripWarning(
+            np.linalg.cond(A) <= COND_TOLERANCE, 'The material decomposition matrix possesses high condition number.')
     M = np.linalg.inv(A)
 
     def decompOne(low, high):
@@ -111,3 +119,34 @@ def deDecompRecon(low: TwoOrThreeD, high: TwoOrThreeD, muBase1Low: float, muBase
         return decompOne(low, high)
     else:
         return np.array(list(map(lambda args: decompOne(*args), zip(low, high)))).transpose((1, 0, 2, 3))
+
+
+def softThreshold(img: np.ndarray, l, h, mode='lower'):
+    shape = img.shape
+    img = img.flatten()
+
+    lower = img < l
+    upper = img >= h
+
+    transitional = (img >= l) * (img < h)
+    if mode == 'upper':
+        transitional = transitional * (img - l) / (h - l)
+        res = upper + transitional
+    elif mode == 'lower':
+        transitional = transitional * (h - img) / (h - l)
+        res = lower + transitional
+
+    return res.reshape(shape)
+
+
+def genDigitalPhantom(img, zsmooth=3, sigma=1, l=80, h=300, boneBase=2000):
+    assert np.min(img) < 0  # HU
+
+    kernel = (zsmooth, 1, 1) if zsmooth is not None else (1, 1)
+    img = uniform_filter(img, kernel, mode='reflect')
+    img = gaussianSmooth(img, sigma)
+
+    water = (img + 1000) / 1000 * softThreshold(img, l, h, 'lower')
+    bone = (img + 1000) / boneBase * softThreshold(img, l, h, 'upper')
+
+    return water, bone
