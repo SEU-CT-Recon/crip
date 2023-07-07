@@ -240,7 +240,7 @@ def fetchCTParam(dicom: pydicom.Dataset, key: str):
     '''
         Fetch CT related parameter from DICOM file. Use `readDicom` to get DICOM Dataset.
 
-        @See CTPARAMS in the source code for available keys.
+        @see CTPARAMS in the source code for available keys.
     '''
     metaParam = CTPARAMS[key]
     if metaParam is None:

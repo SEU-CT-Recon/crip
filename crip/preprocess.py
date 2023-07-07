@@ -183,7 +183,7 @@ def correctBeamHardeningPolynomial(postlog: TwoOrThreeD, coeffs: Or[Tuple, np.po
     return coeffs(postlog)
 
 
-def fan2para(sgm, gammas, betas, d, oThetas, oLines):
+def fan2para(sgm: TwoD, gammas, betas, d, oThetas, oLines):
     '''
         Re-order Fan-Beam sinogram to Parallel-Beam's.
         gammas: the fan angles from min to max

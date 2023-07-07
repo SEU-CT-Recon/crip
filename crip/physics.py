@@ -6,14 +6,14 @@
 
 __all__ = [
     'Spectrum', 'Atten', 'Material', 'calcMu', 'DiagEnergyLow', 'DiagEnergyHigh', 'DiagEnergyRange', 'DiagEnergyLen',
-    'getClassicDensity', 'forwardProjectWithSpectrum', 'brewPowderSolution', 'calcContrastHU'
+    'forwardProjectWithSpectrum', 'brewPowderSolution', 'calcContrastHU', 'getCommonDensity', 'EnergyConversion'
 ]
 
 import json
 import re
 import numpy as np
-from scipy import interpolate
 from os import path
+import enum
 
 from ._typing import *
 from .utils import cvtEnergyUnit, cvtMuUnit, inArray, cripAssert, getChildFolder, inRange, isNumber, isOfSameShape, isType, readFileText, cvtConcentrationUnit
@@ -24,7 +24,7 @@ from .postprocess import muToHU
 
 DiagEnergyLow = 0  # keV
 DiagEnergyHigh = 150  # keV
-DiagEnergyRange = range(DiagEnergyLow, DiagEnergyHigh + 1)  # [low, high)
+DiagEnergyRange = range(DiagEnergyLow, DiagEnergyHigh + 1)  # Diagonstic energy range, [low, high)
 DiagEnergyLen = DiagEnergyHigh - DiagEnergyLow + 1
 AttenAliases = {
     'Gold': 'Au',
@@ -36,17 +36,22 @@ AttenAliases = {
 }
 
 
-def getClassicDensity(materialName: str):
-    '''
-        Get the classic value of density of a specified material (g/cm^3) from built-in dataset.
-    '''
-    _classicRho = readFileText(path.join(getChildFolder('_atten'), './_classicRho.json'))
-    rhoObject = json.loads(_classicRho)
+class EnergyConversion(enum.Enum):
+    EID = 'EID'  # Energy-Integrating Detector
+    PCD = 'PCD'  # Photon-Counting Detector
 
-    key = materialName
-    cripAssert(key in rhoObject, f'Record not found for density: {key}')
 
-    return rhoObject[key]
+def getCommonDensity(materialName: str):
+    '''
+        Get the common value of density of a specified material (g/cm^3) from built-in dataset.
+    '''
+    rhoObject = json.loads(readFileText(path.join(getChildFolder('_atten'), './_classicRho.json')))
+
+    if materialName in AttenAliases:
+        materialName = AttenAliases[materialName]
+    cripAssert(materialName in rhoObject, f'Material not found in density dataset: {materialName}')
+
+    return rhoObject[materialName]
 
 
 class Spectrum:
@@ -58,22 +63,26 @@ class Spectrum:
             omega = spec.omega[E]
         ```
     '''
+
     def __init__(self, omega: np.ndarray, unit='keV'):
-        cripAssert(len(omega) == DiagEnergyLen, 'omega array should have same length as DiagEnergyLen.')
+        cripAssert(
+            len(omega) == DiagEnergyLen,
+            f'omega array should have same length as DiagEnergyLen: got {len(omega)} expect {DiagEnergyLen}.')
         cripAssert(inArray(unit, ['MeV', 'keV', 'eV']), f'Invalid unit: {unit}')
 
         self.unit = unit
-        self.omega = np.array(omega)
+        self.omega = np.array(omega, dtype=np.float32)
         self.sumOmega = np.sum(self.omega)
 
-        self.startEnergy = None
-        self.cutOffEnergy = None
-        for e in DiagEnergyRange:
-            if self.omega[e] > 0:
-                self.startEnergy = e
-            if self.omega[e] <= 0:
-                self.cutOffEnergy = e
-                break
+    def isMonochromatic(self):
+        at = -1
+        for i in DiagEnergyRange:
+            if self.omega[i] > 0:
+                if at != -1:
+                    return False, None
+                at = i
+
+        return True, at
 
     @staticmethod
     def fromText(specText: str, unit='keV'):
@@ -83,7 +92,6 @@ class Spectrum:
             Refer to the document for spectrum text format. @see https://github.com/z0gSh1u/crip            
         '''
         cripAssert(inArray(unit, ['MeV', 'keV', 'eV']), f'Invalid unit: {unit}')
-
         omega = np.zeros(DiagEnergyLen, dtype=DefaultFloatDType)
 
         # split content into list, and ignore all lines starting with non-digit
@@ -106,8 +114,10 @@ class Spectrum:
         specEnergy = cvtEnergyUnit(specEnergy, unit, DefaultEnergyUnit)
 
         startEnergy, cutOffEnergy = int(specEnergy[0]), int(specEnergy[-1])
-        cripAssert(inRange(startEnergy, DiagEnergyRange), '`startEnergy` is out of `DiagEnergyRange`.')
-        cripAssert(inRange(cutOffEnergy, DiagEnergyRange), '`cutOffEnergy` is out of `DiagEnergyRange`.')
+        cripAssert(inRange(startEnergy, DiagEnergyRange),
+                   f'startEnergy is out of DiagEnergyRange: {DiagEnergyRange} keV')
+        cripAssert(inRange(cutOffEnergy, DiagEnergyRange),
+                   f'cutOffEnergy is out of DiagEnergyRange: {DiagEnergyRange} keV')
         cripAssert(cutOffEnergy + 1 - startEnergy == len(specOmega),
                    'The spectrum is not continous by 1 keV from start to cutoff.')
 
@@ -117,12 +127,18 @@ class Spectrum:
 
     @staticmethod
     def fromFile(path: str, unit='keV'):
+        '''
+            Construct a Spectrum object from spectrum file (first column is energy while second is omega).
+        '''
         spec = readFileText(path)
 
         return Spectrum.fromText(spec, unit)
 
     @staticmethod
     def monochromatic(at: int, unit='keV', omega=10**5):
+        '''
+            Construct a monochromatic spectrum.
+        '''
         text = '{} {}\n{} -1'.format(str(at), str(omega), str(at + 1))
 
         return Spectrum.fromText(text, unit)
@@ -131,39 +147,36 @@ class Spectrum:
 class Atten:
     '''
         Parse atten text as `Atten` class object. Interpolation is performed to fill `DiagEnergyRange`.
+        Refer to the document for atten text format (NIST ASCII). The density is in g/cm^3.
 
-        Refer to the document for atten text format (NIST ASCII or ICRP). @see https://github.com/z0gSh1u/crip
-
-        \\rho: g/cm^3.
-
-        Get \\mu of certain energy (keV):
+        Get \\mu (mm-1) of certain energy (keV):
         ```py
             mu = atten.mu[E]
         ```
     '''
-    def __init__(self, muArray: NDArray, rho: Or[None, float] = None) -> None:
+
+    def __init__(self, muArray: NDArray, density: Or[None, float] = None) -> None:
         cripAssert(len(muArray) == DiagEnergyLen, f'muArray should have length of {DiagEnergyLen} energy bins')
         self.mu = muArray
-        self.rho = rho
+        self.rho = density
         self.attenText = ''
         self.energyUnit = 'keV'
 
     @staticmethod
     def builtInAttenList() -> List:
         '''
-            Get the built-in atten list file content.
+            Get all built-in materials.
         '''
         attenListPath = path.join(getChildFolder('_atten'), './data')
         attenList = list(map(lambda x: x.replace('.txt', ''), listDirectory(attenListPath, style='filename')))
+        attenList.extend(AttenAliases.keys())
 
         return attenList
 
     @staticmethod
     def _builtInAttenText(materialName: str):
         '''
-            Get the built-in atten file content of `materialName`.
-
-            Available data sources: `NIST`, `ICRP`. Call `getBuiltInAttenList` to get the material list.
+            Get the built-in atten file content of `materialName` from NIST data source.
         '''
         if materialName in AttenAliases:
             materialName = AttenAliases[materialName]
@@ -175,23 +188,24 @@ class Atten:
         return content
 
     @staticmethod
-    def fromBuiltIn(materialName: str, rho: Or[float, None] = None):
+    def fromBuiltIn(materialName: str, density: Or[float, None] = None):
         '''
             Get the built-in atten object.
-
-            \\rho: g/cm^3.
+            Call `builtInAttenList` to get available materials.
+            The density is in g/cm^3.
         '''
         if materialName in AttenAliases:
             materialName = AttenAliases[materialName]
 
-        if rho is None:
-            rho = getClassicDensity(materialName)
+        if density is None:
+            density = getCommonDensity(materialName)
 
-        return Atten.fromText(Atten._builtInAttenText(materialName), rho, BuiltInAttenEnergyUnit)
+        return Atten.fromText(Atten._builtInAttenText(materialName), density, BuiltInAttenEnergyUnit)
 
     @staticmethod
-    def fromText(attenText: str, rho: float, energyUnit='MeV'):
-        cripAssert(rho > 0, '`rho` should > 0.')
+    def fromText(attenText: str, density: float, energyUnit='MeV'):
+        cripAssert(density > 0, '`density` should > 0.')
+        rho = density
 
         # split attenText into list, and ignore all lines starting with non-digit
         content = list(
@@ -227,6 +241,10 @@ class Atten:
 
     @staticmethod
     def fromFile(path: str, rho: float, energyUnit='MeV'):
+        '''
+            Construct a new material from file where first column is energy while second
+            is \\mu / \\rho.
+        '''
         atten = readFileText(path)
 
         return Atten.fromText(atten, rho, energyUnit)
@@ -236,27 +254,16 @@ Material = Atten
 WaterAtten = Atten.fromBuiltIn('Water')
 
 
-def calcMu(atten: Atten, spec: Spectrum, energyConversion: Or[str, float, int, Callable]) -> float:
+def calcMu(atten: Atten, spec: Spectrum, energyConversion: str) -> float:
     '''
-        Calculate the \mu value (mm-1) of certain atten under a specific spectrum.
+        Calculate the LAC \mu value (mm-1) of certain atten under a specific spectrum.
+        energyConversion determines the energy conversion efficiency of the detector,
+        can be "PCD" (Photon Counting), "EID" (Energy Integrating)
+    '''
+    cripAssert(inArray(energyConversion, ['PCD', 'EID']), f'Invalid energyConversion: {energyConversion}')
 
-        `energyConversion` determines the energy conversion efficiency of the detector.
-            - "PCD" (Photon Counting), "EID" (Energy Integrating)
-            - a constant value
-            - a callback function that takes energy in keV and returns the factor
-    '''
     mus = atten.mu
-    eff = None
-
-    if isType(energyConversion, str):
-        cripAssert(inArray(energyConversion, ['PCD', 'EID']), f'Invalid `energyConversion`: {energyConversion}')
-        eff = {'PCD': 1, 'EID': np.array(DiagEnergyRange)}[energyConversion]
-    elif isNumber(energyConversion):
-        eff = energyConversion
-    elif isType(energyConversion, Callable):
-        eff = np.array(list(map(energyConversion, list(DiagEnergyRange)))).squeeze()
-    else:
-        cripAssert(False, 'Invalid `energyConversion`.')
+    eff = {'PCD': 1, 'EID': np.array(DiagEnergyRange)}[energyConversion]
 
     return np.sum(spec.omega * eff * mus) / np.sum(spec.omega * eff)
 
@@ -265,7 +272,7 @@ def calcAttenedSpec(spec: Spectrum, attens: Or[Atten, List[Atten]], Ls: Or[float
     '''
         Calculate the attenuated spectrum using polychromatic Beer-Lambert law. Supports multiple materials.
 
-        I.e., `\\Omega(E) \\exp (- \\mu(E) L) \\through all E`. L in mm.
+        I.e., `\\Omega(E) \\exp (- \\mu(E) L) through all E`. L in mm.
     '''
     if isType(attens, Atten):
         attens = [attens]
@@ -293,16 +300,15 @@ def calcPostLog(spec: Spectrum, atten: Or[Atten, List[Atten]], L: Or[float, List
     return -np.log(attenSpec.sumOmega / spec.sumOmega)
 
 
-def forwardProjectWithSpectrum(lengths: List[TwoD],
-                               materials: List[Atten],
-                               spec: Spectrum,
-                               energyConversion: str,
-                               fastSkip: bool = False,
-                               flat: float = None):
+def forwardProjectWithSpectrum(lengths: List[TwoD], materials: List[Atten], spec: Spectrum, energyConversion: str):
     '''
         Perform forward projection using `spec`. `lengths` is a list of corresponding length [mm] images 
-        (projection or sinogram) of `materials`. Set `lengths` and `materials` to empty lists to compute the flat field.
+        (projection or sinogram) of `materials`. 
         This function would simulate attenuation and Beam Hardening but no scatter.
+        
+        Set `lengths` and `materials` to empty lists to compute the flat field.
+
+        It's highly recommended to use a monochronmatic spectrum to accelerate if you simulate a lot.
     '''
     cripAssert(len(lengths) == len(materials), 'Lengths and materials should correspond.')
     cripAssert(all([isOfSameShape(lengths[0], x) for x in lengths]), 'Lengths map should have same shape.')
@@ -310,22 +316,28 @@ def forwardProjectWithSpectrum(lengths: List[TwoD],
 
     efficiency = 1 if energyConversion == 'PCD' else np.array(DiagEnergyRange)
 
-    if (len(lengths) == 0) or (fastSkip and (all([np.sum(x) == 0 for x in lengths]))):
+    if len(lengths) == 0:
+        # compute the flat field
         ones = np.ones_like(lengths[0], dtype=DefaultFloatDType) if len(lengths) > 0 else 1
-        if flat is not None:
-            return flat * ones
-        else:
-            effectiveOmega = spec.omega * efficiency
-            return np.sum(effectiveOmega) * ones
+        effectiveOmega = spec.omega * efficiency
+
+        return np.sum(effectiveOmega) * ones
 
     resultShape = lengths[0].shape
+    isMono, monoAt = spec.isMonochromatic()
+    if isMono:
+        attenuations = 0.0
+        for length, material in zip(lengths, materials):
+            attenuations += length * material.mu[monoAt]
 
-    # a[h, w] = [vector of attenuation in that energy bin]
-    attenuations = np.zeros((*resultShape, DiagEnergyLen), dtype=DefaultFloatDType)
-    for length, material in zip(lengths, materials):
-        attenuations += np.outer(length, material.mu).reshape((*resultShape, DiagEnergyLen))
+        attened = spec.omega[monoAt] * np.exp(-attenuations) * efficiency  # the attenuated image
+    else:
+        # a[h, w] = [vector of attenuation in that energy bin]
+        attenuations = np.zeros((*resultShape, DiagEnergyLen), dtype=DefaultFloatDType)
+        for length, material in zip(lengths, materials):
+            attenuations += np.outer(length, material.mu).reshape((*resultShape, DiagEnergyLen))
 
-    attened = spec.omega * np.exp(-attenuations) * efficiency  # the attenuated image
+        attened = spec.omega * np.exp(-attenuations) * efficiency  # the attenuated image
 
     return np.sum(attened, axis=-1)
 
@@ -338,6 +350,8 @@ def brewPowderSolution(solute: Atten,
     '''
         Generate the Atten of powder solution with certain concentration (mg/mL by default).
     '''
+    cripAssert(inArray(concentrationUnit, ['mg/mL', 'g/mL']), f'Invalid concentration unit: {concentrationUnit}')
+
     concentration = cvtConcentrationUnit(concentration, concentrationUnit, 'g/mL')
     mu = solvent.mu + (solute.mu / solute.rho) * concentration
     atten = Atten.fromMuArray(mu, rhoSolution)
@@ -347,7 +361,7 @@ def brewPowderSolution(solute: Atten,
 
 def calcContrastHU(contrast: Atten, spec: Spectrum, energyConversion: str, base: Atten = WaterAtten):
     '''
-        Calculate the contrast difference in HU.
+        Calculate HU difference resulted by contrast.
     '''
     cripAssert(energyConversion in ['EID', 'PCD'], 'Invalid energyConversion.')
 

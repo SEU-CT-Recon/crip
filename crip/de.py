@@ -4,7 +4,10 @@
     https://github.com/z0gSh1u/crip
 '''
 
-__all__ = ['singleMatMuDecomp', 'calcAttenedSpec', 'calcPostLog', 'deDecompGetCoeff', 'deDecompProj', 'deDecompRecon']
+__all__ = [
+    'singleMatMuDecomp', 'calcAttenedSpec', 'calcPostLog', 'deDecompGetCoeff', 'deDecompProj', 'deDecompRecon',
+    'genMaterialPhantom'
+]
 
 import numpy as np
 from scipy.ndimage import uniform_filter
@@ -139,7 +142,14 @@ def softThreshold(img: np.ndarray, l, h, mode='lower'):
     return res.reshape(shape)
 
 
-def genDigitalPhantom(img, zsmooth=3, sigma=1, l=80, h=300, boneBase=2000):
+def genMaterialPhantom(img, zsmooth=3, sigma=1, l=80, h=300, base=1000):
+    '''
+        Generate the phantom of material bases (one is water) from SECT using soft-thresholding.
+        zsmooth: smooth window in slice direction.
+        sigma: Gaussian smooth sigma in single slice.
+        [l, h] defines the fuzzy range of another material, e.g., bone.
+        base: the reference HU of another material.
+    '''
     assert np.min(img) < 0  # HU
 
     kernel = (zsmooth, 1, 1) if zsmooth is not None else (1, 1)
@@ -147,6 +157,6 @@ def genDigitalPhantom(img, zsmooth=3, sigma=1, l=80, h=300, boneBase=2000):
     img = gaussianSmooth(img, sigma)
 
     water = (img + 1000) / 1000 * softThreshold(img, l, h, 'lower')
-    bone = (img + 1000) / boneBase * softThreshold(img, l, h, 'upper')
+    b2 = (img + 1000) / (base + 1000) * softThreshold(img, l, h, 'upper')
 
-    return water, bone
+    return water, b2
