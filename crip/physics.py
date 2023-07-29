@@ -324,6 +324,8 @@ def forwardProjectWithSpectrum(lengths: List[TwoD], materials: List[Atten], spec
         return np.sum(effectiveOmega) * ones
 
     resultShape = lengths[0].shape
+
+    # speed up when it's monochromatic
     isMono, monoAt = spec.isMonochromatic()
     if isMono:
         attenuations = 0.0

@@ -6,7 +6,7 @@
 
 __all__ = [
     'listDirectory', 'imreadDicom', 'readDicom', 'imreadRaw', 'imwriteRaw', 'imreadTiff', 'imwriteTiff', 'CTPARAMS',
-    'fetchCTParam'
+    'fetchCTParam', 'readEVI', 'imreadEVI'
 ]
 
 import os
@@ -180,6 +180,68 @@ def imwriteTiff(img: TwoOrThreeD, path: str, dtype=None):
         img = img.astype(np.float32)  # always use float32 for floating image.
 
     tifffile.imwrite(path, img)
+
+
+def readEVI(path: str):
+    '''
+        Read EVI file saved by XCounter Hydra PCD detector. Return the images and metadata.
+    '''
+    metadata = {
+        'ImageType': None,
+        'Width': None,
+        'Height': None,
+        'NumberOfImages': None,
+        'OffsetToFirstImage': None,
+        'GapBetweenImages': None,
+        'FrameRate': None,
+        'LowThreshold': None,
+        'HighThreshold': None,
+    }
+
+    mapping = {
+        'Image_Type': 'ImageType',
+        'Width': 'Width',
+        'Height': 'Height',
+        'Nr_of_images': 'NumberOfImages',
+        'Offset_To_First_Image': 'OffsetToFirstImage',
+        # interesting
+        'Gap_between_iamges_in_bytes': 'GapBetweenImages',
+        'Gap_between_images_in_bytes': 'GapBetweenImages',
+        'Frame_Rate_HZ': 'FrameRate',
+        'Low_Thresholds_KV': 'LowThreshold',
+        'High_Thresholds_KV': 'HighThreshold',
+    }
+
+    take = lambda str, idx: str.split(' ')[idx]
+    with open(path, 'r', encoding='utf-8', errors='ignore') as fp:
+        line = fp.readline().strip()
+        while len(line):
+            if line == 'COMMENT':
+                break
+
+            key = take(line, 0)
+            if key in mapping:
+                val = take(line, 1)
+                metadata[mapping[key]] = int(val) if str.isdigit(val) else val
+
+            line = fp.readline().strip()
+
+    nones = list(filter(lambda x: x[1] is None, metadata.items()))
+    cripAssert(len(nones) == 0, f'Failed to find metadata for {list(map(lambda x: x[0], nones))}')
+    cripAssert(metadata['ImageType'] in ['Single', 'Double'], f'Unsupported ImageType: {metadata["ImageType"]}')
+    dtype = {'Single': np.float32, 'Double': np.float64}
+
+    img = imreadRaw(path, metadata['Height'], metadata['Width'], dtype[metadata['ImageType']],
+                    metadata['NumberOfImages'], metadata['OffsetToFirstImage'], metadata['GapBetweenImages'])
+
+    return img, metadata
+
+
+def imreadEVI(path: str):
+    '''
+        Read EVI file saved by XCounter Hydra PCD detector. Return the images only.
+    '''
+    return readEVI(path)[0]
 
 
 def _CTPARAM(loc, type_):
