@@ -5,8 +5,8 @@
 '''
 
 __all__ = [
-    'listDirectory', 'imreadDicom', 'readDicom', 'imreadRaw', 'imwriteRaw', 'imreadTiff', 'imwriteTiff', 'CTPARAMS',
-    'fetchCTParam', 'readEVI', 'imreadEVI'
+    'listDirectory', 'imreadDicom', 'imreadDicoms', 'readDicom', 'imreadRaw', 'imreadRaws', 'imwriteRaw', 'imreadTiff', 'imreadTiffs',
+    'imwriteTiff', 'readEVI', 'imreadEVI', 'CTPARAMS', 'fetchCTParam'
 ]
 
 import os
