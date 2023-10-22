@@ -5,18 +5,16 @@
 '''
 
 __all__ = [
-    'singleMatMuDecomp', 'calcAttenedSpec', 'calcPostLog', 'deDecompGetCoeff', 'deDecompProj', 'deDecompRecon',
-    'genMaterialPhantom'
+    'singleMatMuDecomp', 'deDecompGetCoeff', 'deDecompProj', 'deDecompRecon','genMaterialPhantom'
 ]
 
-import numpy as np
 from scipy.ndimage import uniform_filter
 
 from .postprocess import gaussianSmooth
 from .utils import ConvertListNDArray, cripAssert, cripWarning, is2D, isOfSameShape
 from ._typing import *
 from .physics import Atten, DiagEnergyRange, Spectrum, calcAttenedSpec, calcPostLog
-
+from .shared import softThreshold
 
 def singleMatMuDecomp(src: Atten, base1: Atten, base2: Atten, method='coeff', energyRange=DiagEnergyRange) -> NDArray:
     '''
@@ -122,25 +120,6 @@ def deDecompRecon(low: TwoOrThreeD,
         return decompOne(low, high)
     else:
         return np.array(list(map(lambda args: decompOne(*args), zip(low, high)))).transpose((1, 0, 2, 3))
-
-
-def softThreshold(img: np.ndarray, l, h, mode='lower'):
-    shape = img.shape
-    img = img.flatten()
-
-    lower = img < l
-    upper = img >= h
-
-    transitional = (img >= l) * (img < h)
-    if mode == 'upper':
-        transitional = transitional * (img - l) / (h - l)
-        res = upper + transitional
-    elif mode == 'lower':
-        transitional = transitional * (h - img) / (h - l)
-        res = lower + transitional
-
-    return res.reshape(shape)
-
 
 def genMaterialPhantom(img, zsmooth=3, sigma=1, l=80, h=300, base=1000):
     '''
