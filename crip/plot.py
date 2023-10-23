@@ -80,12 +80,5 @@ def zoomIn(img, x, y, hw):
     '''
     return img[y:y + hw, x:x + hw]
 
-
-def stddev(img, leftTop, h, w):
-    y, x = leftTop
-    crop = img[x:x + h, y:y + w]
-    return np.std(crop)
-
-
 def fontdict(family, weight, size):
     return {'family': family, 'weight': weight, 'size': size}
