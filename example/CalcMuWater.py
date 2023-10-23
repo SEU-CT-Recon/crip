@@ -4,7 +4,7 @@
     by z0gSh1u @ https://github.com/z0gSh1u/crip
 '''
 
-from crip.physics import calcMu, Atten, Spectrum, getClassicDensity
+from crip.physics import calcMu, Atten, Spectrum, getCommonDensity
 
 # A sample spectrum file.
 SpectrumFile = '''
@@ -13,7 +13,7 @@ SpectrumFile = '''
 50000  -1
 '''
 
-WaterDensity = getClassicDensity('Water')
+WaterDensity = getCommonDensity('Water')
 print(f'rho_water = {WaterDensity} g/cm^3')
 
 spec = Spectrum.fromText(SpectrumFile, 'eV')
