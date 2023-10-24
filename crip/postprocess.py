@@ -5,7 +5,7 @@
 '''
 
 __all__ = [
-    'drawCircle', 'fovCropRadius', 'fovCrop', 'muToHU', 'huToMu', 'huNoRescale', 'postlogsToProjections', 'binning'
+    'drawCircle', 'fovCropRadius', 'fovCrop', 'muToHU', 'huToMu', 'huNoRescale', 'postlogsToProjections'
 ]
 
 import numpy as np

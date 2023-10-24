@@ -5,7 +5,7 @@
 '''
 
 __all__ = [
-    'rotate', 'verticalFlip', 'horizontalFlip', 'stackFlip', 'resize', 'gaussianSmooth', 'stackImages', 'splitImages',
+    'rotate', 'verticalFlip', 'horizontalFlip', 'stackFlip', 'resize', 'gaussianSmooth', 'softThreshold', 'stackImages', 'splitImages',
     'binning', 'transpose', 'permute'
 ]
 
@@ -121,6 +121,22 @@ def gaussianSmooth(img: TwoOrThreeD, sigma: Or[float, int, Tuple[Or[float, int]]
     else:
         return cv2.GaussianBlur(img, ksize, sigmaX=sigma[0], sigmaY=sigma[1])
 
+def softThreshold(img: np.ndarray, l, h, mode='lower'):
+    shape = img.shape
+    img = img.flatten()
+
+    lower = img < l
+    upper = img >= h
+
+    transitional = (img >= l) * (img < h)
+    if mode == 'upper':
+        transitional = transitional * (img - l) / (h - l)
+        res = upper + transitional
+    elif mode == 'lower':
+        transitional = transitional * (h - img) / (h - l)
+        res = lower + transitional
+
+    return res.reshape(shape)
 
 @ConvertListNDArray
 def stackImages(imgList: ListNDArray, dtype=None) -> NDArray:

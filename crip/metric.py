@@ -9,7 +9,7 @@ from .utils import cripAssert, cripWarning
 from ._typing import *
 from skimage.metrics import structural_similarity, peak_signal_noise_ratio
 
-__all__ = ['calcMAPE', 'calcPSNR', 'calcSSIM', 'calcRMSE']
+__all__ = ['calcMAPE', 'calcPSNR', 'calcSSIM', 'calcRMSE','stddev']
 
 
 def calcMAPE(x, y, eps=1e-6):
@@ -50,3 +50,8 @@ def calcRMSE(x, y):
     '''
     sq = (x - y)**2
     return np.sqrt(sq.mean())
+
+def stddev(img, leftTop, h, w):
+    y, x = leftTop
+    crop = img[x:x + h, y:y + w]
+    return np.std(crop)

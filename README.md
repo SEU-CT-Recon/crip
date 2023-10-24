@@ -32,7 +32,7 @@ All functions are (or will be) with clear documentation. Just consider the funct
 - `crip.lowdose` for Low-Dose researches.
 - `crip.mangoct` for [mangoct](https://github.com/CandleHouse/mandoct) reconstruction tool package integration.
 - `crip.metric` for metrics computation.
-- `crip.paplot` for figure drawing.
+- `crip.plot` for figure drawing.
 
 crip is still under development. More features will be added in the future. And contributions are strongly welcomed.
 

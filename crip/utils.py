@@ -154,7 +154,7 @@ def inRange(a, range_=None, low=None, high=None):
             range_ = (range_[0], range_[-1])
         low, high = range_
 
-    return low <= a and a < high
+    return low <= a and a <= high
 
 
 def inArray(a, arr):

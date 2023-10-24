@@ -6,7 +6,7 @@
 
 __all__ = [
     'averageProjections', 'flatDarkFieldCorrection', 'projectionsToSinograms', 'sinogramsToProjections', 'padImage',
-    'padSinogram', 'correctBeamHardeningPolynomial', 'injectGaussianNoise', 'injectPoissonNoise', 'binning', 'fan2para'
+    'padSinogram', 'correctBeamHardeningPolynomial', 'fan2para'
 ]
 
 import numpy as np
@@ -15,10 +15,8 @@ import warnings
 warnings.simplefilter("ignore", DeprecationWarning)
 
 from scipy.interpolate import interp2d
-from .shared import *
 from ._typing import *
 from .utils import *
-from .lowdose import injectGaussianNoise, injectPoissonNoise
 
 
 @ConvertListNDArray
