@@ -332,7 +332,9 @@ def forwardProjectWithSpectrum(lengths: List[TwoD], materials: List[Atten], spec
         for length, material in zip(lengths, materials):
             attenuations += length * material.mu[monoAt]
 
-        attened = spec.omega[monoAt] * np.exp(-attenuations) * efficiency  # the attenuated image
+        attened = spec.omega[monoAt] * np.exp(-attenuations) * (1 if energyConversion == 'PCD' else monoAt)  # the attenuated image
+
+        return attened
     else:
         # a[h, w] = [vector of attenuation in that energy bin]
         attenuations = np.zeros((*resultShape, DiagEnergyLen), dtype=DefaultFloatDType)

@@ -1,7 +1,5 @@
 '''
     Figure artist module of crip.
-    The name paplot follows pyplot and means paper a lot.
-    ! This module is still working in progress.
 
     https://github.com/z0gSh1u/crip
 '''
@@ -11,8 +9,9 @@ import numpy as np
 from matplotlib import font_manager
 from ._typing import *
 from .utils import cripAssert, is1D, isInt
+from .physics import Spectrum
 
-__all__ = ['smooth', 'window', 'average', 'addFont', 'fontdict', 'zoomIn']
+__all__ = ['smooth', 'window', 'average', 'addFont', 'fontdict', 'zoomIn', 'plotSpectrum']
 
 
 def smooth(data: NDArray, winSize: int = 5):
@@ -89,3 +88,7 @@ def stddev(img, leftTop, h, w):
 
 def fontdict(family, weight, size):
     return {'family': family, 'weight': weight, 'size': size}
+
+
+def plotSpectrum(spec: Spectrum):
+    pass

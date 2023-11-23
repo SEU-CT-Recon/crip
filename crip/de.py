@@ -67,7 +67,8 @@ def deDecompGetCoeff(lowSpec: Spectrum, highSpec: Spectrum, base1: Atten, len1: 
 
         return np.linalg.pinv(A) @ LComb
 
-    beta, gamma = deCalcBetaGamma(np.array(postlogLow), np.array(postlogHigh), np.array(lenCombo)).T
+    beta, gamma = deCalcBetaGamma(
+        np.array(postlogLow), np.array(postlogHigh), np.array(lenCombo)).T
 
     return beta, gamma
 
@@ -80,7 +81,8 @@ def deDecompProj(lowProj: TwoOrThreeD, highProj: TwoOrThreeD, coeff1: NDArray,
 
         Coefficients can be generated using @see `deDecompGetCoeff`.
     '''
-    cripAssert(isOfSameShape(lowProj, highProj), 'Two projection sets should have same shape.')
+    cripAssert(isOfSameShape(lowProj, highProj),
+               'Two projection sets should have same shape.')
     cripAssert(
         len(coeff1) == 6 and len(coeff2) == 6,
         'Decomposing coefficients should have length 6 (2 variable, order 2 with bias).')
@@ -160,3 +162,38 @@ def genMaterialPhantom(img, zsmooth=3, sigma=1, l=80, h=300, base=1000):
     b2 = (img + 1000) / (base + 1000) * softThreshold(img, l, h, 'upper')
 
     return water, b2
+
+
+def compose2(b1, b2, v1, v2):
+    return b1 * v1 + b2 * v2
+
+
+def compose3(b1, b2, b3, v1, v2, v3):
+    return b1 * v1 + b2 * v2 + b3 * v3
+
+@ConvertListNDArray
+def decompReconVolCon(low: TwoOrThreeD, high: TwoOrThreeD, muBase1, muBase2, muBase3):
+    '''Dual-Energy Triple-Material decomposition with Volume Conservation.
+       muBase* = [low, high]
+    '''
+    cripAssert(isOfSameShape(low, high), 'Volumes should have same shape.')
+
+    A = np.array([
+        [muBase1[0], muBase2[0], muBase3[0]],
+        [muBase1[1], muBase2[1], muBase3[1]],
+        [1, 1, 1],
+    ])
+    M = np.linalg.pinv(A)
+
+    def decompOne(low, high):
+        c1 = M[0, 0] * low + M[0, 1] * high + M[0, 2]
+        c2 = M[1, 0] * low + M[1, 1] * high + M[1, 2]
+        c3 = M[2, 0] * low + M[2, 1] * high + M[2, 2]
+
+        return c1, c2, c3
+
+    if is2D(low):
+        return decompOne(low, high)
+    else:
+        return np.array(list(map(lambda args: decompOne(*args), zip(low, high)))).transpose((1, 0, 2, 3))
+
