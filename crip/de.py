@@ -6,7 +6,7 @@
 
 __all__ = [
     'singleMatMuDecomp', 'calcAttenedSpec', 'calcPostLog', 'deDecompGetCoeff', 'deDecompProj', 'deDecompRecon',
-    'genMaterialPhantom'
+    'genMaterialPhantom', 'deDecompReconVolCon', 'teDecompRecon', 'teDecompReconVolCon'
 ]
 
 import numpy as np
@@ -171,8 +171,9 @@ def compose2(b1, b2, v1, v2):
 def compose3(b1, b2, b3, v1, v2, v3):
     return b1 * v1 + b2 * v2 + b3 * v3
 
+
 @ConvertListNDArray
-def decompReconVolCon(low: TwoOrThreeD, high: TwoOrThreeD, muBase1, muBase2, muBase3):
+def deDecompReconVolCon(low: TwoOrThreeD, high: TwoOrThreeD, muBase1, muBase2, muBase3):
     '''Dual-Energy Triple-Material decomposition with Volume Conservation.
        muBase* = [low, high]
     '''
@@ -197,3 +198,59 @@ def decompReconVolCon(low: TwoOrThreeD, high: TwoOrThreeD, muBase1, muBase2, muB
     else:
         return np.array(list(map(lambda args: decompOne(*args), zip(low, high)))).transpose((1, 0, 2, 3))
 
+
+@ConvertListNDArray
+def teDecompRecon(low: TwoOrThreeD, mid: TwoOrThreeD, high: TwoOrThreeD, muBase1, muBase2, muBase3):
+    '''Triple-Energy Triple-Material decomposition.
+       muBase* = [low, mid, high]
+    '''
+    cripAssert(isOfSameShape(low, mid) and isOfSameShape(
+        low, high), 'Volumes should have same shape.')
+
+    A = np.array([
+        [muBase1[0], muBase2[0], muBase3[0]],
+        [muBase1[1], muBase2[1], muBase3[1]],
+        [muBase1[2], muBase2[2], muBase3[2]],
+    ])
+    M = np.linalg.inv(A)
+
+    def decompOne(low, mid, high):
+        c1 = M[0, 0] * low + M[0, 1] * mid + M[0, 2] * high
+        c2 = M[1, 0] * low + M[1, 1] * mid + M[1, 2] * high
+        c3 = M[2, 0] * low + M[2, 1] * mid + M[2, 2] * high
+
+        return c1, c2, c3
+
+    if is2D(low):
+        return decompOne(low, mid, high)
+    else:
+        return np.array(list(map(lambda args: decompOne(*args), zip(low, mid, high)))).transpose((1, 0, 2, 3))
+
+
+@ConvertListNDArray
+def teDecompReconVolCon(low: TwoOrThreeD, mid: TwoOrThreeD, high: TwoOrThreeD, muBase1, muBase2, muBase3):
+    '''Triple-Energy Triple-Material decomposition with Volume Conservation.
+       muBase* = [low, mid, high]
+    '''
+    cripAssert(isOfSameShape(low, mid) and isOfSameShape(
+        low, high), 'Volumes should have same shape.')
+
+    A = np.array([
+        [muBase1[0], muBase2[0], muBase3[0]],
+        [muBase1[1], muBase2[1], muBase3[1]],
+        [muBase1[2], muBase2[2], muBase3[2]],
+        [1, 1, 1],
+    ])
+    M = np.linalg.pinv(A)
+
+    def decompOne(low, mid, high):
+        c1 = M[0, 0] * low + M[0, 1] * mid + M[0, 2] * high + M[0, 3]
+        c2 = M[1, 0] * low + M[1, 1] * mid + M[1, 2] * high + M[1, 3]
+        c3 = M[2, 0] * low + M[2, 1] * mid + M[2, 2] * high + M[2, 3]
+
+        return c1, c2, c3
+
+    if is2D(low):
+        return decompOne(low, mid, high)
+    else:
+        return np.array(list(map(lambda args: decompOne(*args), zip(low, mid, high)))).transpose((1, 0, 2, 3))
