@@ -6,7 +6,8 @@
 
 __all__ = [
     'averageProjections', 'flatDarkFieldCorrection', 'projectionsToSinograms', 'sinogramsToProjections', 'padImage',
-    'padSinogram', 'correctBeamHardeningPolynomial', 'injectGaussianNoise', 'injectPoissonNoise', 'binning', 'fan2para'
+    'padSinogram', 'correctBeamHardeningPolynomial', 'injectGaussianNoise', 'injectPoissonNoise', 'binning', 'fan2para',
+    'correctRingArtifactInProj'
 ]
 
 import numpy as np
@@ -15,6 +16,7 @@ import warnings
 warnings.simplefilter("ignore", DeprecationWarning)
 
 from scipy.interpolate import interp2d
+import cv2
 from .shared import *
 from ._typing import *
 from .utils import *
@@ -181,6 +183,30 @@ def correctBeamHardeningPolynomial(postlog: TwoOrThreeD, coeffs: Or[Tuple, np.po
             coeffs = np.poly1d([*coeffs, 0])
 
     return coeffs(postlog)
+
+
+@ConvertListNDArray
+def correctRingArtifactInProj(sgm: TwoOrThreeD, sigma: float, ksize: Or[int, None] = None):
+    '''
+        Apply the ring artifact correction method in projection domain (input postlog sinogram),
+        using gaussian filter in sinogram detector direction [1].
+        [1] DOI:10.13700/j.bh.1001-5965.2007.11.020.
+    '''
+    ksize = ksize or int(2 * np.ceil(2 * sigma) + 1)
+    kernel = np.squeeze(cv2.getGaussianKernel(ksize, sigma))
+    
+    def procOne(sgm: TwoD):
+        Pc = np.mean(sgm, axis=0)
+        Rc = np.convolve(Pc, kernel, mode='same')
+        Ec = Pc - Rc
+        return sgm - Ec[np.newaxis, :]
+        
+    if is3D(sgm):
+        res = np.array(list(map(procOne, sgm)))
+    else:
+        res = procOne(sgm)
+
+    return res
 
 
 def fan2para(sgm: TwoD, gammas, betas, d, oThetas, oLines):
