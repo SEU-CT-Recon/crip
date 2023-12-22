@@ -126,6 +126,9 @@
             <li>
                     <a class="function" href="#is1D">is1D</a>
             </li>
+            <li>
+                    <a class="function" href="#as3D">as3D</a>
+            </li>
     </ul>
 
 
@@ -161,7 +164,7 @@
 </span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a>    <span class="s1">&#39;readFileText&#39;</span><span class="p">,</span> <span class="s1">&#39;CripException&#39;</span><span class="p">,</span> <span class="s1">&#39;cripAssert&#39;</span><span class="p">,</span> <span class="s1">&#39;cripWarning&#39;</span><span class="p">,</span> <span class="s1">&#39;ConvertListNDArray&#39;</span><span class="p">,</span> <span class="s1">&#39;asFloat&#39;</span><span class="p">,</span> <span class="s1">&#39;is2D&#39;</span><span class="p">,</span> <span class="s1">&#39;is3D&#39;</span><span class="p">,</span>
 </span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a>    <span class="s1">&#39;is2or3D&#39;</span><span class="p">,</span> <span class="s1">&#39;isInt&#39;</span><span class="p">,</span> <span class="s1">&#39;isIntDtype&#39;</span><span class="p">,</span> <span class="s1">&#39;isFloatDtype&#39;</span><span class="p">,</span> <span class="s1">&#39;isIntType&#39;</span><span class="p">,</span> <span class="s1">&#39;isFloatType&#39;</span><span class="p">,</span> <span class="s1">&#39;isType&#39;</span><span class="p">,</span> <span class="s1">&#39;isNumber&#39;</span><span class="p">,</span> <span class="s1">&#39;isList&#39;</span><span class="p">,</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a>    <span class="s1">&#39;isListNDArray&#39;</span><span class="p">,</span> <span class="s1">&#39;isOfSameShape&#39;</span><span class="p">,</span> <span class="s1">&#39;inRange&#39;</span><span class="p">,</span> <span class="s1">&#39;inArray&#39;</span><span class="p">,</span> <span class="s1">&#39;getChildFolder&#39;</span><span class="p">,</span> <span class="s1">&#39;cvtEnergyUnit&#39;</span><span class="p">,</span> <span class="s1">&#39;cvtLengthUnit&#39;</span><span class="p">,</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a>    <span class="s1">&#39;cvtMuUnit&#39;</span><span class="p">,</span> <span class="s1">&#39;radToDeg&#39;</span><span class="p">,</span> <span class="s1">&#39;degToRad&#39;</span><span class="p">,</span> <span class="s1">&#39;sysPlatform&#39;</span><span class="p">,</span> <span class="s1">&#39;getHW&#39;</span><span class="p">,</span> <span class="s1">&#39;is1D&#39;</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a>    <span class="s1">&#39;cvtMuUnit&#39;</span><span class="p">,</span> <span class="s1">&#39;radToDeg&#39;</span><span class="p">,</span> <span class="s1">&#39;degToRad&#39;</span><span class="p">,</span> <span class="s1">&#39;sysPlatform&#39;</span><span class="p">,</span> <span class="s1">&#39;getHW&#39;</span><span class="p">,</span> <span class="s1">&#39;is1D&#39;</span><span class="p">,</span> <span class="s1">&#39;as3D&#39;</span>
 </span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="p">]</span>
 </span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a>
 </span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a><span class="kn">import</span> <span class="nn">os</span>
@@ -240,176 +243,180 @@
 </span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>    <span class="k">return</span> <span class="n">arr</span>
 </span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>
 </span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>
-</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a><span class="k">def</span> <span class="nf">is1D</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>    <span class="k">return</span> <span class="n">isType</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
-</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>
+</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a><span class="k">def</span> <span class="nf">as3D</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>    <span class="n">cripAssert</span><span class="p">(</span><span class="n">is2or3D</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>    <span class="k">return</span> <span class="n">x</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span> <span class="k">else</span> <span class="n">x</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
 </span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a>
-</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a><span class="k">def</span> <span class="nf">is2D</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>    <span class="k">return</span> <span class="n">isType</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a><span class="k">def</span> <span class="nf">is1D</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>    <span class="k">return</span> <span class="n">isType</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
 </span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>
 </span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>
-</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a><span class="k">def</span> <span class="nf">is3D</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>    <span class="k">return</span> <span class="n">isType</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span>
+</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a><span class="k">def</span> <span class="nf">is2D</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>    <span class="k">return</span> <span class="n">isType</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
 </span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>
 </span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>
-</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a><span class="k">def</span> <span class="nf">is2or3D</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>    <span class="k">return</span> <span class="n">is2D</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="ow">or</span> <span class="n">is3D</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a><span class="k">def</span> <span class="nf">is3D</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>    <span class="k">return</span> <span class="n">isType</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span>
 </span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>
 </span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>
-</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a><span class="k">def</span> <span class="nf">isInt</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">==</span> <span class="n">n</span>
+</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a><span class="k">def</span> <span class="nf">is2or3D</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>    <span class="k">return</span> <span class="n">is2D</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="ow">or</span> <span class="n">is3D</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>
 </span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>
-</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a><span class="k">def</span> <span class="nf">isIntDtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">):</span>
-</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)</span>
+</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a><span class="k">def</span> <span class="nf">isInt</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">==</span> <span class="n">n</span>
 </span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>
 </span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>
-</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a><span class="k">def</span> <span class="nf">isFloatDtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">):</span>
-</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)</span>
+</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a><span class="k">def</span> <span class="nf">isIntDtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">):</span>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)</span>
 </span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>
 </span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>
-</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a><span class="k">def</span> <span class="nf">isIntType</span><span class="p">(</span><span class="n">arr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>    <span class="k">return</span> <span class="n">isIntDtype</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a><span class="k">def</span> <span class="nf">isFloatDtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">):</span>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)</span>
 </span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>
 </span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>
-</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a><span class="k">def</span> <span class="nf">isFloatType</span><span class="p">(</span><span class="n">arr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>    <span class="k">return</span> <span class="n">isFloatDtype</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a><span class="k">def</span> <span class="nf">isIntType</span><span class="p">(</span><span class="n">arr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>    <span class="k">return</span> <span class="n">isIntDtype</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
 </span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>
 </span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>
-</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a><span class="k">def</span> <span class="nf">isType</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a><span class="sd">        Check if `x` has type `t` or isinstance of `t`.</span>
-</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a>    <span class="k">if</span> <span class="n">t</span> <span class="ow">is</span> <span class="n">Callable</span><span class="p">:</span>
-</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a>        <span class="k">return</span> <span class="nb">callable</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a>    <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="n">t</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
-</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a>
-</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a>
-</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a><span class="k">def</span> <span class="nf">isNumber</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
-</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a>    <span class="k">return</span> <span class="n">isType</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="n">isType</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
+</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a><span class="k">def</span> <span class="nf">isFloatType</span><span class="p">(</span><span class="n">arr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>    <span class="k">return</span> <span class="n">isFloatDtype</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a>
+</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>
+</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a><span class="k">def</span> <span class="nf">isType</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a><span class="sd">        Check if `x` has type `t` or isinstance of `t`.</span>
+</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a>    <span class="k">if</span> <span class="n">t</span> <span class="ow">is</span> <span class="n">Callable</span><span class="p">:</span>
+</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a>        <span class="k">return</span> <span class="nb">callable</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a>    <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="n">t</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
 </span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a>
 </span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a>
-</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a><span class="k">def</span> <span class="nf">isList</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a>    <span class="k">return</span> <span class="n">isType</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a><span class="k">def</span> <span class="nf">isNumber</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a>    <span class="k">return</span> <span class="n">isType</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="n">isType</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
 </span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a>
 </span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>
-</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a><span class="k">def</span> <span class="nf">isListNDArray</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
-</span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a>    <span class="k">return</span> <span class="n">isType</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="n">isType</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a><span class="k">def</span> <span class="nf">isList</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+</span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a>    <span class="k">return</span> <span class="n">isType</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
 </span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a>
 </span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a>
-</span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a><span class="k">def</span> <span class="nf">isOfSameShape</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a><span class="k">def</span> <span class="nf">isListNDArray</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
+</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a>    <span class="k">return</span> <span class="n">isType</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="n">isType</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
 </span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a>
 </span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a>
-</span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a><span class="k">def</span> <span class="nf">inRange</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">range_</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a>    <span class="k">if</span> <span class="n">range_</span><span class="p">:</span>
-</span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a>        <span class="k">if</span> <span class="n">isType</span><span class="p">(</span><span class="n">range_</span><span class="p">,</span> <span class="nb">range</span><span class="p">):</span>
-</span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a>            <span class="n">range_</span> <span class="o">=</span> <span class="p">(</span><span class="n">range_</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">range_</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-</span><span id="L-155"><a href="#L-155"><span class="linenos">155</span></a>        <span class="n">low</span><span class="p">,</span> <span class="n">high</span> <span class="o">=</span> <span class="n">range_</span>
-</span><span id="L-156"><a href="#L-156"><span class="linenos">156</span></a>
-</span><span id="L-157"><a href="#L-157"><span class="linenos">157</span></a>    <span class="k">return</span> <span class="n">low</span> <span class="o">&lt;=</span> <span class="n">a</span> <span class="ow">and</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="n">high</span>
-</span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a>
-</span><span id="L-159"><a href="#L-159"><span class="linenos">159</span></a>
-</span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a><span class="k">def</span> <span class="nf">inArray</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">arr</span><span class="p">):</span>
-</span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a>    <span class="k">return</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">arr</span>
+</span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a><span class="k">def</span> <span class="nf">isOfSameShape</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+</span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a>
+</span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a>
+</span><span id="L-155"><a href="#L-155"><span class="linenos">155</span></a><span class="k">def</span> <span class="nf">inRange</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">range_</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span><span id="L-156"><a href="#L-156"><span class="linenos">156</span></a>    <span class="k">if</span> <span class="n">range_</span><span class="p">:</span>
+</span><span id="L-157"><a href="#L-157"><span class="linenos">157</span></a>        <span class="k">if</span> <span class="n">isType</span><span class="p">(</span><span class="n">range_</span><span class="p">,</span> <span class="nb">range</span><span class="p">):</span>
+</span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a>            <span class="n">range_</span> <span class="o">=</span> <span class="p">(</span><span class="n">range_</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">range_</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</span><span id="L-159"><a href="#L-159"><span class="linenos">159</span></a>        <span class="n">low</span><span class="p">,</span> <span class="n">high</span> <span class="o">=</span> <span class="n">range_</span>
+</span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a>
+</span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a>    <span class="k">return</span> <span class="n">low</span> <span class="o">&lt;=</span> <span class="n">a</span> <span class="ow">and</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="n">high</span>
 </span><span id="L-162"><a href="#L-162"><span class="linenos">162</span></a>
 </span><span id="L-163"><a href="#L-163"><span class="linenos">163</span></a>
-</span><span id="L-164"><a href="#L-164"><span class="linenos">164</span></a><span class="k">def</span> <span class="nf">getChildFolder</span><span class="p">(</span><span class="n">folder</span><span class="p">):</span>
-</span><span id="L-165"><a href="#L-165"><span class="linenos">165</span></a>    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span> <span class="sa">f</span><span class="s1">&#39;./</span><span class="si">{</span><span class="n">folder</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</span><span id="L-164"><a href="#L-164"><span class="linenos">164</span></a><span class="k">def</span> <span class="nf">inArray</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">arr</span><span class="p">):</span>
+</span><span id="L-165"><a href="#L-165"><span class="linenos">165</span></a>    <span class="k">return</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">arr</span>
 </span><span id="L-166"><a href="#L-166"><span class="linenos">166</span></a>
 </span><span id="L-167"><a href="#L-167"><span class="linenos">167</span></a>
-</span><span id="L-168"><a href="#L-168"><span class="linenos">168</span></a><span class="k">def</span> <span class="nf">cvtEnergyUnit</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">from_</span><span class="p">,</span> <span class="n">to</span><span class="p">):</span>
-</span><span id="L-169"><a href="#L-169"><span class="linenos">169</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-</span><span id="L-170"><a href="#L-170"><span class="linenos">170</span></a><span class="sd">        Convert between energy units. (ev, keV, MeV)</span>
-</span><span id="L-171"><a href="#L-171"><span class="linenos">171</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="L-172"><a href="#L-172"><span class="linenos">172</span></a>    <span class="n">units</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;eV&#39;</span><span class="p">,</span> <span class="s1">&#39;keV&#39;</span><span class="p">,</span> <span class="s1">&#39;MeV&#39;</span><span class="p">]</span>
-</span><span id="L-173"><a href="#L-173"><span class="linenos">173</span></a>    <span class="n">from_</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">from_</span><span class="p">)</span>
-</span><span id="L-174"><a href="#L-174"><span class="linenos">174</span></a>    <span class="n">to</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">to</span><span class="p">)</span>
-</span><span id="L-175"><a href="#L-175"><span class="linenos">175</span></a>
-</span><span id="L-176"><a href="#L-176"><span class="linenos">176</span></a>    <span class="n">a</span> <span class="o">=</span> <span class="mi">1000</span>
-</span><span id="L-177"><a href="#L-177"><span class="linenos">177</span></a>    <span class="n">b</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">a</span>
-</span><span id="L-178"><a href="#L-178"><span class="linenos">178</span></a>    <span class="n">mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
-</span><span id="L-179"><a href="#L-179"><span class="linenos">179</span></a>        <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">b</span><span class="o">**</span><span class="mi">2</span><span class="p">],</span>
-</span><span id="L-180"><a href="#L-180"><span class="linenos">180</span></a>        <span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="p">],</span>
-</span><span id="L-181"><a href="#L-181"><span class="linenos">181</span></a>        <span class="p">[</span><span class="n">a</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
-</span><span id="L-182"><a href="#L-182"><span class="linenos">182</span></a>    <span class="p">])</span>  <span class="c1"># mat[from, to]</span>
-</span><span id="L-183"><a href="#L-183"><span class="linenos">183</span></a>
-</span><span id="L-184"><a href="#L-184"><span class="linenos">184</span></a>    <span class="k">return</span> <span class="n">arr</span> <span class="o">*</span> <span class="n">mat</span><span class="p">[</span><span class="n">from_</span><span class="p">,</span> <span class="n">to</span><span class="p">]</span>
-</span><span id="L-185"><a href="#L-185"><span class="linenos">185</span></a>
-</span><span id="L-186"><a href="#L-186"><span class="linenos">186</span></a>
-</span><span id="L-187"><a href="#L-187"><span class="linenos">187</span></a><span class="k">def</span> <span class="nf">cvtLengthUnit</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">from_</span><span class="p">,</span> <span class="n">to</span><span class="p">):</span>
-</span><span id="L-188"><a href="#L-188"><span class="linenos">188</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-</span><span id="L-189"><a href="#L-189"><span class="linenos">189</span></a><span class="sd">        Convert between length units. (um, mm, cm, m)</span>
-</span><span id="L-190"><a href="#L-190"><span class="linenos">190</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="L-191"><a href="#L-191"><span class="linenos">191</span></a>    <span class="n">units</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;um&#39;</span><span class="p">,</span> <span class="s1">&#39;mm&#39;</span><span class="p">,</span> <span class="s1">&#39;cm&#39;</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">]</span>
-</span><span id="L-192"><a href="#L-192"><span class="linenos">192</span></a>    <span class="n">from_</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">from_</span><span class="p">)</span>
-</span><span id="L-193"><a href="#L-193"><span class="linenos">193</span></a>    <span class="n">to</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">to</span><span class="p">)</span>
-</span><span id="L-194"><a href="#L-194"><span class="linenos">194</span></a>
-</span><span id="L-195"><a href="#L-195"><span class="linenos">195</span></a>    <span class="n">mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
-</span><span id="L-196"><a href="#L-196"><span class="linenos">196</span></a>        <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1e-3</span><span class="p">,</span> <span class="mf">1e-4</span><span class="p">,</span> <span class="mf">1e-6</span><span class="p">],</span>
-</span><span id="L-197"><a href="#L-197"><span class="linenos">197</span></a>        <span class="p">[</span><span class="mf">1e3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1e-1</span><span class="p">,</span> <span class="mf">1e-3</span><span class="p">],</span>
-</span><span id="L-198"><a href="#L-198"><span class="linenos">198</span></a>        <span class="p">[</span><span class="mf">1e4</span><span class="p">,</span> <span class="mf">1e1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1e-2</span><span class="p">],</span>
-</span><span id="L-199"><a href="#L-199"><span class="linenos">199</span></a>        <span class="p">[</span><span class="mf">1e6</span><span class="p">,</span> <span class="mf">1e3</span><span class="p">,</span> <span class="mf">1e2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
-</span><span id="L-200"><a href="#L-200"><span class="linenos">200</span></a>    <span class="p">])</span>  <span class="c1"># mat[from, to]</span>
-</span><span id="L-201"><a href="#L-201"><span class="linenos">201</span></a>
-</span><span id="L-202"><a href="#L-202"><span class="linenos">202</span></a>    <span class="k">return</span> <span class="n">arr</span> <span class="o">*</span> <span class="n">mat</span><span class="p">[</span><span class="n">from_</span><span class="p">,</span> <span class="n">to</span><span class="p">]</span>
-</span><span id="L-203"><a href="#L-203"><span class="linenos">203</span></a>
-</span><span id="L-204"><a href="#L-204"><span class="linenos">204</span></a>
-</span><span id="L-205"><a href="#L-205"><span class="linenos">205</span></a><span class="k">def</span> <span class="nf">cvtMuUnit</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">from_</span><span class="p">,</span> <span class="n">to</span><span class="p">):</span>
-</span><span id="L-206"><a href="#L-206"><span class="linenos">206</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-</span><span id="L-207"><a href="#L-207"><span class="linenos">207</span></a><span class="sd">        Convert between mu value units. (um-1, mm-1, cm-1, m-1)</span>
-</span><span id="L-208"><a href="#L-208"><span class="linenos">208</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="L-209"><a href="#L-209"><span class="linenos">209</span></a>    <span class="n">from_</span> <span class="o">=</span> <span class="n">from_</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-1&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-</span><span id="L-210"><a href="#L-210"><span class="linenos">210</span></a>    <span class="n">to</span> <span class="o">=</span> <span class="n">to</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-1&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-</span><span id="L-211"><a href="#L-211"><span class="linenos">211</span></a>
-</span><span id="L-212"><a href="#L-212"><span class="linenos">212</span></a>    <span class="k">return</span> <span class="n">cvtLengthUnit</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">to</span><span class="p">,</span> <span class="n">from_</span><span class="p">)</span>
-</span><span id="L-213"><a href="#L-213"><span class="linenos">213</span></a>
-</span><span id="L-214"><a href="#L-214"><span class="linenos">214</span></a>
-</span><span id="L-215"><a href="#L-215"><span class="linenos">215</span></a><span class="k">def</span> <span class="nf">cvtConcentrationUnit</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">from_</span><span class="p">,</span> <span class="n">to</span><span class="p">):</span>
-</span><span id="L-216"><a href="#L-216"><span class="linenos">216</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-</span><span id="L-217"><a href="#L-217"><span class="linenos">217</span></a><span class="sd">        Convert between concentration units. (g/mL, mg/mL)</span>
-</span><span id="L-218"><a href="#L-218"><span class="linenos">218</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="L-219"><a href="#L-219"><span class="linenos">219</span></a>    <span class="n">units</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;g/mL&#39;</span><span class="p">,</span> <span class="s1">&#39;mg/mL&#39;</span><span class="p">]</span>
-</span><span id="L-220"><a href="#L-220"><span class="linenos">220</span></a>    <span class="n">from_</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">from_</span><span class="p">)</span>
-</span><span id="L-221"><a href="#L-221"><span class="linenos">221</span></a>    <span class="n">to</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">to</span><span class="p">)</span>
-</span><span id="L-222"><a href="#L-222"><span class="linenos">222</span></a>
-</span><span id="L-223"><a href="#L-223"><span class="linenos">223</span></a>    <span class="c1"># g/mL, mg/mL</span>
-</span><span id="L-224"><a href="#L-224"><span class="linenos">224</span></a>    <span class="n">mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
-</span><span id="L-225"><a href="#L-225"><span class="linenos">225</span></a>        <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1000</span><span class="p">],</span>  <span class="c1"># from g/mL</span>
-</span><span id="L-226"><a href="#L-226"><span class="linenos">226</span></a>        <span class="p">[</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>  <span class="c1"># from mg/mL</span>
-</span><span id="L-227"><a href="#L-227"><span class="linenos">227</span></a>    <span class="p">])</span>
-</span><span id="L-228"><a href="#L-228"><span class="linenos">228</span></a>
-</span><span id="L-229"><a href="#L-229"><span class="linenos">229</span></a>    <span class="k">return</span> <span class="n">arr</span> <span class="o">*</span> <span class="n">mat</span><span class="p">[</span><span class="n">from_</span><span class="p">,</span> <span class="n">to</span><span class="p">]</span>
-</span><span id="L-230"><a href="#L-230"><span class="linenos">230</span></a>
-</span><span id="L-231"><a href="#L-231"><span class="linenos">231</span></a>
-</span><span id="L-232"><a href="#L-232"><span class="linenos">232</span></a><span class="k">def</span> <span class="nf">radToDeg</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-</span><span id="L-233"><a href="#L-233"><span class="linenos">233</span></a>    <span class="k">return</span> <span class="n">x</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mi">180</span>
+</span><span id="L-168"><a href="#L-168"><span class="linenos">168</span></a><span class="k">def</span> <span class="nf">getChildFolder</span><span class="p">(</span><span class="n">folder</span><span class="p">):</span>
+</span><span id="L-169"><a href="#L-169"><span class="linenos">169</span></a>    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span> <span class="sa">f</span><span class="s1">&#39;./</span><span class="si">{</span><span class="n">folder</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</span><span id="L-170"><a href="#L-170"><span class="linenos">170</span></a>
+</span><span id="L-171"><a href="#L-171"><span class="linenos">171</span></a>
+</span><span id="L-172"><a href="#L-172"><span class="linenos">172</span></a><span class="k">def</span> <span class="nf">cvtEnergyUnit</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">from_</span><span class="p">,</span> <span class="n">to</span><span class="p">):</span>
+</span><span id="L-173"><a href="#L-173"><span class="linenos">173</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-174"><a href="#L-174"><span class="linenos">174</span></a><span class="sd">        Convert between energy units. (ev, keV, MeV)</span>
+</span><span id="L-175"><a href="#L-175"><span class="linenos">175</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-176"><a href="#L-176"><span class="linenos">176</span></a>    <span class="n">units</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;eV&#39;</span><span class="p">,</span> <span class="s1">&#39;keV&#39;</span><span class="p">,</span> <span class="s1">&#39;MeV&#39;</span><span class="p">]</span>
+</span><span id="L-177"><a href="#L-177"><span class="linenos">177</span></a>    <span class="n">from_</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">from_</span><span class="p">)</span>
+</span><span id="L-178"><a href="#L-178"><span class="linenos">178</span></a>    <span class="n">to</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">to</span><span class="p">)</span>
+</span><span id="L-179"><a href="#L-179"><span class="linenos">179</span></a>
+</span><span id="L-180"><a href="#L-180"><span class="linenos">180</span></a>    <span class="n">a</span> <span class="o">=</span> <span class="mi">1000</span>
+</span><span id="L-181"><a href="#L-181"><span class="linenos">181</span></a>    <span class="n">b</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">a</span>
+</span><span id="L-182"><a href="#L-182"><span class="linenos">182</span></a>    <span class="n">mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+</span><span id="L-183"><a href="#L-183"><span class="linenos">183</span></a>        <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">b</span><span class="o">**</span><span class="mi">2</span><span class="p">],</span>
+</span><span id="L-184"><a href="#L-184"><span class="linenos">184</span></a>        <span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="p">],</span>
+</span><span id="L-185"><a href="#L-185"><span class="linenos">185</span></a>        <span class="p">[</span><span class="n">a</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+</span><span id="L-186"><a href="#L-186"><span class="linenos">186</span></a>    <span class="p">])</span>  <span class="c1"># mat[from, to]</span>
+</span><span id="L-187"><a href="#L-187"><span class="linenos">187</span></a>
+</span><span id="L-188"><a href="#L-188"><span class="linenos">188</span></a>    <span class="k">return</span> <span class="n">arr</span> <span class="o">*</span> <span class="n">mat</span><span class="p">[</span><span class="n">from_</span><span class="p">,</span> <span class="n">to</span><span class="p">]</span>
+</span><span id="L-189"><a href="#L-189"><span class="linenos">189</span></a>
+</span><span id="L-190"><a href="#L-190"><span class="linenos">190</span></a>
+</span><span id="L-191"><a href="#L-191"><span class="linenos">191</span></a><span class="k">def</span> <span class="nf">cvtLengthUnit</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">from_</span><span class="p">,</span> <span class="n">to</span><span class="p">):</span>
+</span><span id="L-192"><a href="#L-192"><span class="linenos">192</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-193"><a href="#L-193"><span class="linenos">193</span></a><span class="sd">        Convert between length units. (um, mm, cm, m)</span>
+</span><span id="L-194"><a href="#L-194"><span class="linenos">194</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-195"><a href="#L-195"><span class="linenos">195</span></a>    <span class="n">units</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;um&#39;</span><span class="p">,</span> <span class="s1">&#39;mm&#39;</span><span class="p">,</span> <span class="s1">&#39;cm&#39;</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">]</span>
+</span><span id="L-196"><a href="#L-196"><span class="linenos">196</span></a>    <span class="n">from_</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">from_</span><span class="p">)</span>
+</span><span id="L-197"><a href="#L-197"><span class="linenos">197</span></a>    <span class="n">to</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">to</span><span class="p">)</span>
+</span><span id="L-198"><a href="#L-198"><span class="linenos">198</span></a>
+</span><span id="L-199"><a href="#L-199"><span class="linenos">199</span></a>    <span class="n">mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+</span><span id="L-200"><a href="#L-200"><span class="linenos">200</span></a>        <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1e-3</span><span class="p">,</span> <span class="mf">1e-4</span><span class="p">,</span> <span class="mf">1e-6</span><span class="p">],</span>
+</span><span id="L-201"><a href="#L-201"><span class="linenos">201</span></a>        <span class="p">[</span><span class="mf">1e3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1e-1</span><span class="p">,</span> <span class="mf">1e-3</span><span class="p">],</span>
+</span><span id="L-202"><a href="#L-202"><span class="linenos">202</span></a>        <span class="p">[</span><span class="mf">1e4</span><span class="p">,</span> <span class="mf">1e1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1e-2</span><span class="p">],</span>
+</span><span id="L-203"><a href="#L-203"><span class="linenos">203</span></a>        <span class="p">[</span><span class="mf">1e6</span><span class="p">,</span> <span class="mf">1e3</span><span class="p">,</span> <span class="mf">1e2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+</span><span id="L-204"><a href="#L-204"><span class="linenos">204</span></a>    <span class="p">])</span>  <span class="c1"># mat[from, to]</span>
+</span><span id="L-205"><a href="#L-205"><span class="linenos">205</span></a>
+</span><span id="L-206"><a href="#L-206"><span class="linenos">206</span></a>    <span class="k">return</span> <span class="n">arr</span> <span class="o">*</span> <span class="n">mat</span><span class="p">[</span><span class="n">from_</span><span class="p">,</span> <span class="n">to</span><span class="p">]</span>
+</span><span id="L-207"><a href="#L-207"><span class="linenos">207</span></a>
+</span><span id="L-208"><a href="#L-208"><span class="linenos">208</span></a>
+</span><span id="L-209"><a href="#L-209"><span class="linenos">209</span></a><span class="k">def</span> <span class="nf">cvtMuUnit</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">from_</span><span class="p">,</span> <span class="n">to</span><span class="p">):</span>
+</span><span id="L-210"><a href="#L-210"><span class="linenos">210</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-211"><a href="#L-211"><span class="linenos">211</span></a><span class="sd">        Convert between mu value units. (um-1, mm-1, cm-1, m-1)</span>
+</span><span id="L-212"><a href="#L-212"><span class="linenos">212</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-213"><a href="#L-213"><span class="linenos">213</span></a>    <span class="n">from_</span> <span class="o">=</span> <span class="n">from_</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-1&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+</span><span id="L-214"><a href="#L-214"><span class="linenos">214</span></a>    <span class="n">to</span> <span class="o">=</span> <span class="n">to</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-1&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+</span><span id="L-215"><a href="#L-215"><span class="linenos">215</span></a>
+</span><span id="L-216"><a href="#L-216"><span class="linenos">216</span></a>    <span class="k">return</span> <span class="n">cvtLengthUnit</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">to</span><span class="p">,</span> <span class="n">from_</span><span class="p">)</span>
+</span><span id="L-217"><a href="#L-217"><span class="linenos">217</span></a>
+</span><span id="L-218"><a href="#L-218"><span class="linenos">218</span></a>
+</span><span id="L-219"><a href="#L-219"><span class="linenos">219</span></a><span class="k">def</span> <span class="nf">cvtConcentrationUnit</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">from_</span><span class="p">,</span> <span class="n">to</span><span class="p">):</span>
+</span><span id="L-220"><a href="#L-220"><span class="linenos">220</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-221"><a href="#L-221"><span class="linenos">221</span></a><span class="sd">        Convert between concentration units. (g/mL, mg/mL)</span>
+</span><span id="L-222"><a href="#L-222"><span class="linenos">222</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-223"><a href="#L-223"><span class="linenos">223</span></a>    <span class="n">units</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;g/mL&#39;</span><span class="p">,</span> <span class="s1">&#39;mg/mL&#39;</span><span class="p">]</span>
+</span><span id="L-224"><a href="#L-224"><span class="linenos">224</span></a>    <span class="n">from_</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">from_</span><span class="p">)</span>
+</span><span id="L-225"><a href="#L-225"><span class="linenos">225</span></a>    <span class="n">to</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">to</span><span class="p">)</span>
+</span><span id="L-226"><a href="#L-226"><span class="linenos">226</span></a>
+</span><span id="L-227"><a href="#L-227"><span class="linenos">227</span></a>    <span class="c1"># g/mL, mg/mL</span>
+</span><span id="L-228"><a href="#L-228"><span class="linenos">228</span></a>    <span class="n">mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+</span><span id="L-229"><a href="#L-229"><span class="linenos">229</span></a>        <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1000</span><span class="p">],</span>  <span class="c1"># from g/mL</span>
+</span><span id="L-230"><a href="#L-230"><span class="linenos">230</span></a>        <span class="p">[</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>  <span class="c1"># from mg/mL</span>
+</span><span id="L-231"><a href="#L-231"><span class="linenos">231</span></a>    <span class="p">])</span>
+</span><span id="L-232"><a href="#L-232"><span class="linenos">232</span></a>
+</span><span id="L-233"><a href="#L-233"><span class="linenos">233</span></a>    <span class="k">return</span> <span class="n">arr</span> <span class="o">*</span> <span class="n">mat</span><span class="p">[</span><span class="n">from_</span><span class="p">,</span> <span class="n">to</span><span class="p">]</span>
 </span><span id="L-234"><a href="#L-234"><span class="linenos">234</span></a>
 </span><span id="L-235"><a href="#L-235"><span class="linenos">235</span></a>
-</span><span id="L-236"><a href="#L-236"><span class="linenos">236</span></a><span class="k">def</span> <span class="nf">degToRad</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-</span><span id="L-237"><a href="#L-237"><span class="linenos">237</span></a>    <span class="k">return</span> <span class="n">x</span> <span class="o">/</span> <span class="mi">180</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+</span><span id="L-236"><a href="#L-236"><span class="linenos">236</span></a><span class="k">def</span> <span class="nf">radToDeg</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+</span><span id="L-237"><a href="#L-237"><span class="linenos">237</span></a>    <span class="k">return</span> <span class="n">x</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mi">180</span>
 </span><span id="L-238"><a href="#L-238"><span class="linenos">238</span></a>
 </span><span id="L-239"><a href="#L-239"><span class="linenos">239</span></a>
-</span><span id="L-240"><a href="#L-240"><span class="linenos">240</span></a><span class="k">def</span> <span class="nf">sysPlatform</span><span class="p">():</span>
-</span><span id="L-241"><a href="#L-241"><span class="linenos">241</span></a>    <span class="n">platform</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span>
+</span><span id="L-240"><a href="#L-240"><span class="linenos">240</span></a><span class="k">def</span> <span class="nf">degToRad</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+</span><span id="L-241"><a href="#L-241"><span class="linenos">241</span></a>    <span class="k">return</span> <span class="n">x</span> <span class="o">/</span> <span class="mi">180</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
 </span><span id="L-242"><a href="#L-242"><span class="linenos">242</span></a>
-</span><span id="L-243"><a href="#L-243"><span class="linenos">243</span></a>    <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;win32&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-</span><span id="L-244"><a href="#L-244"><span class="linenos">244</span></a>        <span class="k">return</span> <span class="s1">&#39;Windows&#39;</span>
-</span><span id="L-245"><a href="#L-245"><span class="linenos">245</span></a>    <span class="k">elif</span> <span class="n">platform</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;linux&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-</span><span id="L-246"><a href="#L-246"><span class="linenos">246</span></a>        <span class="k">return</span> <span class="s1">&#39;Linux&#39;</span>
-</span><span id="L-247"><a href="#L-247"><span class="linenos">247</span></a>
-</span><span id="L-248"><a href="#L-248"><span class="linenos">248</span></a>    <span class="n">cripAssert</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Unsupported platform: </span><span class="si">{</span><span class="n">platform</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
-</span><span id="L-249"><a href="#L-249"><span class="linenos">249</span></a>
-</span><span id="L-250"><a href="#L-250"><span class="linenos">250</span></a>
-</span><span id="L-251"><a href="#L-251"><span class="linenos">251</span></a><span class="k">def</span> <span class="nf">getHW</span><span class="p">(</span><span class="n">img</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-</span><span id="L-252"><a href="#L-252"><span class="linenos">252</span></a>    <span class="k">if</span> <span class="n">is3D</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
-</span><span id="L-253"><a href="#L-253"><span class="linenos">253</span></a>        <span class="n">_</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span>
-</span><span id="L-254"><a href="#L-254"><span class="linenos">254</span></a>    <span class="k">elif</span> <span class="n">is2D</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
-</span><span id="L-255"><a href="#L-255"><span class="linenos">255</span></a>        <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span>
-</span><span id="L-256"><a href="#L-256"><span class="linenos">256</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="L-257"><a href="#L-257"><span class="linenos">257</span></a>        <span class="k">raise</span>
-</span><span id="L-258"><a href="#L-258"><span class="linenos">258</span></a>
-</span><span id="L-259"><a href="#L-259"><span class="linenos">259</span></a>    <span class="k">return</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span>
+</span><span id="L-243"><a href="#L-243"><span class="linenos">243</span></a>
+</span><span id="L-244"><a href="#L-244"><span class="linenos">244</span></a><span class="k">def</span> <span class="nf">sysPlatform</span><span class="p">():</span>
+</span><span id="L-245"><a href="#L-245"><span class="linenos">245</span></a>    <span class="n">platform</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span>
+</span><span id="L-246"><a href="#L-246"><span class="linenos">246</span></a>
+</span><span id="L-247"><a href="#L-247"><span class="linenos">247</span></a>    <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;win32&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+</span><span id="L-248"><a href="#L-248"><span class="linenos">248</span></a>        <span class="k">return</span> <span class="s1">&#39;Windows&#39;</span>
+</span><span id="L-249"><a href="#L-249"><span class="linenos">249</span></a>    <span class="k">elif</span> <span class="n">platform</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;linux&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+</span><span id="L-250"><a href="#L-250"><span class="linenos">250</span></a>        <span class="k">return</span> <span class="s1">&#39;Linux&#39;</span>
+</span><span id="L-251"><a href="#L-251"><span class="linenos">251</span></a>
+</span><span id="L-252"><a href="#L-252"><span class="linenos">252</span></a>    <span class="n">cripAssert</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Unsupported platform: </span><span class="si">{</span><span class="n">platform</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+</span><span id="L-253"><a href="#L-253"><span class="linenos">253</span></a>
+</span><span id="L-254"><a href="#L-254"><span class="linenos">254</span></a>
+</span><span id="L-255"><a href="#L-255"><span class="linenos">255</span></a><span class="k">def</span> <span class="nf">getHW</span><span class="p">(</span><span class="n">img</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+</span><span id="L-256"><a href="#L-256"><span class="linenos">256</span></a>    <span class="k">if</span> <span class="n">is3D</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
+</span><span id="L-257"><a href="#L-257"><span class="linenos">257</span></a>        <span class="n">_</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span>
+</span><span id="L-258"><a href="#L-258"><span class="linenos">258</span></a>    <span class="k">elif</span> <span class="n">is2D</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
+</span><span id="L-259"><a href="#L-259"><span class="linenos">259</span></a>        <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span>
+</span><span id="L-260"><a href="#L-260"><span class="linenos">260</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="L-261"><a href="#L-261"><span class="linenos">261</span></a>        <span class="k">raise</span>
+</span><span id="L-262"><a href="#L-262"><span class="linenos">262</span></a>
+</span><span id="L-263"><a href="#L-263"><span class="linenos">263</span></a>    <span class="k">return</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span>
 </span></pre></div>
 
 
@@ -614,8 +621,8 @@
 
     </div>
     <a class="headerlink" href="#is2D"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="is2D-95"><a href="#is2D-95"><span class="linenos">95</span></a><span class="k">def</span> <span class="nf">is2D</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-</span><span id="is2D-96"><a href="#is2D-96"><span class="linenos">96</span></a>    <span class="k">return</span> <span class="n">isType</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="is2D-99"><a href="#is2D-99"><span class="linenos"> 99</span></a><span class="k">def</span> <span class="nf">is2D</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+</span><span id="is2D-100"><a href="#is2D-100"><span class="linenos">100</span></a>    <span class="k">return</span> <span class="n">isType</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
 </span></pre></div>
 
 
@@ -633,8 +640,8 @@
 
     </div>
     <a class="headerlink" href="#is3D"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="is3D-99"><a href="#is3D-99"><span class="linenos"> 99</span></a><span class="k">def</span> <span class="nf">is3D</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-</span><span id="is3D-100"><a href="#is3D-100"><span class="linenos">100</span></a>    <span class="k">return</span> <span class="n">isType</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="is3D-103"><a href="#is3D-103"><span class="linenos">103</span></a><span class="k">def</span> <span class="nf">is3D</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+</span><span id="is3D-104"><a href="#is3D-104"><span class="linenos">104</span></a>    <span class="k">return</span> <span class="n">isType</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span>
 </span></pre></div>
 
 
@@ -652,8 +659,8 @@
 
     </div>
     <a class="headerlink" href="#is2or3D"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="is2or3D-103"><a href="#is2or3D-103"><span class="linenos">103</span></a><span class="k">def</span> <span class="nf">is2or3D</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-</span><span id="is2or3D-104"><a href="#is2or3D-104"><span class="linenos">104</span></a>    <span class="k">return</span> <span class="n">is2D</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="ow">or</span> <span class="n">is3D</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="is2or3D-107"><a href="#is2or3D-107"><span class="linenos">107</span></a><span class="k">def</span> <span class="nf">is2or3D</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+</span><span id="is2or3D-108"><a href="#is2or3D-108"><span class="linenos">108</span></a>    <span class="k">return</span> <span class="n">is2D</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="ow">or</span> <span class="n">is3D</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -671,8 +678,8 @@
 
     </div>
     <a class="headerlink" href="#isInt"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="isInt-107"><a href="#isInt-107"><span class="linenos">107</span></a><span class="k">def</span> <span class="nf">isInt</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-</span><span id="isInt-108"><a href="#isInt-108"><span class="linenos">108</span></a>    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">==</span> <span class="n">n</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="isInt-111"><a href="#isInt-111"><span class="linenos">111</span></a><span class="k">def</span> <span class="nf">isInt</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+</span><span id="isInt-112"><a href="#isInt-112"><span class="linenos">112</span></a>    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">==</span> <span class="n">n</span>
 </span></pre></div>
 
 
@@ -690,8 +697,8 @@
 
     </div>
     <a class="headerlink" href="#isIntDtype"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="isIntDtype-111"><a href="#isIntDtype-111"><span class="linenos">111</span></a><span class="k">def</span> <span class="nf">isIntDtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">):</span>
-</span><span id="isIntDtype-112"><a href="#isIntDtype-112"><span class="linenos">112</span></a>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="isIntDtype-115"><a href="#isIntDtype-115"><span class="linenos">115</span></a><span class="k">def</span> <span class="nf">isIntDtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">):</span>
+</span><span id="isIntDtype-116"><a href="#isIntDtype-116"><span class="linenos">116</span></a>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -709,8 +716,8 @@
 
     </div>
     <a class="headerlink" href="#isFloatDtype"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="isFloatDtype-115"><a href="#isFloatDtype-115"><span class="linenos">115</span></a><span class="k">def</span> <span class="nf">isFloatDtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">):</span>
-</span><span id="isFloatDtype-116"><a href="#isFloatDtype-116"><span class="linenos">116</span></a>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="isFloatDtype-119"><a href="#isFloatDtype-119"><span class="linenos">119</span></a><span class="k">def</span> <span class="nf">isFloatDtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">):</span>
+</span><span id="isFloatDtype-120"><a href="#isFloatDtype-120"><span class="linenos">120</span></a>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -728,8 +735,8 @@
 
     </div>
     <a class="headerlink" href="#isIntType"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="isIntType-119"><a href="#isIntType-119"><span class="linenos">119</span></a><span class="k">def</span> <span class="nf">isIntType</span><span class="p">(</span><span class="n">arr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-</span><span id="isIntType-120"><a href="#isIntType-120"><span class="linenos">120</span></a>    <span class="k">return</span> <span class="n">isIntDtype</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="isIntType-123"><a href="#isIntType-123"><span class="linenos">123</span></a><span class="k">def</span> <span class="nf">isIntType</span><span class="p">(</span><span class="n">arr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+</span><span id="isIntType-124"><a href="#isIntType-124"><span class="linenos">124</span></a>    <span class="k">return</span> <span class="n">isIntDtype</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -747,8 +754,8 @@
 
     </div>
     <a class="headerlink" href="#isFloatType"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="isFloatType-123"><a href="#isFloatType-123"><span class="linenos">123</span></a><span class="k">def</span> <span class="nf">isFloatType</span><span class="p">(</span><span class="n">arr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-</span><span id="isFloatType-124"><a href="#isFloatType-124"><span class="linenos">124</span></a>    <span class="k">return</span> <span class="n">isFloatDtype</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="isFloatType-127"><a href="#isFloatType-127"><span class="linenos">127</span></a><span class="k">def</span> <span class="nf">isFloatType</span><span class="p">(</span><span class="n">arr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+</span><span id="isFloatType-128"><a href="#isFloatType-128"><span class="linenos">128</span></a>    <span class="k">return</span> <span class="n">isFloatDtype</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -766,13 +773,13 @@
 
     </div>
     <a class="headerlink" href="#isType"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="isType-127"><a href="#isType-127"><span class="linenos">127</span></a><span class="k">def</span> <span class="nf">isType</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-</span><span id="isType-128"><a href="#isType-128"><span class="linenos">128</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-</span><span id="isType-129"><a href="#isType-129"><span class="linenos">129</span></a><span class="sd">        Check if `x` has type `t` or isinstance of `t`.</span>
-</span><span id="isType-130"><a href="#isType-130"><span class="linenos">130</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="isType-131"><a href="#isType-131"><span class="linenos">131</span></a>    <span class="k">if</span> <span class="n">t</span> <span class="ow">is</span> <span class="n">Callable</span><span class="p">:</span>
-</span><span id="isType-132"><a href="#isType-132"><span class="linenos">132</span></a>        <span class="k">return</span> <span class="nb">callable</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-</span><span id="isType-133"><a href="#isType-133"><span class="linenos">133</span></a>    <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="n">t</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="isType-131"><a href="#isType-131"><span class="linenos">131</span></a><span class="k">def</span> <span class="nf">isType</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+</span><span id="isType-132"><a href="#isType-132"><span class="linenos">132</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="isType-133"><a href="#isType-133"><span class="linenos">133</span></a><span class="sd">        Check if `x` has type `t` or isinstance of `t`.</span>
+</span><span id="isType-134"><a href="#isType-134"><span class="linenos">134</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="isType-135"><a href="#isType-135"><span class="linenos">135</span></a>    <span class="k">if</span> <span class="n">t</span> <span class="ow">is</span> <span class="n">Callable</span><span class="p">:</span>
+</span><span id="isType-136"><a href="#isType-136"><span class="linenos">136</span></a>        <span class="k">return</span> <span class="nb">callable</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</span><span id="isType-137"><a href="#isType-137"><span class="linenos">137</span></a>    <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="n">t</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -792,8 +799,8 @@
 
     </div>
     <a class="headerlink" href="#isNumber"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="isNumber-136"><a href="#isNumber-136"><span class="linenos">136</span></a><span class="k">def</span> <span class="nf">isNumber</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
-</span><span id="isNumber-137"><a href="#isNumber-137"><span class="linenos">137</span></a>    <span class="k">return</span> <span class="n">isType</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="n">isType</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="isNumber-140"><a href="#isNumber-140"><span class="linenos">140</span></a><span class="k">def</span> <span class="nf">isNumber</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+</span><span id="isNumber-141"><a href="#isNumber-141"><span class="linenos">141</span></a>    <span class="k">return</span> <span class="n">isType</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="n">isType</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -811,8 +818,8 @@
 
     </div>
     <a class="headerlink" href="#isList"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="isList-140"><a href="#isList-140"><span class="linenos">140</span></a><span class="k">def</span> <span class="nf">isList</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-</span><span id="isList-141"><a href="#isList-141"><span class="linenos">141</span></a>    <span class="k">return</span> <span class="n">isType</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="isList-144"><a href="#isList-144"><span class="linenos">144</span></a><span class="k">def</span> <span class="nf">isList</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+</span><span id="isList-145"><a href="#isList-145"><span class="linenos">145</span></a>    <span class="k">return</span> <span class="n">isType</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -830,8 +837,8 @@
 
     </div>
     <a class="headerlink" href="#isListNDArray"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="isListNDArray-144"><a href="#isListNDArray-144"><span class="linenos">144</span></a><span class="k">def</span> <span class="nf">isListNDArray</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
-</span><span id="isListNDArray-145"><a href="#isListNDArray-145"><span class="linenos">145</span></a>    <span class="k">return</span> <span class="n">isType</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="n">isType</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="isListNDArray-148"><a href="#isListNDArray-148"><span class="linenos">148</span></a><span class="k">def</span> <span class="nf">isListNDArray</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
+</span><span id="isListNDArray-149"><a href="#isListNDArray-149"><span class="linenos">149</span></a>    <span class="k">return</span> <span class="n">isType</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="n">isType</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -849,8 +856,8 @@
 
     </div>
     <a class="headerlink" href="#isOfSameShape"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="isOfSameShape-148"><a href="#isOfSameShape-148"><span class="linenos">148</span></a><span class="k">def</span> <span class="nf">isOfSameShape</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-</span><span id="isOfSameShape-149"><a href="#isOfSameShape-149"><span class="linenos">149</span></a>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="isOfSameShape-152"><a href="#isOfSameShape-152"><span class="linenos">152</span></a><span class="k">def</span> <span class="nf">isOfSameShape</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+</span><span id="isOfSameShape-153"><a href="#isOfSameShape-153"><span class="linenos">153</span></a>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -868,13 +875,13 @@
 
     </div>
     <a class="headerlink" href="#inRange"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="inRange-152"><a href="#inRange-152"><span class="linenos">152</span></a><span class="k">def</span> <span class="nf">inRange</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">range_</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="inRange-153"><a href="#inRange-153"><span class="linenos">153</span></a>    <span class="k">if</span> <span class="n">range_</span><span class="p">:</span>
-</span><span id="inRange-154"><a href="#inRange-154"><span class="linenos">154</span></a>        <span class="k">if</span> <span class="n">isType</span><span class="p">(</span><span class="n">range_</span><span class="p">,</span> <span class="nb">range</span><span class="p">):</span>
-</span><span id="inRange-155"><a href="#inRange-155"><span class="linenos">155</span></a>            <span class="n">range_</span> <span class="o">=</span> <span class="p">(</span><span class="n">range_</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">range_</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-</span><span id="inRange-156"><a href="#inRange-156"><span class="linenos">156</span></a>        <span class="n">low</span><span class="p">,</span> <span class="n">high</span> <span class="o">=</span> <span class="n">range_</span>
-</span><span id="inRange-157"><a href="#inRange-157"><span class="linenos">157</span></a>
-</span><span id="inRange-158"><a href="#inRange-158"><span class="linenos">158</span></a>    <span class="k">return</span> <span class="n">low</span> <span class="o">&lt;=</span> <span class="n">a</span> <span class="ow">and</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="n">high</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="inRange-156"><a href="#inRange-156"><span class="linenos">156</span></a><span class="k">def</span> <span class="nf">inRange</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">range_</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span><span id="inRange-157"><a href="#inRange-157"><span class="linenos">157</span></a>    <span class="k">if</span> <span class="n">range_</span><span class="p">:</span>
+</span><span id="inRange-158"><a href="#inRange-158"><span class="linenos">158</span></a>        <span class="k">if</span> <span class="n">isType</span><span class="p">(</span><span class="n">range_</span><span class="p">,</span> <span class="nb">range</span><span class="p">):</span>
+</span><span id="inRange-159"><a href="#inRange-159"><span class="linenos">159</span></a>            <span class="n">range_</span> <span class="o">=</span> <span class="p">(</span><span class="n">range_</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">range_</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</span><span id="inRange-160"><a href="#inRange-160"><span class="linenos">160</span></a>        <span class="n">low</span><span class="p">,</span> <span class="n">high</span> <span class="o">=</span> <span class="n">range_</span>
+</span><span id="inRange-161"><a href="#inRange-161"><span class="linenos">161</span></a>
+</span><span id="inRange-162"><a href="#inRange-162"><span class="linenos">162</span></a>    <span class="k">return</span> <span class="n">low</span> <span class="o">&lt;=</span> <span class="n">a</span> <span class="ow">and</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="n">high</span>
 </span></pre></div>
 
 
@@ -892,8 +899,8 @@
 
     </div>
     <a class="headerlink" href="#inArray"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="inArray-161"><a href="#inArray-161"><span class="linenos">161</span></a><span class="k">def</span> <span class="nf">inArray</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">arr</span><span class="p">):</span>
-</span><span id="inArray-162"><a href="#inArray-162"><span class="linenos">162</span></a>    <span class="k">return</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">arr</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="inArray-165"><a href="#inArray-165"><span class="linenos">165</span></a><span class="k">def</span> <span class="nf">inArray</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">arr</span><span class="p">):</span>
+</span><span id="inArray-166"><a href="#inArray-166"><span class="linenos">166</span></a>    <span class="k">return</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">arr</span>
 </span></pre></div>
 
 
@@ -911,8 +918,8 @@
 
     </div>
     <a class="headerlink" href="#getChildFolder"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="getChildFolder-165"><a href="#getChildFolder-165"><span class="linenos">165</span></a><span class="k">def</span> <span class="nf">getChildFolder</span><span class="p">(</span><span class="n">folder</span><span class="p">):</span>
-</span><span id="getChildFolder-166"><a href="#getChildFolder-166"><span class="linenos">166</span></a>    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span> <span class="sa">f</span><span class="s1">&#39;./</span><span class="si">{</span><span class="n">folder</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="getChildFolder-169"><a href="#getChildFolder-169"><span class="linenos">169</span></a><span class="k">def</span> <span class="nf">getChildFolder</span><span class="p">(</span><span class="n">folder</span><span class="p">):</span>
+</span><span id="getChildFolder-170"><a href="#getChildFolder-170"><span class="linenos">170</span></a>    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span> <span class="sa">f</span><span class="s1">&#39;./</span><span class="si">{</span><span class="n">folder</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -930,23 +937,23 @@
 
     </div>
     <a class="headerlink" href="#cvtEnergyUnit"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="cvtEnergyUnit-169"><a href="#cvtEnergyUnit-169"><span class="linenos">169</span></a><span class="k">def</span> <span class="nf">cvtEnergyUnit</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">from_</span><span class="p">,</span> <span class="n">to</span><span class="p">):</span>
-</span><span id="cvtEnergyUnit-170"><a href="#cvtEnergyUnit-170"><span class="linenos">170</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-</span><span id="cvtEnergyUnit-171"><a href="#cvtEnergyUnit-171"><span class="linenos">171</span></a><span class="sd">        Convert between energy units. (ev, keV, MeV)</span>
-</span><span id="cvtEnergyUnit-172"><a href="#cvtEnergyUnit-172"><span class="linenos">172</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="cvtEnergyUnit-173"><a href="#cvtEnergyUnit-173"><span class="linenos">173</span></a>    <span class="n">units</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;eV&#39;</span><span class="p">,</span> <span class="s1">&#39;keV&#39;</span><span class="p">,</span> <span class="s1">&#39;MeV&#39;</span><span class="p">]</span>
-</span><span id="cvtEnergyUnit-174"><a href="#cvtEnergyUnit-174"><span class="linenos">174</span></a>    <span class="n">from_</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">from_</span><span class="p">)</span>
-</span><span id="cvtEnergyUnit-175"><a href="#cvtEnergyUnit-175"><span class="linenos">175</span></a>    <span class="n">to</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">to</span><span class="p">)</span>
-</span><span id="cvtEnergyUnit-176"><a href="#cvtEnergyUnit-176"><span class="linenos">176</span></a>
-</span><span id="cvtEnergyUnit-177"><a href="#cvtEnergyUnit-177"><span class="linenos">177</span></a>    <span class="n">a</span> <span class="o">=</span> <span class="mi">1000</span>
-</span><span id="cvtEnergyUnit-178"><a href="#cvtEnergyUnit-178"><span class="linenos">178</span></a>    <span class="n">b</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">a</span>
-</span><span id="cvtEnergyUnit-179"><a href="#cvtEnergyUnit-179"><span class="linenos">179</span></a>    <span class="n">mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
-</span><span id="cvtEnergyUnit-180"><a href="#cvtEnergyUnit-180"><span class="linenos">180</span></a>        <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">b</span><span class="o">**</span><span class="mi">2</span><span class="p">],</span>
-</span><span id="cvtEnergyUnit-181"><a href="#cvtEnergyUnit-181"><span class="linenos">181</span></a>        <span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="p">],</span>
-</span><span id="cvtEnergyUnit-182"><a href="#cvtEnergyUnit-182"><span class="linenos">182</span></a>        <span class="p">[</span><span class="n">a</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
-</span><span id="cvtEnergyUnit-183"><a href="#cvtEnergyUnit-183"><span class="linenos">183</span></a>    <span class="p">])</span>  <span class="c1"># mat[from, to]</span>
-</span><span id="cvtEnergyUnit-184"><a href="#cvtEnergyUnit-184"><span class="linenos">184</span></a>
-</span><span id="cvtEnergyUnit-185"><a href="#cvtEnergyUnit-185"><span class="linenos">185</span></a>    <span class="k">return</span> <span class="n">arr</span> <span class="o">*</span> <span class="n">mat</span><span class="p">[</span><span class="n">from_</span><span class="p">,</span> <span class="n">to</span><span class="p">]</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="cvtEnergyUnit-173"><a href="#cvtEnergyUnit-173"><span class="linenos">173</span></a><span class="k">def</span> <span class="nf">cvtEnergyUnit</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">from_</span><span class="p">,</span> <span class="n">to</span><span class="p">):</span>
+</span><span id="cvtEnergyUnit-174"><a href="#cvtEnergyUnit-174"><span class="linenos">174</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="cvtEnergyUnit-175"><a href="#cvtEnergyUnit-175"><span class="linenos">175</span></a><span class="sd">        Convert between energy units. (ev, keV, MeV)</span>
+</span><span id="cvtEnergyUnit-176"><a href="#cvtEnergyUnit-176"><span class="linenos">176</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="cvtEnergyUnit-177"><a href="#cvtEnergyUnit-177"><span class="linenos">177</span></a>    <span class="n">units</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;eV&#39;</span><span class="p">,</span> <span class="s1">&#39;keV&#39;</span><span class="p">,</span> <span class="s1">&#39;MeV&#39;</span><span class="p">]</span>
+</span><span id="cvtEnergyUnit-178"><a href="#cvtEnergyUnit-178"><span class="linenos">178</span></a>    <span class="n">from_</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">from_</span><span class="p">)</span>
+</span><span id="cvtEnergyUnit-179"><a href="#cvtEnergyUnit-179"><span class="linenos">179</span></a>    <span class="n">to</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">to</span><span class="p">)</span>
+</span><span id="cvtEnergyUnit-180"><a href="#cvtEnergyUnit-180"><span class="linenos">180</span></a>
+</span><span id="cvtEnergyUnit-181"><a href="#cvtEnergyUnit-181"><span class="linenos">181</span></a>    <span class="n">a</span> <span class="o">=</span> <span class="mi">1000</span>
+</span><span id="cvtEnergyUnit-182"><a href="#cvtEnergyUnit-182"><span class="linenos">182</span></a>    <span class="n">b</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">a</span>
+</span><span id="cvtEnergyUnit-183"><a href="#cvtEnergyUnit-183"><span class="linenos">183</span></a>    <span class="n">mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+</span><span id="cvtEnergyUnit-184"><a href="#cvtEnergyUnit-184"><span class="linenos">184</span></a>        <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">b</span><span class="o">**</span><span class="mi">2</span><span class="p">],</span>
+</span><span id="cvtEnergyUnit-185"><a href="#cvtEnergyUnit-185"><span class="linenos">185</span></a>        <span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="p">],</span>
+</span><span id="cvtEnergyUnit-186"><a href="#cvtEnergyUnit-186"><span class="linenos">186</span></a>        <span class="p">[</span><span class="n">a</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+</span><span id="cvtEnergyUnit-187"><a href="#cvtEnergyUnit-187"><span class="linenos">187</span></a>    <span class="p">])</span>  <span class="c1"># mat[from, to]</span>
+</span><span id="cvtEnergyUnit-188"><a href="#cvtEnergyUnit-188"><span class="linenos">188</span></a>
+</span><span id="cvtEnergyUnit-189"><a href="#cvtEnergyUnit-189"><span class="linenos">189</span></a>    <span class="k">return</span> <span class="n">arr</span> <span class="o">*</span> <span class="n">mat</span><span class="p">[</span><span class="n">from_</span><span class="p">,</span> <span class="n">to</span><span class="p">]</span>
 </span></pre></div>
 
 
@@ -966,22 +973,22 @@
 
     </div>
     <a class="headerlink" href="#cvtLengthUnit"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="cvtLengthUnit-188"><a href="#cvtLengthUnit-188"><span class="linenos">188</span></a><span class="k">def</span> <span class="nf">cvtLengthUnit</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">from_</span><span class="p">,</span> <span class="n">to</span><span class="p">):</span>
-</span><span id="cvtLengthUnit-189"><a href="#cvtLengthUnit-189"><span class="linenos">189</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-</span><span id="cvtLengthUnit-190"><a href="#cvtLengthUnit-190"><span class="linenos">190</span></a><span class="sd">        Convert between length units. (um, mm, cm, m)</span>
-</span><span id="cvtLengthUnit-191"><a href="#cvtLengthUnit-191"><span class="linenos">191</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="cvtLengthUnit-192"><a href="#cvtLengthUnit-192"><span class="linenos">192</span></a>    <span class="n">units</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;um&#39;</span><span class="p">,</span> <span class="s1">&#39;mm&#39;</span><span class="p">,</span> <span class="s1">&#39;cm&#39;</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">]</span>
-</span><span id="cvtLengthUnit-193"><a href="#cvtLengthUnit-193"><span class="linenos">193</span></a>    <span class="n">from_</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">from_</span><span class="p">)</span>
-</span><span id="cvtLengthUnit-194"><a href="#cvtLengthUnit-194"><span class="linenos">194</span></a>    <span class="n">to</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">to</span><span class="p">)</span>
-</span><span id="cvtLengthUnit-195"><a href="#cvtLengthUnit-195"><span class="linenos">195</span></a>
-</span><span id="cvtLengthUnit-196"><a href="#cvtLengthUnit-196"><span class="linenos">196</span></a>    <span class="n">mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
-</span><span id="cvtLengthUnit-197"><a href="#cvtLengthUnit-197"><span class="linenos">197</span></a>        <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1e-3</span><span class="p">,</span> <span class="mf">1e-4</span><span class="p">,</span> <span class="mf">1e-6</span><span class="p">],</span>
-</span><span id="cvtLengthUnit-198"><a href="#cvtLengthUnit-198"><span class="linenos">198</span></a>        <span class="p">[</span><span class="mf">1e3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1e-1</span><span class="p">,</span> <span class="mf">1e-3</span><span class="p">],</span>
-</span><span id="cvtLengthUnit-199"><a href="#cvtLengthUnit-199"><span class="linenos">199</span></a>        <span class="p">[</span><span class="mf">1e4</span><span class="p">,</span> <span class="mf">1e1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1e-2</span><span class="p">],</span>
-</span><span id="cvtLengthUnit-200"><a href="#cvtLengthUnit-200"><span class="linenos">200</span></a>        <span class="p">[</span><span class="mf">1e6</span><span class="p">,</span> <span class="mf">1e3</span><span class="p">,</span> <span class="mf">1e2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
-</span><span id="cvtLengthUnit-201"><a href="#cvtLengthUnit-201"><span class="linenos">201</span></a>    <span class="p">])</span>  <span class="c1"># mat[from, to]</span>
-</span><span id="cvtLengthUnit-202"><a href="#cvtLengthUnit-202"><span class="linenos">202</span></a>
-</span><span id="cvtLengthUnit-203"><a href="#cvtLengthUnit-203"><span class="linenos">203</span></a>    <span class="k">return</span> <span class="n">arr</span> <span class="o">*</span> <span class="n">mat</span><span class="p">[</span><span class="n">from_</span><span class="p">,</span> <span class="n">to</span><span class="p">]</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="cvtLengthUnit-192"><a href="#cvtLengthUnit-192"><span class="linenos">192</span></a><span class="k">def</span> <span class="nf">cvtLengthUnit</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">from_</span><span class="p">,</span> <span class="n">to</span><span class="p">):</span>
+</span><span id="cvtLengthUnit-193"><a href="#cvtLengthUnit-193"><span class="linenos">193</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="cvtLengthUnit-194"><a href="#cvtLengthUnit-194"><span class="linenos">194</span></a><span class="sd">        Convert between length units. (um, mm, cm, m)</span>
+</span><span id="cvtLengthUnit-195"><a href="#cvtLengthUnit-195"><span class="linenos">195</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="cvtLengthUnit-196"><a href="#cvtLengthUnit-196"><span class="linenos">196</span></a>    <span class="n">units</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;um&#39;</span><span class="p">,</span> <span class="s1">&#39;mm&#39;</span><span class="p">,</span> <span class="s1">&#39;cm&#39;</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">]</span>
+</span><span id="cvtLengthUnit-197"><a href="#cvtLengthUnit-197"><span class="linenos">197</span></a>    <span class="n">from_</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">from_</span><span class="p">)</span>
+</span><span id="cvtLengthUnit-198"><a href="#cvtLengthUnit-198"><span class="linenos">198</span></a>    <span class="n">to</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">to</span><span class="p">)</span>
+</span><span id="cvtLengthUnit-199"><a href="#cvtLengthUnit-199"><span class="linenos">199</span></a>
+</span><span id="cvtLengthUnit-200"><a href="#cvtLengthUnit-200"><span class="linenos">200</span></a>    <span class="n">mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+</span><span id="cvtLengthUnit-201"><a href="#cvtLengthUnit-201"><span class="linenos">201</span></a>        <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1e-3</span><span class="p">,</span> <span class="mf">1e-4</span><span class="p">,</span> <span class="mf">1e-6</span><span class="p">],</span>
+</span><span id="cvtLengthUnit-202"><a href="#cvtLengthUnit-202"><span class="linenos">202</span></a>        <span class="p">[</span><span class="mf">1e3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1e-1</span><span class="p">,</span> <span class="mf">1e-3</span><span class="p">],</span>
+</span><span id="cvtLengthUnit-203"><a href="#cvtLengthUnit-203"><span class="linenos">203</span></a>        <span class="p">[</span><span class="mf">1e4</span><span class="p">,</span> <span class="mf">1e1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1e-2</span><span class="p">],</span>
+</span><span id="cvtLengthUnit-204"><a href="#cvtLengthUnit-204"><span class="linenos">204</span></a>        <span class="p">[</span><span class="mf">1e6</span><span class="p">,</span> <span class="mf">1e3</span><span class="p">,</span> <span class="mf">1e2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+</span><span id="cvtLengthUnit-205"><a href="#cvtLengthUnit-205"><span class="linenos">205</span></a>    <span class="p">])</span>  <span class="c1"># mat[from, to]</span>
+</span><span id="cvtLengthUnit-206"><a href="#cvtLengthUnit-206"><span class="linenos">206</span></a>
+</span><span id="cvtLengthUnit-207"><a href="#cvtLengthUnit-207"><span class="linenos">207</span></a>    <span class="k">return</span> <span class="n">arr</span> <span class="o">*</span> <span class="n">mat</span><span class="p">[</span><span class="n">from_</span><span class="p">,</span> <span class="n">to</span><span class="p">]</span>
 </span></pre></div>
 
 
@@ -1001,14 +1008,14 @@
 
     </div>
     <a class="headerlink" href="#cvtMuUnit"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="cvtMuUnit-206"><a href="#cvtMuUnit-206"><span class="linenos">206</span></a><span class="k">def</span> <span class="nf">cvtMuUnit</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">from_</span><span class="p">,</span> <span class="n">to</span><span class="p">):</span>
-</span><span id="cvtMuUnit-207"><a href="#cvtMuUnit-207"><span class="linenos">207</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-</span><span id="cvtMuUnit-208"><a href="#cvtMuUnit-208"><span class="linenos">208</span></a><span class="sd">        Convert between mu value units. (um-1, mm-1, cm-1, m-1)</span>
-</span><span id="cvtMuUnit-209"><a href="#cvtMuUnit-209"><span class="linenos">209</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="cvtMuUnit-210"><a href="#cvtMuUnit-210"><span class="linenos">210</span></a>    <span class="n">from_</span> <span class="o">=</span> <span class="n">from_</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-1&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-</span><span id="cvtMuUnit-211"><a href="#cvtMuUnit-211"><span class="linenos">211</span></a>    <span class="n">to</span> <span class="o">=</span> <span class="n">to</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-1&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-</span><span id="cvtMuUnit-212"><a href="#cvtMuUnit-212"><span class="linenos">212</span></a>
-</span><span id="cvtMuUnit-213"><a href="#cvtMuUnit-213"><span class="linenos">213</span></a>    <span class="k">return</span> <span class="n">cvtLengthUnit</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">to</span><span class="p">,</span> <span class="n">from_</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="cvtMuUnit-210"><a href="#cvtMuUnit-210"><span class="linenos">210</span></a><span class="k">def</span> <span class="nf">cvtMuUnit</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">from_</span><span class="p">,</span> <span class="n">to</span><span class="p">):</span>
+</span><span id="cvtMuUnit-211"><a href="#cvtMuUnit-211"><span class="linenos">211</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="cvtMuUnit-212"><a href="#cvtMuUnit-212"><span class="linenos">212</span></a><span class="sd">        Convert between mu value units. (um-1, mm-1, cm-1, m-1)</span>
+</span><span id="cvtMuUnit-213"><a href="#cvtMuUnit-213"><span class="linenos">213</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="cvtMuUnit-214"><a href="#cvtMuUnit-214"><span class="linenos">214</span></a>    <span class="n">from_</span> <span class="o">=</span> <span class="n">from_</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-1&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+</span><span id="cvtMuUnit-215"><a href="#cvtMuUnit-215"><span class="linenos">215</span></a>    <span class="n">to</span> <span class="o">=</span> <span class="n">to</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-1&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+</span><span id="cvtMuUnit-216"><a href="#cvtMuUnit-216"><span class="linenos">216</span></a>
+</span><span id="cvtMuUnit-217"><a href="#cvtMuUnit-217"><span class="linenos">217</span></a>    <span class="k">return</span> <span class="n">cvtLengthUnit</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">to</span><span class="p">,</span> <span class="n">from_</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -1028,8 +1035,8 @@
 
     </div>
     <a class="headerlink" href="#radToDeg"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="radToDeg-233"><a href="#radToDeg-233"><span class="linenos">233</span></a><span class="k">def</span> <span class="nf">radToDeg</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-</span><span id="radToDeg-234"><a href="#radToDeg-234"><span class="linenos">234</span></a>    <span class="k">return</span> <span class="n">x</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mi">180</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="radToDeg-237"><a href="#radToDeg-237"><span class="linenos">237</span></a><span class="k">def</span> <span class="nf">radToDeg</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+</span><span id="radToDeg-238"><a href="#radToDeg-238"><span class="linenos">238</span></a>    <span class="k">return</span> <span class="n">x</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mi">180</span>
 </span></pre></div>
 
 
@@ -1047,8 +1054,8 @@
 
     </div>
     <a class="headerlink" href="#degToRad"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="degToRad-237"><a href="#degToRad-237"><span class="linenos">237</span></a><span class="k">def</span> <span class="nf">degToRad</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-</span><span id="degToRad-238"><a href="#degToRad-238"><span class="linenos">238</span></a>    <span class="k">return</span> <span class="n">x</span> <span class="o">/</span> <span class="mi">180</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="degToRad-241"><a href="#degToRad-241"><span class="linenos">241</span></a><span class="k">def</span> <span class="nf">degToRad</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+</span><span id="degToRad-242"><a href="#degToRad-242"><span class="linenos">242</span></a>    <span class="k">return</span> <span class="n">x</span> <span class="o">/</span> <span class="mi">180</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
 </span></pre></div>
 
 
@@ -1066,15 +1073,15 @@
 
     </div>
     <a class="headerlink" href="#sysPlatform"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="sysPlatform-241"><a href="#sysPlatform-241"><span class="linenos">241</span></a><span class="k">def</span> <span class="nf">sysPlatform</span><span class="p">():</span>
-</span><span id="sysPlatform-242"><a href="#sysPlatform-242"><span class="linenos">242</span></a>    <span class="n">platform</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span>
-</span><span id="sysPlatform-243"><a href="#sysPlatform-243"><span class="linenos">243</span></a>
-</span><span id="sysPlatform-244"><a href="#sysPlatform-244"><span class="linenos">244</span></a>    <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;win32&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-</span><span id="sysPlatform-245"><a href="#sysPlatform-245"><span class="linenos">245</span></a>        <span class="k">return</span> <span class="s1">&#39;Windows&#39;</span>
-</span><span id="sysPlatform-246"><a href="#sysPlatform-246"><span class="linenos">246</span></a>    <span class="k">elif</span> <span class="n">platform</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;linux&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-</span><span id="sysPlatform-247"><a href="#sysPlatform-247"><span class="linenos">247</span></a>        <span class="k">return</span> <span class="s1">&#39;Linux&#39;</span>
-</span><span id="sysPlatform-248"><a href="#sysPlatform-248"><span class="linenos">248</span></a>
-</span><span id="sysPlatform-249"><a href="#sysPlatform-249"><span class="linenos">249</span></a>    <span class="n">cripAssert</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Unsupported platform: </span><span class="si">{</span><span class="n">platform</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="sysPlatform-245"><a href="#sysPlatform-245"><span class="linenos">245</span></a><span class="k">def</span> <span class="nf">sysPlatform</span><span class="p">():</span>
+</span><span id="sysPlatform-246"><a href="#sysPlatform-246"><span class="linenos">246</span></a>    <span class="n">platform</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span>
+</span><span id="sysPlatform-247"><a href="#sysPlatform-247"><span class="linenos">247</span></a>
+</span><span id="sysPlatform-248"><a href="#sysPlatform-248"><span class="linenos">248</span></a>    <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;win32&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+</span><span id="sysPlatform-249"><a href="#sysPlatform-249"><span class="linenos">249</span></a>        <span class="k">return</span> <span class="s1">&#39;Windows&#39;</span>
+</span><span id="sysPlatform-250"><a href="#sysPlatform-250"><span class="linenos">250</span></a>    <span class="k">elif</span> <span class="n">platform</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;linux&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+</span><span id="sysPlatform-251"><a href="#sysPlatform-251"><span class="linenos">251</span></a>        <span class="k">return</span> <span class="s1">&#39;Linux&#39;</span>
+</span><span id="sysPlatform-252"><a href="#sysPlatform-252"><span class="linenos">252</span></a>
+</span><span id="sysPlatform-253"><a href="#sysPlatform-253"><span class="linenos">253</span></a>    <span class="n">cripAssert</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Unsupported platform: </span><span class="si">{</span><span class="n">platform</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -1092,15 +1099,15 @@
 
     </div>
     <a class="headerlink" href="#getHW"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="getHW-252"><a href="#getHW-252"><span class="linenos">252</span></a><span class="k">def</span> <span class="nf">getHW</span><span class="p">(</span><span class="n">img</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-</span><span id="getHW-253"><a href="#getHW-253"><span class="linenos">253</span></a>    <span class="k">if</span> <span class="n">is3D</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
-</span><span id="getHW-254"><a href="#getHW-254"><span class="linenos">254</span></a>        <span class="n">_</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span>
-</span><span id="getHW-255"><a href="#getHW-255"><span class="linenos">255</span></a>    <span class="k">elif</span> <span class="n">is2D</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
-</span><span id="getHW-256"><a href="#getHW-256"><span class="linenos">256</span></a>        <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span>
-</span><span id="getHW-257"><a href="#getHW-257"><span class="linenos">257</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="getHW-258"><a href="#getHW-258"><span class="linenos">258</span></a>        <span class="k">raise</span>
-</span><span id="getHW-259"><a href="#getHW-259"><span class="linenos">259</span></a>
-</span><span id="getHW-260"><a href="#getHW-260"><span class="linenos">260</span></a>    <span class="k">return</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="getHW-256"><a href="#getHW-256"><span class="linenos">256</span></a><span class="k">def</span> <span class="nf">getHW</span><span class="p">(</span><span class="n">img</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+</span><span id="getHW-257"><a href="#getHW-257"><span class="linenos">257</span></a>    <span class="k">if</span> <span class="n">is3D</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
+</span><span id="getHW-258"><a href="#getHW-258"><span class="linenos">258</span></a>        <span class="n">_</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span>
+</span><span id="getHW-259"><a href="#getHW-259"><span class="linenos">259</span></a>    <span class="k">elif</span> <span class="n">is2D</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
+</span><span id="getHW-260"><a href="#getHW-260"><span class="linenos">260</span></a>        <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span>
+</span><span id="getHW-261"><a href="#getHW-261"><span class="linenos">261</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="getHW-262"><a href="#getHW-262"><span class="linenos">262</span></a>        <span class="k">raise</span>
+</span><span id="getHW-263"><a href="#getHW-263"><span class="linenos">263</span></a>
+</span><span id="getHW-264"><a href="#getHW-264"><span class="linenos">264</span></a>    <span class="k">return</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span>
 </span></pre></div>
 
 
@@ -1118,8 +1125,28 @@
 
     </div>
     <a class="headerlink" href="#is1D"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="is1D-91"><a href="#is1D-91"><span class="linenos">91</span></a><span class="k">def</span> <span class="nf">is1D</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-</span><span id="is1D-92"><a href="#is1D-92"><span class="linenos">92</span></a>    <span class="k">return</span> <span class="n">isType</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="is1D-95"><a href="#is1D-95"><span class="linenos">95</span></a><span class="k">def</span> <span class="nf">is1D</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+</span><span id="is1D-96"><a href="#is1D-96"><span class="linenos">96</span></a>    <span class="k">return</span> <span class="n">isType</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+</span></pre></div>
+
+
+    
+
+                </section>
+                <section id="as3D">
+                            <input id="as3D-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">as3D</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">x</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="as3D-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#as3D"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="as3D-91"><a href="#as3D-91"><span class="linenos">91</span></a><span class="k">def</span> <span class="nf">as3D</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+</span><span id="as3D-92"><a href="#as3D-92"><span class="linenos">92</span></a>    <span class="n">cripAssert</span><span class="p">(</span><span class="n">is2or3D</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+</span><span id="as3D-93"><a href="#as3D-93"><span class="linenos">93</span></a>    <span class="k">return</span> <span class="n">x</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span> <span class="k">else</span> <span class="n">x</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
 </span></pre></div>
 
 
