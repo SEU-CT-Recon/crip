@@ -6,14 +6,16 @@
 
 __all__ = [
     'rotate', 'verticalFlip', 'horizontalFlip', 'stackFlip', 'resize', 'gaussianSmooth', 'stackImages', 'splitImages',
-    'binning', 'transpose', 'permute'
+    'binning', 'transpose', 'permute', 'shepplogan'
 ]
 
 import numpy as np
 import cv2
 
-from .utils import ConvertListNDArray, cripAssert, inArray, is2D, is2or3D, is3D, isInt, isType
+from .utils import ConvertListNDArray, cripAssert, getChildFolder, inArray, is2D, is2or3D, is3D, isInt, isType
 from ._typing import *
+from .io import imreadTiff
+from os import path
 
 
 @ConvertListNDArray
@@ -201,7 +203,7 @@ def permute(vol: ThreeD, from_: str, to: str) -> ThreeD:
 
     dirFrom = dirs.index(from_)
     dirTo = dirs.index(to)
-    
+
     # TODO check this matrix
     orders = [
         # to sag       cor         tra      # from
@@ -212,3 +214,14 @@ def permute(vol: ThreeD, from_: str, to: str) -> ThreeD:
     order = orders[dirFrom][dirTo]
 
     return transpose(vol, order)
+
+
+def shepplogan(size: int = 512):
+    '''
+        Generate the Shepp-Logan phantom.
+    '''
+    cripAssert(size in [256, 512, 1024], 'Shepp-Logan can only have size in 256 / 512 / 1024.')
+
+    phantomPath = path.join(getChildFolder('_assrt/shepplogan'), f'{size}.tif')
+
+    return imreadTiff(phantomPath)
