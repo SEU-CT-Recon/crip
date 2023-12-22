@@ -222,6 +222,6 @@ def shepplogan(size: int = 512):
     '''
     cripAssert(size in [256, 512, 1024], 'Shepp-Logan can only have size in 256 / 512 / 1024.')
 
-    phantomPath = path.join(getChildFolder('_assrt/shepplogan'), f'{size}.tif')
+    phantomPath = path.join(getChildFolder('_asset/shepplogan'), f'{size}.tif')
 
     return imreadTiff(phantomPath)
