@@ -73,3 +73,29 @@ def totalVariation(img: TwoOrThreeD) -> TwoOrThreeD:
     tv = np.sum(np.abs(vX) + np.abs(vY), axis=(-2, -1))
 
     return tv
+
+
+def nps2D(img: TwoD, pixelSize: float, n=None):
+    h, w = img.shape
+    cripAssert(h == w, 'h == w required.')
+    dots = n or nextPow2(h)
+
+    detrend = img - np.mean(img)  # order 0
+    dft = np.fft.fftshift(np.fft.fft2(detrend, n=dots))
+    mod2 = np.real(dft * np.conj(dft))
+
+    return mod2 * pixelSize * pixelSize / (h * w)
+
+
+def nps1D(img: TwoD, pixelSize: float, n=None):
+    nps = nps2D(img, pixelSize, n)
+    n = nps.shape[0]
+
+    x, y = np.meshgrid(np.arange(nps.shape[1]), np.arange(nps.shape[0]))
+    R = np.sqrt(x**2 + y**2)
+
+    f = lambda r: nps[(R >= r - .5) & (R < r + .5)].mean()
+    r = np.linspace(1, n, num=n)
+    mean = np.vectorize(f)(r)
+
+    return mean

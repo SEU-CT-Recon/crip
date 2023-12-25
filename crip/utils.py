@@ -8,7 +8,7 @@ __all__ = [
     'readFileText', 'CripException', 'cripAssert', 'cripWarning', 'ConvertListNDArray', 'asFloat', 'is2D', 'is3D',
     'is2or3D', 'isInt', 'isIntDtype', 'isFloatDtype', 'isIntType', 'isFloatType', 'isType', 'isNumber', 'isList',
     'isListNDArray', 'isOfSameShape', 'inRange', 'inArray', 'getChildFolder', 'cvtEnergyUnit', 'cvtLengthUnit',
-    'cvtMuUnit', 'radToDeg', 'degToRad', 'sysPlatform', 'getHW', 'is1D', 'as3D'
+    'cvtMuUnit', 'radToDeg', 'degToRad', 'sysPlatform', 'getHW', 'is1D', 'as3D', 'nextPow2'
 ]
 
 import os
@@ -261,3 +261,7 @@ def getHW(img: np.ndarray):
         raise
 
     return h, w
+
+
+def nextPow2(x):
+    return 1 if x == 0 else 2**math.ceil(math.log2(x))
