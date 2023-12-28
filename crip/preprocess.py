@@ -6,8 +6,8 @@
 
 __all__ = [
     'averageProjections', 'flatDarkFieldCorrection', 'projectionsToSinograms', 'sinogramsToProjections', 'padImage',
-    'padSinogram', 'correctBeamHardeningPolynomial', 'injectGaussianNoise', 'injectPoissonNoise', 'binning', 'fan2para',
-    'correctRingArtifactInProj'
+    'padSinogram', 'correctBeamHardeningPolynomial', 'injectGaussianNoise', 'injectPoissonNoise', 'binning',
+    'fanToPara', 'correctRingArtifactInProj'
 ]
 
 import numpy as np
@@ -123,10 +123,10 @@ def padImage(img: TwoOrThreeD,
 
     decays = {
         'cosine':
-        lambda ascend, dot: np.cos(np.linspace(-np.pi / 2, 0, dot) if ascend else np.linspace(0, np.pi / 2, dot)),
+            lambda ascend, dot: np.cos(np.linspace(-np.pi / 2, 0, dot) if ascend else np.linspace(0, np.pi / 2, dot)),
         'smoothCosine':
-        lambda ascend, dot: 0.5 * np.cos(np.linspace(-np.pi, 0, dot)) + 0.5
-        if ascend else 0.5 * np.cos(np.linspace(0, np.pi, dot)) + 0.5
+            lambda ascend, dot: 0.5 * np.cos(np.linspace(-np.pi, 0, dot)) + 0.5
+            if ascend else 0.5 * np.cos(np.linspace(0, np.pi, dot)) + 0.5
     }
 
     h, w = getHW(img)
@@ -194,13 +194,13 @@ def correctRingArtifactInProj(sgm: TwoOrThreeD, sigma: float, ksize: Or[int, Non
     '''
     ksize = ksize or int(2 * np.ceil(2 * sigma) + 1)
     kernel = np.squeeze(cv2.getGaussianKernel(ksize, sigma))
-    
+
     def procOne(sgm: TwoD):
         Pc = np.mean(sgm, axis=0)
         Rc = np.convolve(Pc, kernel, mode='same')
         Ec = Pc - Rc
         return sgm - Ec[np.newaxis, :]
-        
+
     if is3D(sgm):
         res = np.array(list(map(procOne, sgm)))
     else:
@@ -209,14 +209,22 @@ def correctRingArtifactInProj(sgm: TwoOrThreeD, sigma: float, ksize: Or[int, Non
     return res
 
 
-def fan2para(sgm: TwoD, gammas, betas, d, oThetas, oLines):
+def fanToPara(sgm: TwoD, gammas: NDArray, betas: NDArray, sid: float, oThetas: Tuple[float],
+              oLines: Tuple[float]) -> TwoD:
     '''
         Re-order Fan-Beam sinogram to Parallel-Beam's.
-        gammas: the fan angles from min to max
-        betas: the rotation angles from min to max
-        d: Source-Isocenter-Distance
-        oThetas: output rotation angle [min, delta, max]
-        oLines: output detector element physical locs [min, delta, max]
+        `gammas`: fan angles from min to max [rad], e.g., `arctan(elementOffcenter / SDD)`
+        `betas`: system rotation angles from min to max [rad]
+        `sid`: Source-Isocenter-Distance [mm]
+        `oThetas`: output rotation angle range (min, delta, max) tuple [rad]
+        `oLines`: output detector element physical locations range (min, delta, max) tuple [mm], e.g., `elementOffcenter` array
+        ```
+               /| <- gamma for detector element X
+              / | 
+             /  |
+            /   |
+           /    |
+        ---X------------- <- detector
     '''
     nThetas = np.round((oThetas[2] - oThetas[0]) / oThetas[1]).astype(np.int32)
     nLines = np.round((oLines[2] - oLines[0]) / oLines[1]).astype(np.int32)
@@ -227,7 +235,7 @@ def fan2para(sgm: TwoD, gammas, betas, d, oThetas, oLines):
     thetas = thetas1.T @ np.ones((1, nLines))
     Rs = np.ones((nThetas, 1)) @ R1
 
-    oGammas = np.arcsin(Rs / d)
+    oGammas = np.arcsin(Rs / sid)
     oBetas = thetas + oGammas - np.pi / 2
 
     minBetas, maxBetas = np.min(betas), np.max(betas)
@@ -239,12 +247,7 @@ def fan2para(sgm: TwoD, gammas, betas, d, oThetas, oLines):
         oBetas[inds] = oBetas[inds] + 2 * np.pi
     oBetas = np.minimum(oBetas, maxBetas)
 
-    func = interp2d(gammas, betas, sgm, 'linear', fill_value=0)
-
-    h, w = oGammas.shape
-    out = np.zeros_like(oGammas)
-    for i in range(h):
-        for j in range(w):
-            out[i, j] = func(oGammas[i, j], oBetas[i, j])
+    interpolator = interp2d(gammas, betas, sgm, 'linear', fill_value=0)
+    out = interpolator(oGammas.ravel(), oBetas.ravel()).reshape(*oGammas.shape)
 
     return out
