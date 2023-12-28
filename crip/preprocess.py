@@ -190,7 +190,8 @@ def correctRingArtifactInProj(sgm: TwoOrThreeD, sigma: float, ksize: Or[int, Non
     '''
         Apply the ring artifact correction method in projection domain (input postlog sinogram),
         using gaussian filter in sinogram detector direction [1].
-        [1] DOI:10.13700/j.bh.1001-5965.2007.11.020.
+        [1] 李俊江,胡少兴,李保磊等.CT图像环状伪影校正方法[J].北京航空航天大学学报,2007,(11):1378-1382.DOI:10.13700/j.bh.1001-5965.2007.11.020
+        https://kns.cnki.net/kcms2/article/abstract?v=xBNwvqFr00JMj5WzBbZMcj9N-kBm9Pi08enuNi8ymtGWVZuwGHdLWwttkgzSivkJSBVk0CVQZxo7DgBmujqhLCaVvvBMoig5RV0B4fDLUnjGQcCPo3O4KfAo4iX4vCwZ&uniplatform=NZKPT&flag=copy
     '''
     ksize = ksize or int(2 * np.ceil(2 * sigma) + 1)
     kernel = np.squeeze(cv2.getGaussianKernel(ksize, sigma))

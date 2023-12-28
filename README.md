@@ -32,7 +32,7 @@ All functions are (or will be) with clear documentation. Just consider the funct
 - `crip.lowdose` for Low-Dose researches.
 - `crip.mangoct` for [mangoct](https://github.com/CandleHouse/mandoct) reconstruction tool package integration.
 - `crip.metric` for metrics computation.
-- `crip.paplot` for figure drawing.
+- `crip.plot` for figure drawing.
 
 crip is still under development. More features will be added in the future. And contributions are strongly welcomed.
 
@@ -149,11 +149,13 @@ MIT
 
 ```
 @software{ZHUO_crip,
-  author = {ZHUO, Xu and LU, Yuchen},
+  author = {ZHUO, Xu and LU, Yuchen and SEU-CT-Recon},
   license = {MIT},
   title = {{crip}},
-  url = {https://github.com/z0gSh1u/crip}
+  url = {https://github.com/SEU-CT-Recon/crip}
 }
 ```
+
+We appreciate if you [let us know](https://github.com/SEU-CT-Recon/crip/issues) you are using crip in your workflow or publications.
 
 We are considering publishing crip to [Journal of Open Source Software](https://joss.theoj.org/) and/or apply for a Software Copyright in China in the future.
