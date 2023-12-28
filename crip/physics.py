@@ -6,7 +6,8 @@
 
 __all__ = [
     'Spectrum', 'Atten', 'Material', 'calcMu', 'DiagEnergyLow', 'DiagEnergyHigh', 'DiagEnergyRange', 'DiagEnergyLen',
-    'forwardProjectWithSpectrum', 'brewPowderSolution', 'calcContrastHU', 'getCommonDensity', 'EnergyConversion'
+    'forwardProjectWithSpectrum', 'brewPowderSolution', 'calcContrastHU', 'getCommonDensity', 'EnergyConversion',
+    'calcPathLength'
 ]
 
 import json
@@ -332,7 +333,8 @@ def forwardProjectWithSpectrum(lengths: List[TwoD], materials: List[Atten], spec
         for length, material in zip(lengths, materials):
             attenuations += length * material.mu[monoAt]
 
-        attened = spec.omega[monoAt] * np.exp(-attenuations) * (1 if energyConversion == 'PCD' else monoAt)  # the attenuated image
+        attened = spec.omega[monoAt] * np.exp(-attenuations) * (1 if energyConversion == 'PCD' else monoAt
+                                                               )  # the attenuated image
 
         return attened
     else:
@@ -381,3 +383,39 @@ def calcContrastHU(contrast: Atten, spec: Spectrum, energyConversion: str, base:
     contrastHU = muToHU(muContrast, muWater) - muToHU(muBase, muWater)
 
     return contrastHU
+
+
+def calcPathLength(detH, detW, detElementSize, thickness, SID, detCenter=None):
+    '''
+        Generate ideal water thickness maps.
+    '''
+    detCenter = detCenter or (detW / 2, detH / 2)
+    r, c = np.meshgrid(np.arange(detH), np.arange(detW))
+    coords = np.array((r.flatten(), c.flatten()), dtype=np.float32).T
+
+    offcenter = coords - np.array(detCenter)
+    offcenter = np.abs(offcenter) * detElementSize
+    offcenterDist = np.sqrt(np.sum(offcenter**2, axis=1))
+
+    theta = np.arctan(offcenterDist / SID)
+    rayIntersect = thickness / np.cos(theta)
+    rayIntersect = rayIntersect.reshape((detW, detH)).T
+
+    return rayIntersect
+
+
+def applyPolyV2L2(coeff, A1, A2):
+    return coeff[0] * A1**2 + coeff[1] * A2**2 + coeff[2] * A1 * A2 + coeff[3] * A1 + coeff[4] * A2 + coeff[5]
+
+
+def deCalcBetaGamma(A1, A2, LComb):
+    A1Square = A1.T**2
+    A2Square = A2.T**2
+    A1A2 = (A1 * A2).T
+    A1 = A1.T
+    A2 = A2.T
+    # Ones = np.ones((A1.T.shape[0]))
+    Ones = np.zeros((A1.T.shape[0]))
+    A = np.array([A1Square, A2Square, A1A2, A1, A2, Ones]).T
+
+    return np.linalg.pinv(A) @ LComb
