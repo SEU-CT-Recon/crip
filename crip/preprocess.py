@@ -15,7 +15,7 @@ import warnings
 
 warnings.simplefilter("ignore", DeprecationWarning)
 
-from scipy.interpolate import interp2d
+from scipy.interpolate import interpn
 import cv2
 from .shared import *
 from ._typing import *
@@ -220,11 +220,10 @@ def fanToPara(sgm: TwoD, gammas: NDArray, betas: NDArray, sid: float, oThetas: T
         `oLines`: output detector element physical locations range (min, delta, max) tuple [mm], e.g., `elementOffcenter` array
         ```
                /| <- gamma for detector element X
-              / | 
+              / | <- SID
              /  |
-            /   |
-           /    |
-        ---X------------- <- detector
+        ====X============ <- detector
+            ^---^ <- offcenter
     '''
     nThetas = np.round((oThetas[2] - oThetas[0]) / oThetas[1]).astype(np.int32)
     nLines = np.round((oLines[2] - oLines[0]) / oLines[1]).astype(np.int32)
@@ -247,7 +246,7 @@ def fanToPara(sgm: TwoD, gammas: NDArray, betas: NDArray, sid: float, oThetas: T
         oBetas[inds] = oBetas[inds] + 2 * np.pi
     oBetas = np.minimum(oBetas, maxBetas)
 
-    interpolator = interp2d(gammas, betas, sgm, 'linear', fill_value=0)
-    out = interpolator(oGammas.ravel(), oBetas.ravel()).reshape(*oGammas.shape)
+    interpolator = interpn((betas, gammas), sgm, (oBetas, oGammas), method='linear', bounds_error=False, fill_value=0)
+    out = interpolator.reshape(oBetas.shape)
 
     return out
