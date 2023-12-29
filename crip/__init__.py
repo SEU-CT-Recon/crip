@@ -6,7 +6,7 @@ An all-in-one tool for Cone-Beam CT Data IO, Pre/Post-process, and Physics, Dual
 https://github.com/z0gSh1u/crip
 '''
 
-__all__ = ['de', 'io', 'lowdose', 'physics', 'postprocess', 'preprocess', 'shared', 'utils', 'mangoct', 'plot', 'metric']
+__all__ = ['de', 'io', 'lowdose', 'physics', 'postprocess', 'preprocess', 'shared', 'utils', 'mangoct', 'plot', 'metric', '_rc']
 
 from . import de
 from . import io
@@ -19,3 +19,4 @@ from . import utils
 from . import mangoct
 from . import plot
 from . import metric
+from . import _rc

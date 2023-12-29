@@ -18,6 +18,7 @@ import numpy as np
 import sys
 import functools
 from ._typing import *
+from ._rc import *
 
 
 def readFileText(path_):
@@ -49,7 +50,7 @@ def cripWarning(ensure, hint, dumpStack=False):
     '''
         The only warning method for crip.
     '''
-    if not ensure:
+    if not SUPPRESS_WARNING and not ensure:
         logging.warning(hint, stack_info=dumpStack)
 
 
