@@ -32,6 +32,7 @@ def rotate(img: TwoOrThreeD, deg: int) -> TwoOrThreeD:
     return np.rot90(img, -k, axes)
 
 
+@ConvertListNDArray
 def verticalFlip(img: TwoOrThreeD, copy=False) -> TwoOrThreeD:
     '''
         Vertical flip one image, or each image in a volume.
@@ -46,6 +47,7 @@ def verticalFlip(img: TwoOrThreeD, copy=False) -> TwoOrThreeD:
         return img[..., ::-1, :]
 
 
+@ConvertListNDArray
 def horizontalFlip(img: TwoOrThreeD, copy=False) -> TwoOrThreeD:
     '''
         Horizontal flip one image, or each image in a volume.
@@ -60,6 +62,7 @@ def horizontalFlip(img: TwoOrThreeD, copy=False) -> TwoOrThreeD:
         return img[..., ::-1]
 
 
+@ConvertListNDArray
 def stackFlip(img: ThreeD, copy=False) -> ThreeD:
     '''
         Flip a stack w.r.t. z-axis, i.e., reverse slices.
@@ -74,6 +77,7 @@ def stackFlip(img: ThreeD, copy=False) -> ThreeD:
         return np.flip(img, axis=0)
 
 
+@ConvertListNDArray
 def resize(img: TwoOrThreeD,
            dsize: Tuple[int] = None,
            scale: Tuple[Or[float, int]] = None,
@@ -104,6 +108,7 @@ def resize(img: TwoOrThreeD,
         return cv2.resize(img, dsize, None, fW, fH, interpolation=interp_[interp])
 
 
+@ConvertListNDArray
 def gaussianSmooth(img: TwoOrThreeD, sigma: Or[float, int, Tuple[Or[float, int]]], ksize: int = None):
     '''
         Perform Gaussian smooth with kernel size = ksize and Gaussian \sigma = sigma (int or tuple (x, y)).
