@@ -3,6 +3,8 @@
 </p>
 An all-in-one tool for Cone-Beam CT Data IO, Pre/Post-process, Physics, Dual Energy, Low Dose and everything only except Reconstruction.
 
+:warning: crip is still under very "agile" development and **no** API consistency between versions are guaranteed. Use at your own risk! :construction:
+
 ## Install
 
 - Via [PyPI](https://pypi.org/project/crip/)

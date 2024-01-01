@@ -24,7 +24,7 @@ def listDirectory(folder: str,
                   style='filename',
                   match: Or[re.Pattern, str, None] = None,
                   sort='nat',
-                  reverse=False) -> Or[List[str], zip[Tuple[str, str]]]:
+                  reverse=False) -> Or[List[str], Iterable[Tuple[str, str]]]:
     '''
         List files under `folder` and sort in `nat`(ural) or `dict`(ionary) order. 
         Return `style` can be `filename`, `fullpath` or `both` (path, name) tuple.
