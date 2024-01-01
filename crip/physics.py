@@ -17,7 +17,7 @@ from os import path
 import enum
 
 from ._typing import *
-from .utils import cvtEnergyUnit, cvtMuUnit, inArray, cripAssert, getChildFolder, inRange, isNumber, isOfSameShape, isType, readFileText, cvtConcentrationUnit
+from .utils import cvtEnergyUnit, cvtMuUnit, inArray, cripAssert, getAsset, inRange, isOfSameShape, isType, readFileText, cvtConcentrationUnit
 from .io import listDirectory
 from .postprocess import muToHU
 
@@ -46,7 +46,7 @@ def getCommonDensity(materialName: str):
     '''
         Get the common value of density of a specified material (g/cm^3) from built-in dataset.
     '''
-    rhoObject = json.loads(readFileText(path.join(getChildFolder('_atten'), './_classicRho.json')))
+    rhoObject = json.loads(readFileText(path.join(getAsset('atten'), 'commonDensity.json')))
 
     if materialName in AttenAliases:
         materialName = AttenAliases[materialName]
@@ -168,7 +168,7 @@ class Atten:
         '''
             Get all built-in materials.
         '''
-        attenListPath = path.join(getChildFolder('_atten'), './data')
+        attenListPath = path.join(getAsset('atten'), 'data')
         attenList = list(map(lambda x: x.replace('.txt', ''), listDirectory(attenListPath, style='filename')))
         attenList.extend(AttenAliases.keys())
 
@@ -182,7 +182,7 @@ class Atten:
         if materialName in AttenAliases:
             materialName = AttenAliases[materialName]
 
-        attenFilePath = path.join(getChildFolder('_atten'), f'./data/{materialName}.txt')
+        attenFilePath = path.join(getAsset('atten'), f'data/{materialName}.txt')
         cripAssert(path.exists(attenFilePath), f'Atten file for {materialName} does not exist.')
         content = readFileText(attenFilePath)
 

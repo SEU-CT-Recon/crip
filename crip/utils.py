@@ -7,8 +7,8 @@
 __all__ = [
     'readFileText', 'CripException', 'cripAssert', 'cripWarning', 'ConvertListNDArray', 'asFloat', 'is2D', 'is3D',
     'is2or3D', 'isInt', 'isIntDtype', 'isFloatDtype', 'isIntType', 'isFloatType', 'isType', 'isNumber', 'isList',
-    'isListNDArray', 'isOfSameShape', 'inRange', 'inArray', 'getChildFolder', 'cvtEnergyUnit', 'cvtLengthUnit',
-    'cvtMuUnit', 'radToDeg', 'degToRad', 'sysPlatform', 'getHW', 'is1D', 'as3D', 'nextPow2'
+    'isListNDArray', 'isOfSameShape', 'inRange', 'inArray', 'getAsset', 'cvtEnergyUnit', 'cvtLengthUnit', 'cvtMuUnit',
+    'radToDeg', 'degToRad', 'sysPlatform', 'getHW', 'is1D', 'as3D', 'nextPow2'
 ]
 
 import os
@@ -34,6 +34,7 @@ class CripException(BaseException):
     '''
         The universal expection class for crip.
     '''
+
     def __init__(self, *args: object) -> None:
         super().__init__(*args)
 
@@ -61,6 +62,7 @@ def ConvertListNDArray(f):
     '''
         Decorator to convert List[ndarray] to ndarray.
     '''
+
     @functools.wraps(f)
     def fn(*args, **kwargs):
         # args and kwargs are immutable
@@ -91,6 +93,7 @@ def asFloat(arr):
 def as3D(x: np.ndarray):
     cripAssert(is2or3D(x))
     return x if len(x.shape) == 3 else x[np.newaxis, ...]
+
 
 def is1D(x: np.ndarray):
     return isType(x, NDArray) and len(x.shape) == 1
@@ -166,8 +169,8 @@ def inArray(a, arr):
     return a in arr
 
 
-def getChildFolder(folder):
-    return os.path.join(os.path.dirname(os.path.abspath(__file__)), f'./{folder}')
+def getAsset(folder, prefix='_asset'):
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), f'{prefix}/{folder}')
 
 
 def cvtEnergyUnit(arr, from_, to):

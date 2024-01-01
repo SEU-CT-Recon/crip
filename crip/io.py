@@ -10,6 +10,7 @@ __all__ = [
 ]
 
 import os
+import re
 import numpy as np
 import tifffile
 import pydicom
@@ -19,27 +20,27 @@ from .utils import *
 from ._typing import *
 
 
-def listDirectory(folder: str, sort='nat', style='filename', natAlg='default', extFilter: str = None, reverse=False):
+def listDirectory(folder: str,
+                  style='filename',
+                  match: Or[re.Pattern, str, None] = None,
+                  sort='nat',
+                  reverse=False) -> Or[List[str], zip[Tuple[str, str]]]:
     '''
-        List files under `folder` and sort using `"nat"` (natural) or
-        `"dict"` (dictionary) order. The return `style` can be `filename`, `fullpath` or `both` (path, file).
-        `
+        List files under `folder` and sort in `nat`(ural) or `dict`(ionary) order. 
+        Return `style` can be `filename`, `fullpath` or `both` (path, name) tuple.
     '''
     cripAssert(sort in ['nat', 'dict'], 'Invalid sort.')
     cripAssert(style in ['filename', 'fullpath', 'both'], 'Invalid style.')
-    cripAssert(natAlg in ['default', 'locale'], 'Invalid natAlg.')
 
     files = os.listdir(folder)
-    if extFilter is not None:
-        if not extFilter.startswith('.'):
-            extFilter = '.' + extFilter
-        files = list(filter(lambda x: os.path.splitext(x)[1] == extFilter, files))
+
+    if match is not None:
+        if isinstance(match, str):
+            match = re.compile(match)
+        files = list(filter(lambda x: match.search(x), files))
 
     files = sorted(files, reverse=reverse) if sort == 'dict' else natsort.natsorted(
-        files, reverse=reverse, alg={
-            'default': natsort.ns.DEFAULT,
-            'locale': natsort.ns.LOCALE
-        }[natAlg])
+        files, reverse=reverse, alg=natsort.ns.DEFAULT)
 
     if style == 'filename':
         return files

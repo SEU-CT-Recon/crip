@@ -12,7 +12,7 @@ __all__ = [
 import numpy as np
 import cv2
 
-from .utils import ConvertListNDArray, cripAssert, getChildFolder, inArray, is2D, is2or3D, is3D, isInt, isType
+from .utils import ConvertListNDArray, cripAssert, getAsset, inArray, is2D, is2or3D, is3D, isInt, isType
 from ._typing import *
 from .io import imreadTiff
 from os import path
@@ -227,6 +227,6 @@ def shepplogan(size: int = 512):
     '''
     cripAssert(size in [256, 512, 1024], 'Shepp-Logan can only have size in 256 / 512 / 1024.')
 
-    phantomPath = path.join(getChildFolder('_asset/shepplogan'), f'{size}.tif')
+    phantomPath = path.join(getAsset('shepplogan'), f'{size}.tif')
 
     return imreadTiff(phantomPath)
