@@ -161,7 +161,7 @@ def imreadTiff(path: str, dtype=None):
 
 def imreadTiffs(dir_: str, dtype=None):
     '''
-        Read series of tiff images in directory.
+        Read series of tiff images in directory. Will add one dim.
     '''
     imgs = [imreadTiff(x, dtype) for x in listDirectory(dir_, style='fullpath')]
 
