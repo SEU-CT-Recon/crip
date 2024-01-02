@@ -1,7 +1,7 @@
 '''
     I/O module of crip.
 
-    https://github.com/z0gSh1u/crip
+    https://github.com/SEU-CT-Recon/crip
 '''
 
 __all__ = [
@@ -260,6 +260,9 @@ CTPARAMS = {
     # Manufacturer
     'Manufacturer': _CTPARAM([0x0008, 0x0070], str),
     'Manufacturer Model Name': _CTPARAM([0x0008, 0x1090], str),
+
+    # Study
+    'Series Instance UID': _CTPARAM([0x0020, 0x000E], str),
 
     # Patient status
     'Body Part Examined': _CTPARAM([0x0018, 0x0015], str),

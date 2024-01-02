@@ -2,7 +2,7 @@
     This example uses crip to perform truncation artifact correction on projections
     using existing projection and FDK reconstruction algorithm.
 
-    by CandleHouse @ https://github.com/z0gSh1u/crip
+    by CandleHouse @ https://github.com/SEU-CT-Recon/crip
 '''
 
 import numpy as np

@@ -1,12 +1,12 @@
 '''
     Shared module of crip.
 
-    https://github.com/z0gSh1u/crip
+    https://github.com/SEU-CT-Recon/crip
 '''
 
 __all__ = [
     'rotate', 'verticalFlip', 'horizontalFlip', 'stackFlip', 'resize', 'gaussianSmooth', 'stackImages', 'splitImages',
-    'binning', 'transpose', 'permute', 'shepplogan'
+    'binning', 'transpose', 'permute', 'shepplogan', 'applyPolyV2L2'
 ]
 
 import numpy as np
@@ -230,3 +230,37 @@ def shepplogan(size: int = 512):
     phantomPath = path.join(getAsset('shepplogan'), f'{size}.tif')
 
     return imreadTiff(phantomPath)
+
+
+def applyPolyV2L2(coeff: NDArray, A1: NDArray, A2: NDArray):
+    '''
+        Apply a 2nd-order polynomial to a pair of variables `A1, A2`.
+        
+        `c[0] * x1**2 + c[1] * x2**2 + c[2] * x1 * x2 + c[3] * x1 + c[4] * x2 + c[5]`
+    '''
+    cripAssert(len(coeff) in [5, 6], 'coeff should have length 5 or 6.')
+
+    if len(coeff) == 5:
+        bias = 0
+    else:
+        bias = coeff[5]
+
+    return coeff[0] * A1**2 + coeff[1] * A2**2 + coeff[2] * A1 * A2 + coeff[3] * A1 + coeff[4] * A2 + bias
+
+
+def fitPolyV2L2(x1: NDArray, x2: NDArray, y: NDArray, bias: bool = True):
+    '''
+        Fit a 2nd-order polynomial to a pair of variables `x1, x2`.
+        Output 6 coefficients. If bias is False, the last coefficient will be 0.
+
+        `c[0] * x1**2 + c[1] * x2**2 + c[2] * x1 * x2 + c[3] * x1 + c[4] * x2 + c[5]`
+    '''
+    x1sq = x1.T**2
+    x2sq = x2.T**2
+    x1x2 = (x1 * x2).T
+    x1 = x1.T
+    x2 = x2.T
+    const = np.ones((x1.T.shape[0])) if bias else np.zeros((x1.T.shape[0]))
+    A = np.array([x1sq, x2sq, x1x2, x1, x2, const]).T
+
+    return np.linalg.pinv(A) @ y

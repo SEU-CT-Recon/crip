@@ -1,7 +1,7 @@
 '''
     Low Dose CT (LDCT) module of crip.
 
-    https://github.com/z0gSh1u/crip
+    https://github.com/SEU-CT-Recon/crip
 '''
 
 __all__ = ['injectGaussianNoise', 'injectPoissonNoise', 'totalVariation']
@@ -75,20 +75,28 @@ def totalVariation(img: TwoOrThreeD) -> TwoOrThreeD:
     return tv
 
 
-def nps2D(img: TwoD, pixelSize: float, n=None):
-    h, w = img.shape
+def nps2D(roi: TwoOrThreeD, pixelSize: float, n: Or[int, None]=None):
+    '''
+        Compute the noise power spectrum (NPS) of a 2D region of interest (ROI).
+        It's recommended that you provide multiple samples (realizations) of the ROI.
+    '''
+    h, w = getHW(roi)
     cripAssert(h == w, 'h == w required.')
     dots = n or nextPow2(h)
 
-    detrend = img - np.mean(img)  # order 0
-    dft = np.fft.fftshift(np.fft.fft2(detrend, n=dots))
+    deTrend = roi - np.mean(roi)  # order 0
+    dft = np.fft.fftshift(np.fft.fft2(deTrend, n=dots))
     mod2 = np.real(dft * np.conj(dft))
 
     return mod2 * pixelSize * pixelSize / (h * w)
 
 
-def nps1D(img: TwoD, pixelSize: float, n=None):
-    nps = nps2D(img, pixelSize, n)
+def nps1D(roi: TwoOrThreeD, pixelSize: float, n: Or[int, None]=None):
+    '''
+        Compute the radially averaged noise power spectrum (NPS) of a 2D region of interest (ROI).
+        It's recommended that you provide multiple samples (realizations) of the ROI.
+    '''
+    nps = nps2D(roi, pixelSize, n)
     n = nps.shape[0]
 
     x, y = np.meshgrid(np.arange(nps.shape[1]), np.arange(nps.shape[0]))

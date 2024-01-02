@@ -1,7 +1,7 @@
 '''
     Internal typing module of crip.
 
-    https://github.com/z0gSh1u/crip
+    https://github.com/SEU-CT-Recon/crip
 '''
 
 import numpy as np

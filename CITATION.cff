@@ -15,7 +15,7 @@ authors:
   - given-names: Yuchen
     family-names: LU
     affiliation: 'Southeast University, China'
-repository-code: 'https://github.com/z0gSh1u/crip'
-url: 'https://github.com/z0gSh1u/crip'
-repository: 'https://github.com/z0gSh1u/crip'
+repository-code: 'https://github.com/SEU-CT-Recon/crip'
+url: 'https://github.com/SEU-CT-Recon/crip'
+repository: 'https://github.com/SEU-CT-Recon/crip'
 license: MIT

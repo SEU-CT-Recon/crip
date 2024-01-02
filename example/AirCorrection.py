@@ -2,7 +2,7 @@
     This example uses crip to perform air correction on projections
     using existing air projection.
 
-    by z0gSh1u @ https://github.com/z0gSh1u/crip
+    by z0gSh1u @ https://github.com/SEU-CT-Recon/crip
 '''
 
 import os

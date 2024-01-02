@@ -1,7 +1,7 @@
 '''
     Utilities of crip.
 
-    https://github.com/z0gSh1u/crip
+    https://github.com/SEU-CT-Recon/crip
 '''
 
 __all__ = [
@@ -257,15 +257,21 @@ def sysPlatform():
 
 
 def getHW(img: np.ndarray):
+    '''
+        Get height and width of `img`.
+    '''
     if is3D(img):
         _, h, w = img.shape
     elif is2D(img):
         h, w = img.shape
     else:
-        raise
+        cripAssert(False, 'img should be 2D or 3D.')
 
     return h, w
 
 
 def nextPow2(x):
+    '''
+        Get the next power of 2 of `x`.
+    '''
     return 1 if x == 0 else 2**math.ceil(math.log2(x))

@@ -1,7 +1,7 @@
 '''
     Preprocess module of crip.
 
-    https://github.com/z0gSh1u/crip
+    https://github.com/SEU-CT-Recon/crip
 '''
 
 __all__ = [
@@ -176,13 +176,7 @@ def correctBeamHardeningPolynomial(postlog: TwoOrThreeD, coeffs: Or[Tuple, np.po
         Apply the polynomial (\\mu L vs. PostLog fit) on postlog to perform basic beam hardening correction.
         `coeffs` can be either `tuple` or `np.poly1d`. Set `bias=True` if your coeffs includes the bias (order 0) term.
     '''
-    cripWarning(isType(coeffs, np.poly1d) and bias is False, 'When using np.poly1d as coeffs, bias is always True.')
-
-    if isType(coeffs, Tuple):
-        if bias is False:
-            coeffs = np.poly1d([*coeffs, 0])
-
-    return coeffs(postlog)
+    cripAssert(False, 'The implementation of this function is being re-investigating now.')
 
 
 @ConvertListNDArray

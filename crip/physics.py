@@ -1,7 +1,7 @@
 '''
     Physics module of crip.
 
-    https://github.com/z0gSh1u/crip
+    https://github.com/SEU-CT-Recon/crip
 '''
 
 __all__ = [
@@ -90,7 +90,7 @@ class Spectrum:
         '''
             Parse spectrum text as `Spectrum` class object.
             
-            Refer to the document for spectrum text format. @see https://github.com/z0gSh1u/crip            
+            Refer to the document for spectrum text format. @see https://github.com/SEU-CT-Recon/crip      
         '''
         cripAssert(inArray(unit, ['MeV', 'keV', 'eV']), f'Invalid unit: {unit}')
         omega = np.zeros(DiagEnergyLen, dtype=DefaultFloatDType)
@@ -402,20 +402,3 @@ def calcPathLength(detH, detW, detElementSize, thickness, SID, detCenter=None):
     rayIntersect = rayIntersect.reshape((detW, detH)).T
 
     return rayIntersect
-
-
-def applyPolyV2L2(coeff, A1, A2):
-    return coeff[0] * A1**2 + coeff[1] * A2**2 + coeff[2] * A1 * A2 + coeff[3] * A1 + coeff[4] * A2 + coeff[5]
-
-
-def deCalcBetaGamma(A1, A2, LComb):
-    A1Square = A1.T**2
-    A2Square = A2.T**2
-    A1A2 = (A1 * A2).T
-    A1 = A1.T
-    A2 = A2.T
-    # Ones = np.ones((A1.T.shape[0]))
-    Ones = np.zeros((A1.T.shape[0]))
-    A = np.array([A1Square, A2Square, A1A2, A1, A2, Ones]).T
-
-    return np.linalg.pinv(A) @ LComb

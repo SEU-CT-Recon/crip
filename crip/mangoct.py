@@ -1,10 +1,7 @@
 '''
-    MangoCT integration interface. See
-    https://gitee.com/njjixu/mangoct
-    https://github.com/z0gSh1u/mangoct
-    https://github.com/CandleHouse/mandoct
+    MangoCT integration interface. See https://github.com/SEU-CT-Recon/mandoct
 
-    https://github.com/z0gSh1u/crip
+    https://github.com/SEU-CT-Recon/crip
 '''
 
 __all__ = ['Mgfbp', 'Mgfpj', 'MgfbpConfig', 'MgfpjConfig']
@@ -14,11 +11,12 @@ import json
 import tempfile
 import subprocess
 
-from .utils import cripAssert, cripWarning, isType
+from .utils import cripAssert, isType
 from ._typing import *
 
 
 class _MgConfig(object):
+
     def __init__(self):
         pass
 
@@ -46,6 +44,7 @@ class _MgConfig(object):
 
 
 class MgfbpConfig(_MgConfig):
+
     def __init__(self):
         super().__init__()
         self.setIO(None, None, None, None, [])
@@ -153,6 +152,7 @@ class MgfbpConfig(_MgConfig):
 
 
 class MgfpjConfig(_MgConfig):
+
     def __init__(self):
         super().__init__()
         self.setIO(None, None, None, None, [])
@@ -220,6 +220,7 @@ class MgfpjConfig(_MgConfig):
 
 
 class _Mgbin(object):
+
     def __init__(self, exe: str, name: str, cudaDevice: int = 0, tempDir: str = None):
         self.exe = exe
         self.name = name
@@ -251,6 +252,7 @@ class _Mgbin(object):
 
 
 class Mgfbp(_Mgbin):
+
     def __init__(self, exe: str = 'mgfbp', cudaDevice: int = 0, tempDir: str = None):
         '''
             Initialize a handler object to use the FBP tool in mangoct.
@@ -260,6 +262,7 @@ class Mgfbp(_Mgbin):
 
 
 class Mgfpj(_Mgbin):
+
     def __init__(self, exe: str = 'mgfpj', cudaDevice=0, tempDir: str = None) -> None:
         '''
             Initialize a handler object to use the FPJ tool in mangoct.

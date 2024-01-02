@@ -1,11 +1,11 @@
 '''
     Metrics calculator module of crip.
 
-    https://github.com/z0gSh1u/crip
+    https://github.com/SEU-CT-Recon/crip
 '''
 
 import numpy as np
-from .utils import cripAssert, cripWarning
+from .utils import cripWarning
 from ._typing import *
 from skimage.metrics import structural_similarity, peak_signal_noise_ratio
 

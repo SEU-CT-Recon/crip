@@ -1,7 +1,7 @@
 '''
     Postprocess module of crip.
 
-    https://github.com/z0gSh1u/crip
+    https://github.com/SEU-CT-Recon/crip
 '''
 
 __all__ = [
@@ -38,12 +38,10 @@ def fovCropRadius(SOD: float, SDD: float, detWidth: float, reconPixSize: float, 
         Get the radius (in pixel) of the circle valid FOV of the reconstructed volume.
 
         Geometry:
-            - SOD: Source Object Distance.
-            - SDD: Source Detector Distance.
-            - detWidth: Width of the detector, i.e., nElements * detElementWidth.
-            - reconPixSize: Pixel size of the reconstructed image.
-        
-        Note that all these lengths should have same unit, like (mm) as recommended.
+            - SOD: Source Object Distance
+            - SDD: Source Detector Distance
+            - detWidth: Width of the detector, i.e., nElements * detElementWidth
+            - reconPixSize: Pixel size of the reconstructed image
     '''
     halfDW = detWidth / 2
     L = np.sqrt(halfDW**2 + SDD**2)
@@ -116,6 +114,7 @@ def huNoRescale(image: TwoOrThreeD, b: float = -1000, k: float = 1) -> TwoOrThre
     return (image - b) / k
 
 
+@ConvertListNDArray
 def postlogsToProjections(postlogs: TwoOrThreeD, flat: Or[TwoD, float]) -> TwoOrThreeD:
     '''
         Invert postlog images to the original projections.

@@ -206,3 +206,13 @@ def makeImageGrid(subimages: List[TwoD],
         grid[ncols * i].set_ylabel(rowTitles[i], fontdict=fontdict)
 
     return fig
+
+
+def plotMu(atten, start, fig, logScale=True):
+    x = list(DiagEnergyRange)[start:]
+    fig.figure()
+    fig.plot(x, atten.mu[start:])
+    if logScale:
+        fig.yscale('log')
+    fig.xlabel('Energy (keV)')
+    fig.ylabel('LAC (1/mm)')

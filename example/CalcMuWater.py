@@ -1,7 +1,7 @@
 '''
     This example uses crip to calculate \mu_water for a specified spectrum.
 
-    by z0gSh1u @ https://github.com/z0gSh1u/crip
+    by z0gSh1u @ https://github.com/SEU-CT-Recon/crip
 '''
 
 from crip.physics import calcMu, Atten, Spectrum, getClassicDensity
