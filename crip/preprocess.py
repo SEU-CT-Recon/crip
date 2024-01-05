@@ -7,7 +7,7 @@
 __all__ = [
     'averageProjections', 'flatDarkFieldCorrection', 'projectionsToSinograms', 'sinogramsToProjections', 'padImage',
     'padSinogram', 'correctBeamHardeningPolynomial', 'injectGaussianNoise', 'injectPoissonNoise', 'binning',
-    'fanToPara', 'correctRingArtifactInProj'
+    'fanToPara', 'correctRingArtifactInProj', 'correctFlatDarkField'
 ]
 
 import numpy as np
@@ -72,6 +72,10 @@ def flatDarkFieldCorrection(projections: TwoOrThreeD,
     res[res == np.nan] = 0
 
     return res
+
+
+# a recommended alias
+correctFlatDarkField = flatDarkFieldCorrection
 
 
 @ConvertListNDArray
@@ -218,7 +222,7 @@ def fanToPara(sgm: TwoD, gammas: NDArray, betas: NDArray, sid: float, oThetas: T
               / | <- SID
              /  |
         ====X============ <- detector
-            ^---^ <- offcenter
+            ^<--^ <- offcenter
     '''
     nThetas = np.round((oThetas[2] - oThetas[0]) / oThetas[1]).astype(np.int32)
     nLines = np.round((oLines[2] - oLines[0]) / oLines[1]).astype(np.int32)

@@ -6,7 +6,7 @@
 
 __all__ = [
     'rotate', 'verticalFlip', 'horizontalFlip', 'stackFlip', 'resize', 'gaussianSmooth', 'stackImages', 'splitImages',
-    'binning', 'transpose', 'permute', 'shepplogan', 'applyPolyV2L2'
+    'binning', 'transpose', 'permute', 'shepplogan', 'fitPolyV1D2', 'fitPolyV2D2', 'applyPolyV1D2', 'applyPolyV2D2'
 ]
 
 import numpy as np
@@ -232,9 +232,27 @@ def shepplogan(size: int = 512):
     return imreadTiff(phantomPath)
 
 
-def applyPolyV2L2(coeff: NDArray, A1: NDArray, A2: NDArray):
+def fitPolyV2D2(x1: NDArray, x2: NDArray, y: NDArray, bias: bool = True):
     '''
-        Apply a 2nd-order polynomial to a pair of variables `A1, A2`.
+        Fit a degree-2 polynomial using pseudo-inverse to a pair of variables `x1, x2`.
+        Output 6 coefficients. If `bias` is False, the last coefficient will be 0.
+
+        `c[0] * x1**2 + c[1] * x2**2 + c[2] * x1 * x2 + c[3] * x1 + c[4] * x2 + c[5]`
+    '''
+    x1sq = x1.T**2
+    x2sq = x2.T**2
+    x1x2 = (x1 * x2).T
+    x1 = x1.T
+    x2 = x2.T
+    const = (np.ones if bias else np.zeros)((x1.T.shape[0]))
+    A = np.array([x1sq, x2sq, x1x2, x1, x2, const]).T
+
+    return np.linalg.pinv(A) @ y
+
+
+def applyPolyV2D2(coeff: NDArray, x1: NDArray, x2: NDArray):
+    '''
+        Apply a degree-2 polynomial to a pair of variables `x1, x2`.
         
         `c[0] * x1**2 + c[1] * x2**2 + c[2] * x1 * x2 + c[3] * x1 + c[4] * x2 + c[5]`
     '''
@@ -245,47 +263,35 @@ def applyPolyV2L2(coeff: NDArray, A1: NDArray, A2: NDArray):
     else:
         bias = coeff[5]
 
-    return coeff[0] * A1**2 + coeff[1] * A2**2 + coeff[2] * A1 * A2 + coeff[3] * A1 + coeff[4] * A2 + bias
+    return coeff[0] * x1**2 + coeff[1] * x2**2 + coeff[2] * x1 * x2 + coeff[3] * x1 + coeff[4] * x2 + bias
 
 
-def fitPolyV2L2(x1: NDArray, x2: NDArray, y: NDArray, bias: bool = True):
+def fitPolyV1D2(x1: NDArray, y: NDArray, bias: bool = True):
     '''
-        Fit a 2nd-order polynomial to a pair of variables `x1, x2`.
-        Output 6 coefficients. If bias is False, the last coefficient will be 0.
+        Fit a degree-2 polynomial using pseudo-inverse to a variable `x1`.
+        Output 3 coefficients. If `bias` is False, the last coefficient will be 0.
 
-        `c[0] * x1**2 + c[1] * x2**2 + c[2] * x1 * x2 + c[3] * x1 + c[4] * x2 + c[5]`
+        `c[0] * x1**2 + c[1] * x1 + c[2]`
     '''
     x1sq = x1.T**2
-    x2sq = x2.T**2
-    x1x2 = (x1 * x2).T
     x1 = x1.T
-    x2 = x2.T
-    const = np.ones((x1.T.shape[0])) if bias else np.zeros((x1.T.shape[0]))
-    A = np.array([x1sq, x2sq, x1x2, x1, x2, const]).T
+    const = (np.ones if bias else np.zeros)((x1.T.shape[0]))
+    A = np.array([x1sq, x1, const]).T
 
     return np.linalg.pinv(A) @ y
 
 
-def applyPolyV1L2(coeff: NDArray, A1: NDArray):
+def applyPolyV1D2(coeff: NDArray, x1: NDArray):
     '''
-        Apply a 2nd-order polynomial to a pair of variables `A1, A2`.
+        Apply a degree-2 polynomial to a variable `x1`.
         
-        `c[0] * x1**2 + c[1] * x2**2 + c[2] * x1 * x2 + c[3] * x1 + c[4] * x2 + c[5]`
+        `c[0] * x1**2 + c[1] * x1 + c[2]`
     '''
-    cripAssert(len(coeff) in [2, 3], 'coeff should have length 5 or 6.')
+    cripAssert(len(coeff) in [2, 3], 'coeff should have length 2 or 3.')
 
     if len(coeff) == 5:
         bias = 0
     else:
         bias = coeff[2]
 
-    return coeff[0] * A1**2 + coeff[1] * A1 + bias
-
-
-def fitPolyV1L2(x1: NDArray, y: NDArray, bias: bool = True):
-    x1sq = x1.T**2
-    x1 = x1.T
-    const = np.ones((x1.T.shape[0])) if bias else np.zeros((x1.T.shape[0]))
-    A = np.array([x1sq, x1, const]).T
-
-    return np.linalg.pinv(A) @ y
+    return coeff[0] * x1**2 + coeff[1] * x1 + bias

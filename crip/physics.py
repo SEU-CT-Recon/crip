@@ -37,6 +37,7 @@ AttenAliases = {
 }
 
 
+# recommended
 class EnergyConversion(enum.Enum):
     EID = 'EID'  # Energy-Integrating Detector
     PCD = 'PCD'  # Photon-Counting Detector
@@ -385,11 +386,12 @@ def calcContrastHU(contrast: Atten, spec: Spectrum, energyConversion: str, base:
     return contrastHU
 
 
-def calcPathLength(detH, detW, detElementSize, thickness, SID, detCenter=None):
+def calcPathLength(thickness: float, SID: float, detH: int, detW: int, detElementSize: float):
     '''
-        Generate ideal water thickness maps.
+        Calculate the X-ray peneration pathlength of an cuboid object based on geometry.
+        SID is source-isocenter distance. Currently no offset can be assumed.
     '''
-    detCenter = detCenter or (detW / 2, detH / 2)
+    detCenter = (detW / 2, detH / 2)
     r, c = np.meshgrid(np.arange(detH), np.arange(detW))
     coords = np.array((r.flatten(), c.flatten()), dtype=np.float32).T
 

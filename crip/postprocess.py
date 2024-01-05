@@ -46,11 +46,11 @@ def fovCropRadius(SOD: float, SDD: float, detWidth: float, reconPixSize: float, 
     halfDW = detWidth / 2
     L = np.sqrt(halfDW**2 + SDD**2)
 
-    # 1 - Treat table as arc, L_arc = r \times \theta.
+    # Treat table as arc, L_arc = r \times \theta.
     Larc = SOD * np.arcsin(halfDW / L)
     r1 = Larc / reconPixSize
 
-    # 2 - Treat table as plane, L_flat = \tan(\theta) \times r
+    # Treat table as plane, L_flat = \tan(\theta) \times r
     Lflat = SOD / (SDD / detWidth) / 2
     r2 = Lflat / reconPixSize
 

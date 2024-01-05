@@ -8,11 +8,13 @@ import cv2
 import numpy as np
 from matplotlib import font_manager
 import matplotlib.pyplot as plt
-import matplotlib.patches as patches
+import matplotlib.figure
+import matplotlib.patches
+import matplotlib.axes
 from mpl_toolkits.axes_grid1 import ImageGrid
 from ._typing import *
 from .utils import cripAssert, is1D, isInt, cripWarning
-from .physics import Spectrum, DiagEnergyRange
+from .physics import Spectrum, DiagEnergyRange, Atten
 from .shared import resize
 
 __all__ = ['smooth', 'window', 'average', 'addFont', 'fontdict', 'zoomIn', 'plotSpectrum', 'makeImageGrid']
@@ -22,7 +24,7 @@ def smooth(data: NDArray, winSize: int = 5):
     '''
         Smooth an 1D array by moving averaging window. This name follows MATLAB.
 
-        The implementation is from: https://stackoverflow.com/questions/40443020
+        The implementation is from https://stackoverflow.com/questions/40443020
     '''
     cripAssert(is1D(data), '`data` should be 1D array.')
     cripAssert(isInt(winSize) and winSize % 2 == 1, '`winSize` should be odd integer.')
@@ -77,30 +79,23 @@ def average(imgs: ThreeD, i: int, r: int):
     return np.mean(imgs[i - r:i + r], axis=0)
 
 
-def zoomIn(img, x, y, hw):
+def zoomIn(img, row, col, h, w):
     '''
-        Crop a patch.
+        Crop a patch. (row, col) determines the left-top point. (h, w) gives height and width.
     '''
-    return img[y:y + hw, x:x + hw]
+    return img[row:row + h, col:col + w]
 
 
-def stddev(img, leftTop, h, w):
-    y, x = leftTop
-    crop = img[x:x + h, y:y + w]
-    return np.std(crop)
+def stddev(img, row, col, h, w):
+    '''
+        Compute the standard deviation of a image crop.
+        (row, col) determines the left-top point. (h, w) gives height and width.
+    '''
+    return np.std(zoomIn(img, row, col, h, w))
 
 
 def fontdict(family, weight, size):
     return {'family': family, 'weight': weight, 'size': size}
-
-
-def plotSpectrum(fig, spec: Spectrum):
-    energies = DiagEnergyRange
-    omega = spec.omega
-
-    fig.plot(energies, omega, 'k')
-    fig.xlabel('Energy (keV)')
-    fig.ylabel('Omega')
 
 
 def makeImageGrid(subimages: List[TwoD],
@@ -111,14 +106,31 @@ def makeImageGrid(subimages: List[TwoD],
                   crops=None,
                   cropLocs='bottom right',
                   cropEdgeColor='yellow',
-                  cropSize=512 // 4,
+                  cropSize=64,
                   figsize=None,
                   vmin0vmax1=True):
+    '''
+        Make an Image Grid.
+        `preprocessor(index, subimage)` is applied to each subimage, e.g, perform windowing.
+        `figsize` accepts that for `plt.figure(figsize=...)`.
+        `vmin0vmax1=True` guarantees correct windowing when windowed image is not compactly supported in [0, 1].
+        Return the handle of plt.Figure.
+    ```
+               colTitles
+            +-------------+
+            |             |
+    row     |  subImages  |  ...
+    Titles  |       +-----|
+            |       |crop |
+            +-------------+
+                  ...
+    '''
 
     cripWarning(
         vmin0vmax1,
         'vmin0vmax1=False is not recommended because it might cause incorrect windowing. Make sure you know what you are doing.'
     )
+
     cripAssert(len(subimages) == ncols * nrows)
     cripAssert(crops is None or len(crops) == nrows)
 
@@ -127,6 +139,9 @@ def makeImageGrid(subimages: List[TwoD],
 
     if isinstance(cropLocs, str):
         cropLocs = [cropLocs] * nrows
+
+    cripAssert(all(list(map(lambda x: x in ['bottom right', 'bottom left', 'top right', 'top left'], cropLocs))),
+               'Invalid cropLocs, not in `bottom right`, `bottom left`, `top right`, `top left`.')
 
     fig = plt.figure(figsize=figsize or (ncols * 2, nrows * 2))
 
@@ -137,7 +152,7 @@ def makeImageGrid(subimages: List[TwoD],
 
     if crops is not None:
         rects = [
-            patches.Rectangle((x, y), hw, hw, linewidth=1, edgecolor=cropEdgeColor, facecolor='none')
+            matplotlib.patches.Rectangle((x, y), hw, hw, linewidth=1, edgecolor=cropEdgeColor, facecolor='none')
             for x, y, hw in crops
         ]
     else:
@@ -154,42 +169,40 @@ def makeImageGrid(subimages: List[TwoD],
 
         patch = zoomIn(im, *crops[i // ncols])
         patch = resize(patch, (cropSize, cropSize))
-        cropLoc = cropLocs[i // ncols]
+        cropLocs = cropLocs[i // ncols]
 
-        if cropLoc == 'bottom right':
+        if cropLocs == 'bottom right':
             im[-patch.shape[0]:, -patch.shape[1]:] = patch
-            patchRect = patches.Rectangle((im.shape[1] - patch.shape[1], im.shape[0] - patch.shape[0]),
-                                          patch.shape[1],
-                                          patch.shape[0],
-                                          linewidth=1,
-                                          edgecolor=cropEdgeColor,
-                                          facecolor='none')
-        elif cropLoc == 'top left':
+            patchRect = matplotlib.patches.Rectangle((im.shape[1] - patch.shape[1], im.shape[0] - patch.shape[0]),
+                                                     patch.shape[1],
+                                                     patch.shape[0],
+                                                     linewidth=1,
+                                                     edgecolor=cropEdgeColor,
+                                                     facecolor='none')
+        elif cropLocs == 'top left':
             im[:patch.shape[0], :patch.shape[1]] = patch
-            patchRect = patches.Rectangle((0, 0),
-                                          patch.shape[1],
-                                          patch.shape[0],
-                                          linewidth=1,
-                                          edgecolor=cropEdgeColor,
-                                          facecolor='none')
-        elif cropLoc == 'bottom left':
+            patchRect = matplotlib.patches.Rectangle((0, 0),
+                                                     patch.shape[1],
+                                                     patch.shape[0],
+                                                     linewidth=1,
+                                                     edgecolor=cropEdgeColor,
+                                                     facecolor='none')
+        elif cropLocs == 'bottom left':
             im[-patch.shape[0]:, :patch.shape[1]] = patch
-            patchRect = patches.Rectangle((0, im.shape[0] - patch.shape[0]),
-                                          patch.shape[1],
-                                          patch.shape[0],
-                                          linewidth=1,
-                                          edgecolor=cropEdgeColor,
-                                          facecolor='none')
-        elif cropLoc == 'top right':
+            patchRect = matplotlib.patches.Rectangle((0, im.shape[0] - patch.shape[0]),
+                                                     patch.shape[1],
+                                                     patch.shape[0],
+                                                     linewidth=1,
+                                                     edgecolor=cropEdgeColor,
+                                                     facecolor='none')
+        elif cropLocs == 'top right':
             im[:patch.shape[0], -patch.shape[1]:] = patch
-            patchRect = patches.Rectangle((im.shape[1] - patch.shape[1], 0),
-                                          patch.shape[1],
-                                          patch.shape[0],
-                                          linewidth=1,
-                                          edgecolor=cropEdgeColor,
-                                          facecolor='none')
-        else:
-            raise
+            patchRect = matplotlib.patches.Rectangle((im.shape[1] - patch.shape[1], 0),
+                                                     patch.shape[1],
+                                                     patch.shape[0],
+                                                     linewidth=1,
+                                                     edgecolor=cropEdgeColor,
+                                                     facecolor='none')
 
         ax.add_patch(patchRect)
 
@@ -208,11 +221,31 @@ def makeImageGrid(subimages: List[TwoD],
     return fig
 
 
-def plotMu(atten, start, fig, logScale=True):
-    x = list(DiagEnergyRange)[start:]
-    fig.figure()
-    fig.plot(x, atten.mu[start:])
+def plotSpectrum(ax: matplotlib.axes.Axes, spec: Spectrum):
+    '''
+        Plot the spectrum in `ax`. Example
+        ```
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        plotSpectrum(ax, spec)
+    '''
+    energies = DiagEnergyRange
+    omega = spec.omega
+
+    ax.plot(energies, omega, 'k')
+    ax.set_xlabel('Energy (keV)')
+    ax.set_ylabel('Omega')
+
+
+def plotMu(ax: matplotlib.axes.Axes, atten: Atten, startEnergy: int = 1, logScale=True):
+    '''
+        Plot the LACs of `atten` from `startEnergy` keV in ax in `logScale` if true.
+    '''
+    x = list(DiagEnergyRange)[startEnergy:]
+    ax.plot(x, atten.mu[startEnergy:])
+
     if logScale:
-        fig.yscale('log')
-    fig.xlabel('Energy (keV)')
-    fig.ylabel('LAC (1/mm)')
+        ax.set_yscale('log')
+
+    ax.xlabel('Energy (keV)')
+    ax.ylabel('LAC (1/mm)')

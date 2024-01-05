@@ -31,7 +31,10 @@ def injectGaussianNoise(projections: TwoOrThreeD, sigma: float, mu: float = 0) -
 
 
 @ConvertListNDArray
-def injectPoissonNoise(projections: TwoOrThreeD, type_: str = 'postlog', nPhoton: Or[int, float] = 1) -> TwoOrThreeD:
+def injectPoissonNoise(projections: TwoOrThreeD,
+                       type_: str = 'postlog',
+                       nPhoton: Or[int, float] = 1,
+                       suppressWarning=False) -> TwoOrThreeD:
     '''
         Inject Poisson noise which obeys distribution `P(\\lambda)` where \\lambda is the ground-truth quanta in `projections`.
         `projections` must have int type whose value stands for the photon quanta in some way. Floating projections
@@ -49,7 +52,9 @@ def injectPoissonNoise(projections: TwoOrThreeD, type_: str = 'postlog', nPhoton
     img = img * nPhoton  # N0 exp(-\sum \mu L)
 
     cripAssert(np.min(img >= 0), '`img` should not contain negative values.')
-    cripWarning(isIntType(img), '`img` should have int dtype. It will be floored after rescaling.')
+    if not suppressWarning:
+        # temporary workaround
+        cripWarning(isIntType(img), '`img` should have int dtype. It will be floored after rescaling.')
 
     img = np.random.poisson(img.astype(np.uint32)).astype(DefaultFloatDType)
     img[img <= 0] = 1
@@ -75,7 +80,7 @@ def totalVariation(img: TwoOrThreeD) -> TwoOrThreeD:
     return tv
 
 
-def nps2D(roi: TwoOrThreeD, pixelSize: float, n: Or[int, None]=None):
+def nps2D(roi: TwoOrThreeD, pixelSize: float, n: Or[int, None] = None):
     '''
         Compute the noise power spectrum (NPS) of a 2D region of interest (ROI).
         It's recommended that you provide multiple samples (realizations) of the ROI.
@@ -91,7 +96,7 @@ def nps2D(roi: TwoOrThreeD, pixelSize: float, n: Or[int, None]=None):
     return mod2 * pixelSize * pixelSize / (h * w)
 
 
-def nps1D(roi: TwoOrThreeD, pixelSize: float, n: Or[int, None]=None):
+def nps1D(roi: TwoOrThreeD, pixelSize: float, n: Or[int, None] = None):
     '''
         Compute the radially averaged noise power spectrum (NPS) of a 2D region of interest (ROI).
         It's recommended that you provide multiple samples (realizations) of the ROI.
