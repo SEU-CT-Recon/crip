@@ -264,3 +264,28 @@ def fitPolyV2L2(x1: NDArray, x2: NDArray, y: NDArray, bias: bool = True):
     A = np.array([x1sq, x2sq, x1x2, x1, x2, const]).T
 
     return np.linalg.pinv(A) @ y
+
+
+def applyPolyV1L2(coeff: NDArray, A1: NDArray):
+    '''
+        Apply a 2nd-order polynomial to a pair of variables `A1, A2`.
+        
+        `c[0] * x1**2 + c[1] * x2**2 + c[2] * x1 * x2 + c[3] * x1 + c[4] * x2 + c[5]`
+    '''
+    cripAssert(len(coeff) in [2, 3], 'coeff should have length 5 or 6.')
+
+    if len(coeff) == 5:
+        bias = 0
+    else:
+        bias = coeff[2]
+
+    return coeff[0] * A1**2 + coeff[1] * A1 + bias
+
+
+def fitPolyV1L2(x1: NDArray, y: NDArray, bias: bool = True):
+    x1sq = x1.T**2
+    x1 = x1.T
+    const = np.ones((x1.T.shape[0])) if bias else np.zeros((x1.T.shape[0]))
+    A = np.array([x1sq, x1, const]).T
+
+    return np.linalg.pinv(A) @ y
