@@ -7,15 +7,63 @@ on:
     branches: [master]
 
 jobs:
-  run-unit-tests:
+  test-on-python37:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: InstallPython3
+      - name: InstallPython37
         uses: actions/setup-python@v1
         with:
-          python-version: 3.7
-      - name: Install
+          python-version: '3.7'
+      - name: InstallCrip
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: RunTests
+        run: |
+          python -m unittest discover
+
+  test-on-python38:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: InstallPython38
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.8'
+      - name: InstallCrip
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: RunTests
+        run: |
+          python -m unittest discover
+
+  test-on-python39:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: InstallPython39
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.9'
+      - name: InstallCrip
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: RunTests
+        run: |
+          python -m unittest discover
+
+  test-on-python310:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: InstallPython39
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.10'
+      - name: InstallCrip
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
