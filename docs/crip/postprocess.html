@@ -72,7 +72,7 @@
 
                         <div class="docstring"><p>Postprocess module of crip.</p>
 
-<p><a href="https://github.com/z0gSh1u/crip">https://github.com/z0gSh1u/crip</a></p>
+<p><a href="https://github.com/SEU-CT-Recon/crip">https://github.com/SEU-CT-Recon/crip</a></p>
 </div>
 
                         <input id="mod-postprocess-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
@@ -82,7 +82,7 @@
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a><span class="sd">    Postprocess module of crip.</span>
 </span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a>
-</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="sd">    https://github.com/z0gSh1u/crip</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="sd">    https://github.com/SEU-CT-Recon/crip</span>
 </span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a>
 </span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
@@ -119,91 +119,90 @@
 </span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a><span class="sd">        Get the radius (in pixel) of the circle valid FOV of the reconstructed volume.</span>
 </span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a>
 </span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a><span class="sd">        Geometry:</span>
-</span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a><span class="sd">            - SOD: Source Object Distance.</span>
-</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a><span class="sd">            - SDD: Source Detector Distance.</span>
-</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a><span class="sd">            - detWidth: Width of the detector, i.e., nElements * detElementWidth.</span>
-</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a><span class="sd">            - reconPixSize: Pixel size of the reconstructed image.</span>
-</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="sd">        </span>
-</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="sd">        Note that all these lengths should have same unit, like (mm) as recommended.</span>
-</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a>    <span class="n">halfDW</span> <span class="o">=</span> <span class="n">detWidth</span> <span class="o">/</span> <span class="mi">2</span>
-</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a>    <span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">halfDW</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">SDD</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
-</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a>
-</span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>    <span class="c1"># 1 - Treat table as arc, L_arc = r \times \theta.</span>
-</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>    <span class="n">Larc</span> <span class="o">=</span> <span class="n">SOD</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arcsin</span><span class="p">(</span><span class="n">halfDW</span> <span class="o">/</span> <span class="n">L</span><span class="p">)</span>
-</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>    <span class="n">r1</span> <span class="o">=</span> <span class="n">Larc</span> <span class="o">/</span> <span class="n">reconPixSize</span>
-</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>
-</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a>    <span class="c1"># 2 - Treat table as plane, L_flat = \tan(\theta) \times r</span>
-</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>    <span class="n">Lflat</span> <span class="o">=</span> <span class="n">SOD</span> <span class="o">/</span> <span class="p">(</span><span class="n">SDD</span> <span class="o">/</span> <span class="n">detWidth</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
-</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>    <span class="n">r2</span> <span class="o">=</span> <span class="n">Lflat</span> <span class="o">/</span> <span class="n">reconPixSize</span>
-</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a>
-</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>    <span class="c1"># As we all know, tanx = x+x^3/3 + O(x^3), (|x| &lt; pi/2).</span>
-</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a>    <span class="c1"># So under no circumstances will r1 greater than r2.</span>
-</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a>    <span class="n">r3</span> <span class="o">=</span> <span class="n">SOD</span> <span class="o">/</span> <span class="p">(</span><span class="n">L</span> <span class="o">/</span> <span class="n">halfDW</span><span class="p">)</span> <span class="o">/</span> <span class="n">reconPixSize</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a><span class="sd">            - SOD: Source Object Distance</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a><span class="sd">            - SDD: Source Detector Distance</span>
+</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a><span class="sd">            - detWidth: Width of the detector, i.e., nElements * detElementWidth</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a><span class="sd">            - reconPixSize: Pixel size of the reconstructed image</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a>    <span class="n">halfDW</span> <span class="o">=</span> <span class="n">detWidth</span> <span class="o">/</span> <span class="mi">2</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a>    <span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">halfDW</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">SDD</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a>
+</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a>    <span class="c1"># Treat table as arc, L_arc = r \times \theta.</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a>    <span class="n">Larc</span> <span class="o">=</span> <span class="n">SOD</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arcsin</span><span class="p">(</span><span class="n">halfDW</span> <span class="o">/</span> <span class="n">L</span><span class="p">)</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>    <span class="n">r1</span> <span class="o">=</span> <span class="n">Larc</span> <span class="o">/</span> <span class="n">reconPixSize</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>
+</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>    <span class="c1"># Treat table as plane, L_flat = \tan(\theta) \times r</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>    <span class="n">Lflat</span> <span class="o">=</span> <span class="n">SOD</span> <span class="o">/</span> <span class="p">(</span><span class="n">SDD</span> <span class="o">/</span> <span class="n">detWidth</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a>    <span class="n">r2</span> <span class="o">=</span> <span class="n">Lflat</span> <span class="o">/</span> <span class="n">reconPixSize</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>
+</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>    <span class="c1"># As we all know, tanx = x+x^3/3 + O(x^3), (|x| &lt; pi/2).</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a>    <span class="c1"># So under no circumstances will r1 greater than r2.</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>    <span class="n">r3</span> <span class="o">=</span> <span class="n">SOD</span> <span class="o">/</span> <span class="p">(</span><span class="n">L</span> <span class="o">/</span> <span class="n">halfDW</span><span class="p">)</span> <span class="o">/</span> <span class="n">reconPixSize</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a>
+</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a>    <span class="n">r</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">r1</span><span class="p">,</span> <span class="n">r2</span><span class="p">,</span> <span class="n">r3</span><span class="p">)</span>
 </span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>
-</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>    <span class="n">r</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">r1</span><span class="p">,</span> <span class="n">r2</span><span class="p">,</span> <span class="n">r3</span><span class="p">)</span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>    <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">if</span> <span class="n">roundOff</span> <span class="k">else</span> <span class="n">r</span>
 </span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>
-</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>    <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">if</span> <span class="n">roundOff</span> <span class="k">else</span> <span class="n">r</span>
-</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>
-</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>
-</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a><span class="nd">@ConvertListNDArray</span>
-</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="k">def</span> <span class="nf">fovCrop</span><span class="p">(</span><span class="n">img</span><span class="p">:</span> <span class="n">TwoOrThreeD</span><span class="p">,</span> <span class="n">radius</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">fill</span><span class="p">:</span> <span class="n">Or</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ThreeD</span><span class="p">:</span>
-</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="sd">        Crop a circle FOV on reconstructed image `img` with `radius` (pixel) \\</span>
-</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a><span class="sd">        and `fill` value for outside FOV.</span>
-</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>    <span class="n">cripAssert</span><span class="p">(</span><span class="n">radius</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">isInt</span><span class="p">(</span><span class="n">radius</span><span class="p">),</span> <span class="s1">&#39;Invalid radius. Radius should be positive int.&#39;</span><span class="p">)</span>
-</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>    <span class="n">cripAssert</span><span class="p">(</span><span class="n">is2or3D</span><span class="p">(</span><span class="n">img</span><span class="p">),</span> <span class="s1">&#39;img should be 2D or 3D.&#39;</span><span class="p">)</span>
-</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>
-</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>    <span class="n">N</span><span class="p">,</span> <span class="n">M</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
-</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DefaultFloatDType</span><span class="p">)</span> <span class="o">-</span> <span class="n">N</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mf">0.5</span>
-</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DefaultFloatDType</span><span class="p">)</span> <span class="o">-</span> <span class="n">M</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mf">0.5</span>
-</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a>    <span class="n">xx</span><span class="p">,</span> <span class="n">yy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a>
-</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>    <span class="n">outside</span> <span class="o">=</span> <span class="n">xx</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">yy</span><span class="o">**</span><span class="mi">2</span> <span class="o">&gt;</span> <span class="n">radius</span><span class="o">**</span><span class="mi">2</span>
-</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>    <span class="n">cropped</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>
-</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>    <span class="k">if</span> <span class="n">is3D</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
-</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>        <span class="n">cropped</span><span class="p">[:,</span> <span class="n">outside</span><span class="p">]</span> <span class="o">=</span> <span class="n">fill</span>
-</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>        <span class="n">cropped</span><span class="p">[</span><span class="n">outside</span><span class="p">]</span> <span class="o">=</span> <span class="n">fill</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>
+</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="nd">@ConvertListNDArray</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="k">def</span> <span class="nf">fovCrop</span><span class="p">(</span><span class="n">img</span><span class="p">:</span> <span class="n">TwoOrThreeD</span><span class="p">,</span> <span class="n">radius</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">fill</span><span class="p">:</span> <span class="n">Or</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ThreeD</span><span class="p">:</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="sd">        Crop a circle FOV on reconstructed image `img` with `radius` (pixel) \\</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a><span class="sd">        and `fill` value for outside FOV.</span>
+</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>    <span class="n">cripAssert</span><span class="p">(</span><span class="n">radius</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">isInt</span><span class="p">(</span><span class="n">radius</span><span class="p">),</span> <span class="s1">&#39;Invalid radius. Radius should be positive int.&#39;</span><span class="p">)</span>
+</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>    <span class="n">cripAssert</span><span class="p">(</span><span class="n">is2or3D</span><span class="p">(</span><span class="n">img</span><span class="p">),</span> <span class="s1">&#39;img should be 2D or 3D.&#39;</span><span class="p">)</span>
+</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>
+</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>    <span class="n">N</span><span class="p">,</span> <span class="n">M</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
+</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DefaultFloatDType</span><span class="p">)</span> <span class="o">-</span> <span class="n">N</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mf">0.5</span>
+</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DefaultFloatDType</span><span class="p">)</span> <span class="o">-</span> <span class="n">M</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mf">0.5</span>
+</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>    <span class="n">xx</span><span class="p">,</span> <span class="n">yy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>
+</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a>    <span class="n">outside</span> <span class="o">=</span> <span class="n">xx</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">yy</span><span class="o">**</span><span class="mi">2</span> <span class="o">&gt;</span> <span class="n">radius</span><span class="o">**</span><span class="mi">2</span>
+</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a>    <span class="n">cropped</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>
+</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>    <span class="k">if</span> <span class="n">is3D</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
+</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>        <span class="n">cropped</span><span class="p">[:,</span> <span class="n">outside</span><span class="p">]</span> <span class="o">=</span> <span class="n">fill</span>
+</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>        <span class="n">cropped</span><span class="p">[</span><span class="n">outside</span><span class="p">]</span> <span class="o">=</span> <span class="n">fill</span>
+</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>
+</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>    <span class="k">return</span> <span class="n">cropped</span>
 </span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>
-</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>    <span class="k">return</span> <span class="n">cropped</span>
-</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>
-</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>
-</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a><span class="nd">@ConvertListNDArray</span>
-</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a><span class="k">def</span> <span class="nf">muToHU</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="n">TwoOrThreeD</span><span class="p">,</span> <span class="n">muWater</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TwoOrThreeD</span><span class="p">:</span>
-</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a><span class="sd">        Convert \\mu map to HU.</span>
-</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a><span class="sd">        </span>
-</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a><span class="sd">        `HU = (\\mu - \\muWater) / \\muWater * b`</span>
-</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>    <span class="k">return</span> <span class="p">(</span><span class="n">image</span> <span class="o">-</span> <span class="n">muWater</span><span class="p">)</span> <span class="o">/</span> <span class="n">muWater</span> <span class="o">*</span> <span class="n">b</span>
-</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>
-</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>
-</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a><span class="nd">@ConvertListNDArray</span>
-</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a><span class="k">def</span> <span class="nf">huToMu</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="n">TwoOrThreeD</span><span class="p">,</span> <span class="n">muWater</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TwoOrThreeD</span><span class="p">:</span>
-</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a><span class="sd">        Convert HU to mu. (Invert of `MuToHU`.)</span>
-</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>    <span class="k">return</span> <span class="n">image</span> <span class="o">/</span> <span class="n">b</span> <span class="o">*</span> <span class="n">muWater</span> <span class="o">+</span> <span class="n">muWater</span>
-</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>
-</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>
-</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a><span class="nd">@ConvertListNDArray</span>
-</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a><span class="k">def</span> <span class="nf">huNoRescale</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="n">TwoOrThreeD</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1000</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TwoOrThreeD</span><span class="p">:</span>
-</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a><span class="sd">        Invert the rescale-slope (y = kx + b) of HU value to get linear relationship between HU and mu.</span>
-</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>    <span class="k">return</span> <span class="p">(</span><span class="n">image</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">/</span> <span class="n">k</span>
-</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>
-</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>
-</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a><span class="k">def</span> <span class="nf">postlogsToProjections</span><span class="p">(</span><span class="n">postlogs</span><span class="p">:</span> <span class="n">TwoOrThreeD</span><span class="p">,</span> <span class="n">flat</span><span class="p">:</span> <span class="n">Or</span><span class="p">[</span><span class="n">TwoD</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">TwoOrThreeD</span><span class="p">:</span>
-</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a><span class="sd">        Invert postlog images to the original projections.</span>
-</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>    <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">postlogs</span><span class="p">)</span> <span class="o">*</span> <span class="n">flat</span>
-</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>
-</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>    <span class="k">return</span> <span class="n">res</span>
+</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>
+</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a><span class="nd">@ConvertListNDArray</span>
+</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a><span class="k">def</span> <span class="nf">muToHU</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="n">TwoOrThreeD</span><span class="p">,</span> <span class="n">muWater</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TwoOrThreeD</span><span class="p">:</span>
+</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a><span class="sd">        Convert \\mu map to HU.</span>
+</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a><span class="sd">        </span>
+</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a><span class="sd">        `HU = (\\mu - \\muWater) / \\muWater * b`</span>
+</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>    <span class="k">return</span> <span class="p">(</span><span class="n">image</span> <span class="o">-</span> <span class="n">muWater</span><span class="p">)</span> <span class="o">/</span> <span class="n">muWater</span> <span class="o">*</span> <span class="n">b</span>
+</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>
+</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a><span class="nd">@ConvertListNDArray</span>
+</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a><span class="k">def</span> <span class="nf">huToMu</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="n">TwoOrThreeD</span><span class="p">,</span> <span class="n">muWater</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TwoOrThreeD</span><span class="p">:</span>
+</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a><span class="sd">        Convert HU to mu. (Invert of `MuToHU`.)</span>
+</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>    <span class="k">return</span> <span class="n">image</span> <span class="o">/</span> <span class="n">b</span> <span class="o">*</span> <span class="n">muWater</span> <span class="o">+</span> <span class="n">muWater</span>
+</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>
+</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>
+</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a><span class="nd">@ConvertListNDArray</span>
+</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a><span class="k">def</span> <span class="nf">huNoRescale</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="n">TwoOrThreeD</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1000</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TwoOrThreeD</span><span class="p">:</span>
+</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a><span class="sd">        Invert the rescale-slope (y = kx + b) of HU value to get linear relationship between HU and mu.</span>
+</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>    <span class="k">return</span> <span class="p">(</span><span class="n">image</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">/</span> <span class="n">k</span>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a><span class="nd">@ConvertListNDArray</span>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a><span class="k">def</span> <span class="nf">postlogsToProjections</span><span class="p">(</span><span class="n">postlogs</span><span class="p">:</span> <span class="n">TwoOrThreeD</span><span class="p">,</span> <span class="n">flat</span><span class="p">:</span> <span class="n">Or</span><span class="p">[</span><span class="n">TwoD</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">TwoOrThreeD</span><span class="p">:</span>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a><span class="sd">        Invert postlog images to the original projections.</span>
+</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>    <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">postlogs</span><span class="p">)</span> <span class="o">*</span> <span class="n">flat</span>
+</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>
+</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>    <span class="k">return</span> <span class="n">res</span>
 </span></pre></div>
 
 
@@ -261,43 +260,39 @@
 </span><span id="fovCropRadius-39"><a href="#fovCropRadius-39"><span class="linenos">39</span></a><span class="sd">        Get the radius (in pixel) of the circle valid FOV of the reconstructed volume.</span>
 </span><span id="fovCropRadius-40"><a href="#fovCropRadius-40"><span class="linenos">40</span></a>
 </span><span id="fovCropRadius-41"><a href="#fovCropRadius-41"><span class="linenos">41</span></a><span class="sd">        Geometry:</span>
-</span><span id="fovCropRadius-42"><a href="#fovCropRadius-42"><span class="linenos">42</span></a><span class="sd">            - SOD: Source Object Distance.</span>
-</span><span id="fovCropRadius-43"><a href="#fovCropRadius-43"><span class="linenos">43</span></a><span class="sd">            - SDD: Source Detector Distance.</span>
-</span><span id="fovCropRadius-44"><a href="#fovCropRadius-44"><span class="linenos">44</span></a><span class="sd">            - detWidth: Width of the detector, i.e., nElements * detElementWidth.</span>
-</span><span id="fovCropRadius-45"><a href="#fovCropRadius-45"><span class="linenos">45</span></a><span class="sd">            - reconPixSize: Pixel size of the reconstructed image.</span>
-</span><span id="fovCropRadius-46"><a href="#fovCropRadius-46"><span class="linenos">46</span></a><span class="sd">        </span>
-</span><span id="fovCropRadius-47"><a href="#fovCropRadius-47"><span class="linenos">47</span></a><span class="sd">        Note that all these lengths should have same unit, like (mm) as recommended.</span>
-</span><span id="fovCropRadius-48"><a href="#fovCropRadius-48"><span class="linenos">48</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="fovCropRadius-49"><a href="#fovCropRadius-49"><span class="linenos">49</span></a>    <span class="n">halfDW</span> <span class="o">=</span> <span class="n">detWidth</span> <span class="o">/</span> <span class="mi">2</span>
-</span><span id="fovCropRadius-50"><a href="#fovCropRadius-50"><span class="linenos">50</span></a>    <span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">halfDW</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">SDD</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
-</span><span id="fovCropRadius-51"><a href="#fovCropRadius-51"><span class="linenos">51</span></a>
-</span><span id="fovCropRadius-52"><a href="#fovCropRadius-52"><span class="linenos">52</span></a>    <span class="c1"># 1 - Treat table as arc, L_arc = r \times \theta.</span>
-</span><span id="fovCropRadius-53"><a href="#fovCropRadius-53"><span class="linenos">53</span></a>    <span class="n">Larc</span> <span class="o">=</span> <span class="n">SOD</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arcsin</span><span class="p">(</span><span class="n">halfDW</span> <span class="o">/</span> <span class="n">L</span><span class="p">)</span>
-</span><span id="fovCropRadius-54"><a href="#fovCropRadius-54"><span class="linenos">54</span></a>    <span class="n">r1</span> <span class="o">=</span> <span class="n">Larc</span> <span class="o">/</span> <span class="n">reconPixSize</span>
-</span><span id="fovCropRadius-55"><a href="#fovCropRadius-55"><span class="linenos">55</span></a>
-</span><span id="fovCropRadius-56"><a href="#fovCropRadius-56"><span class="linenos">56</span></a>    <span class="c1"># 2 - Treat table as plane, L_flat = \tan(\theta) \times r</span>
-</span><span id="fovCropRadius-57"><a href="#fovCropRadius-57"><span class="linenos">57</span></a>    <span class="n">Lflat</span> <span class="o">=</span> <span class="n">SOD</span> <span class="o">/</span> <span class="p">(</span><span class="n">SDD</span> <span class="o">/</span> <span class="n">detWidth</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
-</span><span id="fovCropRadius-58"><a href="#fovCropRadius-58"><span class="linenos">58</span></a>    <span class="n">r2</span> <span class="o">=</span> <span class="n">Lflat</span> <span class="o">/</span> <span class="n">reconPixSize</span>
-</span><span id="fovCropRadius-59"><a href="#fovCropRadius-59"><span class="linenos">59</span></a>
-</span><span id="fovCropRadius-60"><a href="#fovCropRadius-60"><span class="linenos">60</span></a>    <span class="c1"># As we all know, tanx = x+x^3/3 + O(x^3), (|x| &lt; pi/2).</span>
-</span><span id="fovCropRadius-61"><a href="#fovCropRadius-61"><span class="linenos">61</span></a>    <span class="c1"># So under no circumstances will r1 greater than r2.</span>
-</span><span id="fovCropRadius-62"><a href="#fovCropRadius-62"><span class="linenos">62</span></a>    <span class="n">r3</span> <span class="o">=</span> <span class="n">SOD</span> <span class="o">/</span> <span class="p">(</span><span class="n">L</span> <span class="o">/</span> <span class="n">halfDW</span><span class="p">)</span> <span class="o">/</span> <span class="n">reconPixSize</span>
+</span><span id="fovCropRadius-42"><a href="#fovCropRadius-42"><span class="linenos">42</span></a><span class="sd">            - SOD: Source Object Distance</span>
+</span><span id="fovCropRadius-43"><a href="#fovCropRadius-43"><span class="linenos">43</span></a><span class="sd">            - SDD: Source Detector Distance</span>
+</span><span id="fovCropRadius-44"><a href="#fovCropRadius-44"><span class="linenos">44</span></a><span class="sd">            - detWidth: Width of the detector, i.e., nElements * detElementWidth</span>
+</span><span id="fovCropRadius-45"><a href="#fovCropRadius-45"><span class="linenos">45</span></a><span class="sd">            - reconPixSize: Pixel size of the reconstructed image</span>
+</span><span id="fovCropRadius-46"><a href="#fovCropRadius-46"><span class="linenos">46</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="fovCropRadius-47"><a href="#fovCropRadius-47"><span class="linenos">47</span></a>    <span class="n">halfDW</span> <span class="o">=</span> <span class="n">detWidth</span> <span class="o">/</span> <span class="mi">2</span>
+</span><span id="fovCropRadius-48"><a href="#fovCropRadius-48"><span class="linenos">48</span></a>    <span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">halfDW</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">SDD</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+</span><span id="fovCropRadius-49"><a href="#fovCropRadius-49"><span class="linenos">49</span></a>
+</span><span id="fovCropRadius-50"><a href="#fovCropRadius-50"><span class="linenos">50</span></a>    <span class="c1"># Treat table as arc, L_arc = r \times \theta.</span>
+</span><span id="fovCropRadius-51"><a href="#fovCropRadius-51"><span class="linenos">51</span></a>    <span class="n">Larc</span> <span class="o">=</span> <span class="n">SOD</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arcsin</span><span class="p">(</span><span class="n">halfDW</span> <span class="o">/</span> <span class="n">L</span><span class="p">)</span>
+</span><span id="fovCropRadius-52"><a href="#fovCropRadius-52"><span class="linenos">52</span></a>    <span class="n">r1</span> <span class="o">=</span> <span class="n">Larc</span> <span class="o">/</span> <span class="n">reconPixSize</span>
+</span><span id="fovCropRadius-53"><a href="#fovCropRadius-53"><span class="linenos">53</span></a>
+</span><span id="fovCropRadius-54"><a href="#fovCropRadius-54"><span class="linenos">54</span></a>    <span class="c1"># Treat table as plane, L_flat = \tan(\theta) \times r</span>
+</span><span id="fovCropRadius-55"><a href="#fovCropRadius-55"><span class="linenos">55</span></a>    <span class="n">Lflat</span> <span class="o">=</span> <span class="n">SOD</span> <span class="o">/</span> <span class="p">(</span><span class="n">SDD</span> <span class="o">/</span> <span class="n">detWidth</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+</span><span id="fovCropRadius-56"><a href="#fovCropRadius-56"><span class="linenos">56</span></a>    <span class="n">r2</span> <span class="o">=</span> <span class="n">Lflat</span> <span class="o">/</span> <span class="n">reconPixSize</span>
+</span><span id="fovCropRadius-57"><a href="#fovCropRadius-57"><span class="linenos">57</span></a>
+</span><span id="fovCropRadius-58"><a href="#fovCropRadius-58"><span class="linenos">58</span></a>    <span class="c1"># As we all know, tanx = x+x^3/3 + O(x^3), (|x| &lt; pi/2).</span>
+</span><span id="fovCropRadius-59"><a href="#fovCropRadius-59"><span class="linenos">59</span></a>    <span class="c1"># So under no circumstances will r1 greater than r2.</span>
+</span><span id="fovCropRadius-60"><a href="#fovCropRadius-60"><span class="linenos">60</span></a>    <span class="n">r3</span> <span class="o">=</span> <span class="n">SOD</span> <span class="o">/</span> <span class="p">(</span><span class="n">L</span> <span class="o">/</span> <span class="n">halfDW</span><span class="p">)</span> <span class="o">/</span> <span class="n">reconPixSize</span>
+</span><span id="fovCropRadius-61"><a href="#fovCropRadius-61"><span class="linenos">61</span></a>
+</span><span id="fovCropRadius-62"><a href="#fovCropRadius-62"><span class="linenos">62</span></a>    <span class="n">r</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">r1</span><span class="p">,</span> <span class="n">r2</span><span class="p">,</span> <span class="n">r3</span><span class="p">)</span>
 </span><span id="fovCropRadius-63"><a href="#fovCropRadius-63"><span class="linenos">63</span></a>
-</span><span id="fovCropRadius-64"><a href="#fovCropRadius-64"><span class="linenos">64</span></a>    <span class="n">r</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">r1</span><span class="p">,</span> <span class="n">r2</span><span class="p">,</span> <span class="n">r3</span><span class="p">)</span>
-</span><span id="fovCropRadius-65"><a href="#fovCropRadius-65"><span class="linenos">65</span></a>
-</span><span id="fovCropRadius-66"><a href="#fovCropRadius-66"><span class="linenos">66</span></a>    <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">if</span> <span class="n">roundOff</span> <span class="k">else</span> <span class="n">r</span>
+</span><span id="fovCropRadius-64"><a href="#fovCropRadius-64"><span class="linenos">64</span></a>    <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">if</span> <span class="n">roundOff</span> <span class="k">else</span> <span class="n">r</span>
 </span></pre></div>
 
 
             <div class="docstring"><p>Get the radius (in pixel) of the circle valid FOV of the reconstructed volume.</p>
 
 <p>Geometry:
-    - SOD: Source Object Distance.
-    - SDD: Source Detector Distance.
-    - detWidth: Width of the detector, i.e., nElements * detElementWidth.
-    - reconPixSize: Pixel size of the reconstructed image.</p>
-
-<p>Note that all these lengths should have same unit, like (mm) as recommended.</p>
+    - SOD: Source Object Distance
+    - SDD: Source Detector Distance
+    - detWidth: Width of the detector, i.e., nElements * detElementWidth
+    - reconPixSize: Pixel size of the reconstructed image</p>
 </div>
 
 
@@ -314,29 +309,29 @@
 
     </div>
     <a class="headerlink" href="#fovCrop"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="fovCrop-69"><a href="#fovCrop-69"><span class="linenos">69</span></a><span class="nd">@ConvertListNDArray</span>
-</span><span id="fovCrop-70"><a href="#fovCrop-70"><span class="linenos">70</span></a><span class="k">def</span> <span class="nf">fovCrop</span><span class="p">(</span><span class="n">img</span><span class="p">:</span> <span class="n">TwoOrThreeD</span><span class="p">,</span> <span class="n">radius</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">fill</span><span class="p">:</span> <span class="n">Or</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ThreeD</span><span class="p">:</span>
-</span><span id="fovCrop-71"><a href="#fovCrop-71"><span class="linenos">71</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-</span><span id="fovCrop-72"><a href="#fovCrop-72"><span class="linenos">72</span></a><span class="sd">        Crop a circle FOV on reconstructed image `img` with `radius` (pixel) \\</span>
-</span><span id="fovCrop-73"><a href="#fovCrop-73"><span class="linenos">73</span></a><span class="sd">        and `fill` value for outside FOV.</span>
-</span><span id="fovCrop-74"><a href="#fovCrop-74"><span class="linenos">74</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="fovCrop-75"><a href="#fovCrop-75"><span class="linenos">75</span></a>    <span class="n">cripAssert</span><span class="p">(</span><span class="n">radius</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">isInt</span><span class="p">(</span><span class="n">radius</span><span class="p">),</span> <span class="s1">&#39;Invalid radius. Radius should be positive int.&#39;</span><span class="p">)</span>
-</span><span id="fovCrop-76"><a href="#fovCrop-76"><span class="linenos">76</span></a>    <span class="n">cripAssert</span><span class="p">(</span><span class="n">is2or3D</span><span class="p">(</span><span class="n">img</span><span class="p">),</span> <span class="s1">&#39;img should be 2D or 3D.&#39;</span><span class="p">)</span>
-</span><span id="fovCrop-77"><a href="#fovCrop-77"><span class="linenos">77</span></a>
-</span><span id="fovCrop-78"><a href="#fovCrop-78"><span class="linenos">78</span></a>    <span class="n">N</span><span class="p">,</span> <span class="n">M</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
-</span><span id="fovCrop-79"><a href="#fovCrop-79"><span class="linenos">79</span></a>    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DefaultFloatDType</span><span class="p">)</span> <span class="o">-</span> <span class="n">N</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mf">0.5</span>
-</span><span id="fovCrop-80"><a href="#fovCrop-80"><span class="linenos">80</span></a>    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DefaultFloatDType</span><span class="p">)</span> <span class="o">-</span> <span class="n">M</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mf">0.5</span>
-</span><span id="fovCrop-81"><a href="#fovCrop-81"><span class="linenos">81</span></a>    <span class="n">xx</span><span class="p">,</span> <span class="n">yy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-</span><span id="fovCrop-82"><a href="#fovCrop-82"><span class="linenos">82</span></a>
-</span><span id="fovCrop-83"><a href="#fovCrop-83"><span class="linenos">83</span></a>    <span class="n">outside</span> <span class="o">=</span> <span class="n">xx</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">yy</span><span class="o">**</span><span class="mi">2</span> <span class="o">&gt;</span> <span class="n">radius</span><span class="o">**</span><span class="mi">2</span>
-</span><span id="fovCrop-84"><a href="#fovCrop-84"><span class="linenos">84</span></a>    <span class="n">cropped</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-</span><span id="fovCrop-85"><a href="#fovCrop-85"><span class="linenos">85</span></a>
-</span><span id="fovCrop-86"><a href="#fovCrop-86"><span class="linenos">86</span></a>    <span class="k">if</span> <span class="n">is3D</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
-</span><span id="fovCrop-87"><a href="#fovCrop-87"><span class="linenos">87</span></a>        <span class="n">cropped</span><span class="p">[:,</span> <span class="n">outside</span><span class="p">]</span> <span class="o">=</span> <span class="n">fill</span>
-</span><span id="fovCrop-88"><a href="#fovCrop-88"><span class="linenos">88</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="fovCrop-89"><a href="#fovCrop-89"><span class="linenos">89</span></a>        <span class="n">cropped</span><span class="p">[</span><span class="n">outside</span><span class="p">]</span> <span class="o">=</span> <span class="n">fill</span>
-</span><span id="fovCrop-90"><a href="#fovCrop-90"><span class="linenos">90</span></a>
-</span><span id="fovCrop-91"><a href="#fovCrop-91"><span class="linenos">91</span></a>    <span class="k">return</span> <span class="n">cropped</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="fovCrop-67"><a href="#fovCrop-67"><span class="linenos">67</span></a><span class="nd">@ConvertListNDArray</span>
+</span><span id="fovCrop-68"><a href="#fovCrop-68"><span class="linenos">68</span></a><span class="k">def</span> <span class="nf">fovCrop</span><span class="p">(</span><span class="n">img</span><span class="p">:</span> <span class="n">TwoOrThreeD</span><span class="p">,</span> <span class="n">radius</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">fill</span><span class="p">:</span> <span class="n">Or</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ThreeD</span><span class="p">:</span>
+</span><span id="fovCrop-69"><a href="#fovCrop-69"><span class="linenos">69</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="fovCrop-70"><a href="#fovCrop-70"><span class="linenos">70</span></a><span class="sd">        Crop a circle FOV on reconstructed image `img` with `radius` (pixel) \\</span>
+</span><span id="fovCrop-71"><a href="#fovCrop-71"><span class="linenos">71</span></a><span class="sd">        and `fill` value for outside FOV.</span>
+</span><span id="fovCrop-72"><a href="#fovCrop-72"><span class="linenos">72</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="fovCrop-73"><a href="#fovCrop-73"><span class="linenos">73</span></a>    <span class="n">cripAssert</span><span class="p">(</span><span class="n">radius</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">isInt</span><span class="p">(</span><span class="n">radius</span><span class="p">),</span> <span class="s1">&#39;Invalid radius. Radius should be positive int.&#39;</span><span class="p">)</span>
+</span><span id="fovCrop-74"><a href="#fovCrop-74"><span class="linenos">74</span></a>    <span class="n">cripAssert</span><span class="p">(</span><span class="n">is2or3D</span><span class="p">(</span><span class="n">img</span><span class="p">),</span> <span class="s1">&#39;img should be 2D or 3D.&#39;</span><span class="p">)</span>
+</span><span id="fovCrop-75"><a href="#fovCrop-75"><span class="linenos">75</span></a>
+</span><span id="fovCrop-76"><a href="#fovCrop-76"><span class="linenos">76</span></a>    <span class="n">N</span><span class="p">,</span> <span class="n">M</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
+</span><span id="fovCrop-77"><a href="#fovCrop-77"><span class="linenos">77</span></a>    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DefaultFloatDType</span><span class="p">)</span> <span class="o">-</span> <span class="n">N</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mf">0.5</span>
+</span><span id="fovCrop-78"><a href="#fovCrop-78"><span class="linenos">78</span></a>    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">DefaultFloatDType</span><span class="p">)</span> <span class="o">-</span> <span class="n">M</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mf">0.5</span>
+</span><span id="fovCrop-79"><a href="#fovCrop-79"><span class="linenos">79</span></a>    <span class="n">xx</span><span class="p">,</span> <span class="n">yy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</span><span id="fovCrop-80"><a href="#fovCrop-80"><span class="linenos">80</span></a>
+</span><span id="fovCrop-81"><a href="#fovCrop-81"><span class="linenos">81</span></a>    <span class="n">outside</span> <span class="o">=</span> <span class="n">xx</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">yy</span><span class="o">**</span><span class="mi">2</span> <span class="o">&gt;</span> <span class="n">radius</span><span class="o">**</span><span class="mi">2</span>
+</span><span id="fovCrop-82"><a href="#fovCrop-82"><span class="linenos">82</span></a>    <span class="n">cropped</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</span><span id="fovCrop-83"><a href="#fovCrop-83"><span class="linenos">83</span></a>
+</span><span id="fovCrop-84"><a href="#fovCrop-84"><span class="linenos">84</span></a>    <span class="k">if</span> <span class="n">is3D</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
+</span><span id="fovCrop-85"><a href="#fovCrop-85"><span class="linenos">85</span></a>        <span class="n">cropped</span><span class="p">[:,</span> <span class="n">outside</span><span class="p">]</span> <span class="o">=</span> <span class="n">fill</span>
+</span><span id="fovCrop-86"><a href="#fovCrop-86"><span class="linenos">86</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="fovCrop-87"><a href="#fovCrop-87"><span class="linenos">87</span></a>        <span class="n">cropped</span><span class="p">[</span><span class="n">outside</span><span class="p">]</span> <span class="o">=</span> <span class="n">fill</span>
+</span><span id="fovCrop-88"><a href="#fovCrop-88"><span class="linenos">88</span></a>
+</span><span id="fovCrop-89"><a href="#fovCrop-89"><span class="linenos">89</span></a>    <span class="k">return</span> <span class="n">cropped</span>
 </span></pre></div>
 
 
@@ -358,14 +353,14 @@ and <code>fill</code> value for outside FOV.</p>
 
     </div>
     <a class="headerlink" href="#muToHU"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="muToHU-94"><a href="#muToHU-94"><span class="linenos"> 94</span></a><span class="nd">@ConvertListNDArray</span>
-</span><span id="muToHU-95"><a href="#muToHU-95"><span class="linenos"> 95</span></a><span class="k">def</span> <span class="nf">muToHU</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="n">TwoOrThreeD</span><span class="p">,</span> <span class="n">muWater</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TwoOrThreeD</span><span class="p">:</span>
-</span><span id="muToHU-96"><a href="#muToHU-96"><span class="linenos"> 96</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-</span><span id="muToHU-97"><a href="#muToHU-97"><span class="linenos"> 97</span></a><span class="sd">        Convert \\mu map to HU.</span>
-</span><span id="muToHU-98"><a href="#muToHU-98"><span class="linenos"> 98</span></a><span class="sd">        </span>
-</span><span id="muToHU-99"><a href="#muToHU-99"><span class="linenos"> 99</span></a><span class="sd">        `HU = (\\mu - \\muWater) / \\muWater * b`</span>
-</span><span id="muToHU-100"><a href="#muToHU-100"><span class="linenos">100</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="muToHU-101"><a href="#muToHU-101"><span class="linenos">101</span></a>    <span class="k">return</span> <span class="p">(</span><span class="n">image</span> <span class="o">-</span> <span class="n">muWater</span><span class="p">)</span> <span class="o">/</span> <span class="n">muWater</span> <span class="o">*</span> <span class="n">b</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="muToHU-92"><a href="#muToHU-92"><span class="linenos">92</span></a><span class="nd">@ConvertListNDArray</span>
+</span><span id="muToHU-93"><a href="#muToHU-93"><span class="linenos">93</span></a><span class="k">def</span> <span class="nf">muToHU</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="n">TwoOrThreeD</span><span class="p">,</span> <span class="n">muWater</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TwoOrThreeD</span><span class="p">:</span>
+</span><span id="muToHU-94"><a href="#muToHU-94"><span class="linenos">94</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="muToHU-95"><a href="#muToHU-95"><span class="linenos">95</span></a><span class="sd">        Convert \\mu map to HU.</span>
+</span><span id="muToHU-96"><a href="#muToHU-96"><span class="linenos">96</span></a><span class="sd">        </span>
+</span><span id="muToHU-97"><a href="#muToHU-97"><span class="linenos">97</span></a><span class="sd">        `HU = (\\mu - \\muWater) / \\muWater * b`</span>
+</span><span id="muToHU-98"><a href="#muToHU-98"><span class="linenos">98</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="muToHU-99"><a href="#muToHU-99"><span class="linenos">99</span></a>    <span class="k">return</span> <span class="p">(</span><span class="n">image</span> <span class="o">-</span> <span class="n">muWater</span><span class="p">)</span> <span class="o">/</span> <span class="n">muWater</span> <span class="o">*</span> <span class="n">b</span>
 </span></pre></div>
 
 
@@ -388,12 +383,12 @@ and <code>fill</code> value for outside FOV.</p>
 
     </div>
     <a class="headerlink" href="#huToMu"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="huToMu-104"><a href="#huToMu-104"><span class="linenos">104</span></a><span class="nd">@ConvertListNDArray</span>
-</span><span id="huToMu-105"><a href="#huToMu-105"><span class="linenos">105</span></a><span class="k">def</span> <span class="nf">huToMu</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="n">TwoOrThreeD</span><span class="p">,</span> <span class="n">muWater</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TwoOrThreeD</span><span class="p">:</span>
-</span><span id="huToMu-106"><a href="#huToMu-106"><span class="linenos">106</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-</span><span id="huToMu-107"><a href="#huToMu-107"><span class="linenos">107</span></a><span class="sd">        Convert HU to mu. (Invert of `MuToHU`.)</span>
-</span><span id="huToMu-108"><a href="#huToMu-108"><span class="linenos">108</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="huToMu-109"><a href="#huToMu-109"><span class="linenos">109</span></a>    <span class="k">return</span> <span class="n">image</span> <span class="o">/</span> <span class="n">b</span> <span class="o">*</span> <span class="n">muWater</span> <span class="o">+</span> <span class="n">muWater</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="huToMu-102"><a href="#huToMu-102"><span class="linenos">102</span></a><span class="nd">@ConvertListNDArray</span>
+</span><span id="huToMu-103"><a href="#huToMu-103"><span class="linenos">103</span></a><span class="k">def</span> <span class="nf">huToMu</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="n">TwoOrThreeD</span><span class="p">,</span> <span class="n">muWater</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TwoOrThreeD</span><span class="p">:</span>
+</span><span id="huToMu-104"><a href="#huToMu-104"><span class="linenos">104</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="huToMu-105"><a href="#huToMu-105"><span class="linenos">105</span></a><span class="sd">        Convert HU to mu. (Invert of `MuToHU`.)</span>
+</span><span id="huToMu-106"><a href="#huToMu-106"><span class="linenos">106</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="huToMu-107"><a href="#huToMu-107"><span class="linenos">107</span></a>    <span class="k">return</span> <span class="n">image</span> <span class="o">/</span> <span class="n">b</span> <span class="o">*</span> <span class="n">muWater</span> <span class="o">+</span> <span class="n">muWater</span>
 </span></pre></div>
 
 
@@ -414,12 +409,12 @@ and <code>fill</code> value for outside FOV.</p>
 
     </div>
     <a class="headerlink" href="#huNoRescale"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="huNoRescale-112"><a href="#huNoRescale-112"><span class="linenos">112</span></a><span class="nd">@ConvertListNDArray</span>
-</span><span id="huNoRescale-113"><a href="#huNoRescale-113"><span class="linenos">113</span></a><span class="k">def</span> <span class="nf">huNoRescale</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="n">TwoOrThreeD</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1000</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TwoOrThreeD</span><span class="p">:</span>
-</span><span id="huNoRescale-114"><a href="#huNoRescale-114"><span class="linenos">114</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-</span><span id="huNoRescale-115"><a href="#huNoRescale-115"><span class="linenos">115</span></a><span class="sd">        Invert the rescale-slope (y = kx + b) of HU value to get linear relationship between HU and mu.</span>
-</span><span id="huNoRescale-116"><a href="#huNoRescale-116"><span class="linenos">116</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="huNoRescale-117"><a href="#huNoRescale-117"><span class="linenos">117</span></a>    <span class="k">return</span> <span class="p">(</span><span class="n">image</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">/</span> <span class="n">k</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="huNoRescale-110"><a href="#huNoRescale-110"><span class="linenos">110</span></a><span class="nd">@ConvertListNDArray</span>
+</span><span id="huNoRescale-111"><a href="#huNoRescale-111"><span class="linenos">111</span></a><span class="k">def</span> <span class="nf">huNoRescale</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="n">TwoOrThreeD</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1000</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TwoOrThreeD</span><span class="p">:</span>
+</span><span id="huNoRescale-112"><a href="#huNoRescale-112"><span class="linenos">112</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="huNoRescale-113"><a href="#huNoRescale-113"><span class="linenos">113</span></a><span class="sd">        Invert the rescale-slope (y = kx + b) of HU value to get linear relationship between HU and mu.</span>
+</span><span id="huNoRescale-114"><a href="#huNoRescale-114"><span class="linenos">114</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="huNoRescale-115"><a href="#huNoRescale-115"><span class="linenos">115</span></a>    <span class="k">return</span> <span class="p">(</span><span class="n">image</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">/</span> <span class="n">k</span>
 </span></pre></div>
 
 
@@ -431,7 +426,8 @@ and <code>fill</code> value for outside FOV.</p>
                 <section id="postlogsToProjections">
                             <input id="postlogsToProjections-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
-            
+                    <div class="decorator">@ConvertListNDArray</div>
+
         <span class="def">def</span>
         <span class="name">postlogsToProjections</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">postlogs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]</span>,</span><span class="param">	<span class="n">flat</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]</span>:</span></span>
 
@@ -439,13 +435,14 @@ and <code>fill</code> value for outside FOV.</p>
 
     </div>
     <a class="headerlink" href="#postlogsToProjections"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="postlogsToProjections-120"><a href="#postlogsToProjections-120"><span class="linenos">120</span></a><span class="k">def</span> <span class="nf">postlogsToProjections</span><span class="p">(</span><span class="n">postlogs</span><span class="p">:</span> <span class="n">TwoOrThreeD</span><span class="p">,</span> <span class="n">flat</span><span class="p">:</span> <span class="n">Or</span><span class="p">[</span><span class="n">TwoD</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">TwoOrThreeD</span><span class="p">:</span>
-</span><span id="postlogsToProjections-121"><a href="#postlogsToProjections-121"><span class="linenos">121</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-</span><span id="postlogsToProjections-122"><a href="#postlogsToProjections-122"><span class="linenos">122</span></a><span class="sd">        Invert postlog images to the original projections.</span>
-</span><span id="postlogsToProjections-123"><a href="#postlogsToProjections-123"><span class="linenos">123</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="postlogsToProjections-124"><a href="#postlogsToProjections-124"><span class="linenos">124</span></a>    <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">postlogs</span><span class="p">)</span> <span class="o">*</span> <span class="n">flat</span>
-</span><span id="postlogsToProjections-125"><a href="#postlogsToProjections-125"><span class="linenos">125</span></a>
-</span><span id="postlogsToProjections-126"><a href="#postlogsToProjections-126"><span class="linenos">126</span></a>    <span class="k">return</span> <span class="n">res</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="postlogsToProjections-118"><a href="#postlogsToProjections-118"><span class="linenos">118</span></a><span class="nd">@ConvertListNDArray</span>
+</span><span id="postlogsToProjections-119"><a href="#postlogsToProjections-119"><span class="linenos">119</span></a><span class="k">def</span> <span class="nf">postlogsToProjections</span><span class="p">(</span><span class="n">postlogs</span><span class="p">:</span> <span class="n">TwoOrThreeD</span><span class="p">,</span> <span class="n">flat</span><span class="p">:</span> <span class="n">Or</span><span class="p">[</span><span class="n">TwoD</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">TwoOrThreeD</span><span class="p">:</span>
+</span><span id="postlogsToProjections-120"><a href="#postlogsToProjections-120"><span class="linenos">120</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="postlogsToProjections-121"><a href="#postlogsToProjections-121"><span class="linenos">121</span></a><span class="sd">        Invert postlog images to the original projections.</span>
+</span><span id="postlogsToProjections-122"><a href="#postlogsToProjections-122"><span class="linenos">122</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="postlogsToProjections-123"><a href="#postlogsToProjections-123"><span class="linenos">123</span></a>    <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">postlogs</span><span class="p">)</span> <span class="o">*</span> <span class="n">flat</span>
+</span><span id="postlogsToProjections-124"><a href="#postlogsToProjections-124"><span class="linenos">124</span></a>
+</span><span id="postlogsToProjections-125"><a href="#postlogsToProjections-125"><span class="linenos">125</span></a>    <span class="k">return</span> <span class="n">res</span>
 </span></pre></div>
 
 

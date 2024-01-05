@@ -52,8 +52,8 @@
                     <h1 class="modulename">
 crip    </h1>
 
-                        <div class="docstring"><p>An all-in-one tool for Cone-Beam CT Data IO, Pre/Post-process, and Physics, Dual Energy, Low Dose, Deep Learning researches and everything only except Reconstruction.
-<a href="https://github.com/z0gSh1u/crip">https://github.com/z0gSh1u/crip</a></p>
+                        <div class="docstring"><p>CT Recon in Python: An all-in-one tool for Data IO, Pre/Post-process, Physics, Dual Energy, Low Dose and everything.
+<a href="https://github.com/SEU-CT-Recon/crip">https://github.com/SEU-CT-Recon/crip</a></p>
 </div>
 
                         <input id="mod-crip-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
@@ -64,24 +64,26 @@ crip    </h1>
 </span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="n">__author__</span> <span class="o">=</span> <span class="s1">&#39;z0gSh1u&#39;</span>
 </span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="n">__license__</span> <span class="o">=</span> <span class="s1">&#39;MIT License&#39;</span>
 </span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="vm">__doc__</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span>
-</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="s1">An all-in-one tool for Cone-Beam CT Data IO, Pre/Post-process, and Physics, Dual Energy, Low Dose, Deep Learning researches and everything only except Reconstruction.</span>
-</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="s1">https://github.com/z0gSh1u/crip</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="s1">CT Recon in Python: An all-in-one tool for Data IO, Pre/Post-process, Physics, Dual Energy, Low Dose and everything.</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="s1">https://github.com/SEU-CT-Recon/crip</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="s1">&#39;&#39;&#39;</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;de&#39;</span><span class="p">,</span> <span class="s1">&#39;io&#39;</span><span class="p">,</span> <span class="s1">&#39;lowdose&#39;</span><span class="p">,</span> <span class="s1">&#39;physics&#39;</span><span class="p">,</span> <span class="s1">&#39;postprocess&#39;</span><span class="p">,</span> <span class="s1">&#39;preprocess&#39;</span><span class="p">,</span> <span class="s1">&#39;shared&#39;</span><span class="p">,</span> <span class="s1">&#39;utils&#39;</span><span class="p">,</span> <span class="s1">&#39;mangoct&#39;</span><span class="p">,</span> <span class="s1">&#39;plot&#39;</span><span class="p">,</span> <span class="s1">&#39;metric&#39;</span><span class="p">,</span> <span class="s1">&#39;_rc&#39;</span><span class="p">]</span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">de</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">io</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">lowdose</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">physics</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">postprocess</span>
-</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">preprocess</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">shared</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">utils</span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">mangoct</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">plot</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">metric</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">_rc</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>    <span class="s1">&#39;de&#39;</span><span class="p">,</span> <span class="s1">&#39;io&#39;</span><span class="p">,</span> <span class="s1">&#39;lowdose&#39;</span><span class="p">,</span> <span class="s1">&#39;physics&#39;</span><span class="p">,</span> <span class="s1">&#39;postprocess&#39;</span><span class="p">,</span> <span class="s1">&#39;preprocess&#39;</span><span class="p">,</span> <span class="s1">&#39;shared&#39;</span><span class="p">,</span> <span class="s1">&#39;utils&#39;</span><span class="p">,</span> <span class="s1">&#39;mangoct&#39;</span><span class="p">,</span> <span class="s1">&#39;plot&#39;</span><span class="p">,</span> <span class="s1">&#39;metric&#39;</span><span class="p">,</span> <span class="s1">&#39;_rc&#39;</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="p">]</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">_rc</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">de</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">io</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">lowdose</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">physics</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">postprocess</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">preprocess</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">shared</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">utils</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">mangoct</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">plot</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">metric</span>
 </span></pre></div>
 
 

@@ -150,7 +150,7 @@
 
                         <div class="docstring"><p>Utilities of crip.</p>
 
-<p><a href="https://github.com/z0gSh1u/crip">https://github.com/z0gSh1u/crip</a></p>
+<p><a href="https://github.com/SEU-CT-Recon/crip">https://github.com/SEU-CT-Recon/crip</a></p>
 </div>
 
                         <input id="mod-utils-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
@@ -160,7 +160,7 @@
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a><span class="sd">    Utilities of crip.</span>
 </span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a>
-</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="sd">    https://github.com/z0gSh1u/crip</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="sd">    https://github.com/SEU-CT-Recon/crip</span>
 </span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a>
 </span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
@@ -416,18 +416,24 @@
 </span><span id="L-257"><a href="#L-257"><span class="linenos">257</span></a>
 </span><span id="L-258"><a href="#L-258"><span class="linenos">258</span></a>
 </span><span id="L-259"><a href="#L-259"><span class="linenos">259</span></a><span class="k">def</span> <span class="nf">getHW</span><span class="p">(</span><span class="n">img</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-</span><span id="L-260"><a href="#L-260"><span class="linenos">260</span></a>    <span class="k">if</span> <span class="n">is3D</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
-</span><span id="L-261"><a href="#L-261"><span class="linenos">261</span></a>        <span class="n">_</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span>
-</span><span id="L-262"><a href="#L-262"><span class="linenos">262</span></a>    <span class="k">elif</span> <span class="n">is2D</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
-</span><span id="L-263"><a href="#L-263"><span class="linenos">263</span></a>        <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span>
-</span><span id="L-264"><a href="#L-264"><span class="linenos">264</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="L-265"><a href="#L-265"><span class="linenos">265</span></a>        <span class="k">raise</span>
-</span><span id="L-266"><a href="#L-266"><span class="linenos">266</span></a>
-</span><span id="L-267"><a href="#L-267"><span class="linenos">267</span></a>    <span class="k">return</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span>
-</span><span id="L-268"><a href="#L-268"><span class="linenos">268</span></a>
+</span><span id="L-260"><a href="#L-260"><span class="linenos">260</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-261"><a href="#L-261"><span class="linenos">261</span></a><span class="sd">        Get height and width of `img`.</span>
+</span><span id="L-262"><a href="#L-262"><span class="linenos">262</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-263"><a href="#L-263"><span class="linenos">263</span></a>    <span class="k">if</span> <span class="n">is3D</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
+</span><span id="L-264"><a href="#L-264"><span class="linenos">264</span></a>        <span class="n">_</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span>
+</span><span id="L-265"><a href="#L-265"><span class="linenos">265</span></a>    <span class="k">elif</span> <span class="n">is2D</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
+</span><span id="L-266"><a href="#L-266"><span class="linenos">266</span></a>        <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span>
+</span><span id="L-267"><a href="#L-267"><span class="linenos">267</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="L-268"><a href="#L-268"><span class="linenos">268</span></a>        <span class="n">cripAssert</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;img should be 2D or 3D.&#39;</span><span class="p">)</span>
 </span><span id="L-269"><a href="#L-269"><span class="linenos">269</span></a>
-</span><span id="L-270"><a href="#L-270"><span class="linenos">270</span></a><span class="k">def</span> <span class="nf">nextPow2</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-</span><span id="L-271"><a href="#L-271"><span class="linenos">271</span></a>    <span class="k">return</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">2</span><span class="o">**</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+</span><span id="L-270"><a href="#L-270"><span class="linenos">270</span></a>    <span class="k">return</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span>
+</span><span id="L-271"><a href="#L-271"><span class="linenos">271</span></a>
+</span><span id="L-272"><a href="#L-272"><span class="linenos">272</span></a>
+</span><span id="L-273"><a href="#L-273"><span class="linenos">273</span></a><span class="k">def</span> <span class="nf">nextPow2</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+</span><span id="L-274"><a href="#L-274"><span class="linenos">274</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-275"><a href="#L-275"><span class="linenos">275</span></a><span class="sd">        Get the next power of 2 of `x`.</span>
+</span><span id="L-276"><a href="#L-276"><span class="linenos">276</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-277"><a href="#L-277"><span class="linenos">277</span></a>    <span class="k">return</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">2</span><span class="o">**</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
 </span></pre></div>
 
 
@@ -1113,18 +1119,23 @@
     </div>
     <a class="headerlink" href="#getHW"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="getHW-260"><a href="#getHW-260"><span class="linenos">260</span></a><span class="k">def</span> <span class="nf">getHW</span><span class="p">(</span><span class="n">img</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-</span><span id="getHW-261"><a href="#getHW-261"><span class="linenos">261</span></a>    <span class="k">if</span> <span class="n">is3D</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
-</span><span id="getHW-262"><a href="#getHW-262"><span class="linenos">262</span></a>        <span class="n">_</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span>
-</span><span id="getHW-263"><a href="#getHW-263"><span class="linenos">263</span></a>    <span class="k">elif</span> <span class="n">is2D</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
-</span><span id="getHW-264"><a href="#getHW-264"><span class="linenos">264</span></a>        <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span>
-</span><span id="getHW-265"><a href="#getHW-265"><span class="linenos">265</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="getHW-266"><a href="#getHW-266"><span class="linenos">266</span></a>        <span class="k">raise</span>
-</span><span id="getHW-267"><a href="#getHW-267"><span class="linenos">267</span></a>
-</span><span id="getHW-268"><a href="#getHW-268"><span class="linenos">268</span></a>    <span class="k">return</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span>
+</span><span id="getHW-261"><a href="#getHW-261"><span class="linenos">261</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="getHW-262"><a href="#getHW-262"><span class="linenos">262</span></a><span class="sd">        Get height and width of `img`.</span>
+</span><span id="getHW-263"><a href="#getHW-263"><span class="linenos">263</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="getHW-264"><a href="#getHW-264"><span class="linenos">264</span></a>    <span class="k">if</span> <span class="n">is3D</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
+</span><span id="getHW-265"><a href="#getHW-265"><span class="linenos">265</span></a>        <span class="n">_</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span>
+</span><span id="getHW-266"><a href="#getHW-266"><span class="linenos">266</span></a>    <span class="k">elif</span> <span class="n">is2D</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
+</span><span id="getHW-267"><a href="#getHW-267"><span class="linenos">267</span></a>        <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span>
+</span><span id="getHW-268"><a href="#getHW-268"><span class="linenos">268</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="getHW-269"><a href="#getHW-269"><span class="linenos">269</span></a>        <span class="n">cripAssert</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;img should be 2D or 3D.&#39;</span><span class="p">)</span>
+</span><span id="getHW-270"><a href="#getHW-270"><span class="linenos">270</span></a>
+</span><span id="getHW-271"><a href="#getHW-271"><span class="linenos">271</span></a>    <span class="k">return</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span>
 </span></pre></div>
 
 
-    
+            <div class="docstring"><p>Get height and width of <code>img</code>.</p>
+</div>
+
 
                 </section>
                 <section id="is1D">
@@ -1177,12 +1188,17 @@
 
     </div>
     <a class="headerlink" href="#nextPow2"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="nextPow2-271"><a href="#nextPow2-271"><span class="linenos">271</span></a><span class="k">def</span> <span class="nf">nextPow2</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-</span><span id="nextPow2-272"><a href="#nextPow2-272"><span class="linenos">272</span></a>    <span class="k">return</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">2</span><span class="o">**</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="nextPow2-274"><a href="#nextPow2-274"><span class="linenos">274</span></a><span class="k">def</span> <span class="nf">nextPow2</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+</span><span id="nextPow2-275"><a href="#nextPow2-275"><span class="linenos">275</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="nextPow2-276"><a href="#nextPow2-276"><span class="linenos">276</span></a><span class="sd">        Get the next power of 2 of `x`.</span>
+</span><span id="nextPow2-277"><a href="#nextPow2-277"><span class="linenos">277</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="nextPow2-278"><a href="#nextPow2-278"><span class="linenos">278</span></a>    <span class="k">return</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">2</span><span class="o">**</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
 </span></pre></div>
 
 
-    
+            <div class="docstring"><p>Get the next power of 2 of <code>x</code>.</p>
+</div>
+
 
                 </section>
     </main>

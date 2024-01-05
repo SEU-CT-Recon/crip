@@ -66,6 +66,18 @@
             <li>
                     <a class="function" href="#shepplogan">shepplogan</a>
             </li>
+            <li>
+                    <a class="function" href="#fitPolyV1D2">fitPolyV1D2</a>
+            </li>
+            <li>
+                    <a class="function" href="#fitPolyV2D2">fitPolyV2D2</a>
+            </li>
+            <li>
+                    <a class="function" href="#applyPolyV1D2">applyPolyV1D2</a>
+            </li>
+            <li>
+                    <a class="function" href="#applyPolyV2D2">applyPolyV2D2</a>
+            </li>
     </ul>
 
 
@@ -84,7 +96,7 @@
 
                         <div class="docstring"><p>Shared module of crip.</p>
 
-<p><a href="https://github.com/z0gSh1u/crip">https://github.com/z0gSh1u/crip</a></p>
+<p><a href="https://github.com/SEU-CT-Recon/crip">https://github.com/SEU-CT-Recon/crip</a></p>
 </div>
 
                         <input id="mod-shared-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
@@ -94,12 +106,12 @@
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a><span class="sd">    Shared module of crip.</span>
 </span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a>
-</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="sd">    https://github.com/z0gSh1u/crip</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="sd">    https://github.com/SEU-CT-Recon/crip</span>
 </span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a>
 </span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a>    <span class="s1">&#39;rotate&#39;</span><span class="p">,</span> <span class="s1">&#39;verticalFlip&#39;</span><span class="p">,</span> <span class="s1">&#39;horizontalFlip&#39;</span><span class="p">,</span> <span class="s1">&#39;stackFlip&#39;</span><span class="p">,</span> <span class="s1">&#39;resize&#39;</span><span class="p">,</span> <span class="s1">&#39;gaussianSmooth&#39;</span><span class="p">,</span> <span class="s1">&#39;stackImages&#39;</span><span class="p">,</span> <span class="s1">&#39;splitImages&#39;</span><span class="p">,</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a>    <span class="s1">&#39;binning&#39;</span><span class="p">,</span> <span class="s1">&#39;transpose&#39;</span><span class="p">,</span> <span class="s1">&#39;permute&#39;</span><span class="p">,</span> <span class="s1">&#39;shepplogan&#39;</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a>    <span class="s1">&#39;binning&#39;</span><span class="p">,</span> <span class="s1">&#39;transpose&#39;</span><span class="p">,</span> <span class="s1">&#39;permute&#39;</span><span class="p">,</span> <span class="s1">&#39;shepplogan&#39;</span><span class="p">,</span> <span class="s1">&#39;fitPolyV1D2&#39;</span><span class="p">,</span> <span class="s1">&#39;fitPolyV2D2&#39;</span><span class="p">,</span> <span class="s1">&#39;applyPolyV1D2&#39;</span><span class="p">,</span> <span class="s1">&#39;applyPolyV2D2&#39;</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="p">]</span>
 </span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a>
 </span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -323,6 +335,71 @@
 </span><span id="L-230"><a href="#L-230"><span class="linenos">230</span></a>    <span class="n">phantomPath</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">getAsset</span><span class="p">(</span><span class="s1">&#39;shepplogan&#39;</span><span class="p">),</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s1">.tif&#39;</span><span class="p">)</span>
 </span><span id="L-231"><a href="#L-231"><span class="linenos">231</span></a>
 </span><span id="L-232"><a href="#L-232"><span class="linenos">232</span></a>    <span class="k">return</span> <span class="n">imreadTiff</span><span class="p">(</span><span class="n">phantomPath</span><span class="p">)</span>
+</span><span id="L-233"><a href="#L-233"><span class="linenos">233</span></a>
+</span><span id="L-234"><a href="#L-234"><span class="linenos">234</span></a>
+</span><span id="L-235"><a href="#L-235"><span class="linenos">235</span></a><span class="k">def</span> <span class="nf">fitPolyV2D2</span><span class="p">(</span><span class="n">x1</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span> <span class="n">x2</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span> <span class="n">bias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+</span><span id="L-236"><a href="#L-236"><span class="linenos">236</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-237"><a href="#L-237"><span class="linenos">237</span></a><span class="sd">        Fit a degree-2 polynomial using pseudo-inverse to a pair of variables `x1, x2`.</span>
+</span><span id="L-238"><a href="#L-238"><span class="linenos">238</span></a><span class="sd">        Output 6 coefficients. If `bias` is False, the last coefficient will be 0.</span>
+</span><span id="L-239"><a href="#L-239"><span class="linenos">239</span></a>
+</span><span id="L-240"><a href="#L-240"><span class="linenos">240</span></a><span class="sd">        `c[0] * x1**2 + c[1] * x2**2 + c[2] * x1 * x2 + c[3] * x1 + c[4] * x2 + c[5]`</span>
+</span><span id="L-241"><a href="#L-241"><span class="linenos">241</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-242"><a href="#L-242"><span class="linenos">242</span></a>    <span class="n">x1sq</span> <span class="o">=</span> <span class="n">x1</span><span class="o">.</span><span class="n">T</span><span class="o">**</span><span class="mi">2</span>
+</span><span id="L-243"><a href="#L-243"><span class="linenos">243</span></a>    <span class="n">x2sq</span> <span class="o">=</span> <span class="n">x2</span><span class="o">.</span><span class="n">T</span><span class="o">**</span><span class="mi">2</span>
+</span><span id="L-244"><a href="#L-244"><span class="linenos">244</span></a>    <span class="n">x1x2</span> <span class="o">=</span> <span class="p">(</span><span class="n">x1</span> <span class="o">*</span> <span class="n">x2</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+</span><span id="L-245"><a href="#L-245"><span class="linenos">245</span></a>    <span class="n">x1</span> <span class="o">=</span> <span class="n">x1</span><span class="o">.</span><span class="n">T</span>
+</span><span id="L-246"><a href="#L-246"><span class="linenos">246</span></a>    <span class="n">x2</span> <span class="o">=</span> <span class="n">x2</span><span class="o">.</span><span class="n">T</span>
+</span><span id="L-247"><a href="#L-247"><span class="linenos">247</span></a>    <span class="n">const</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span> <span class="k">if</span> <span class="n">bias</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">)((</span><span class="n">x1</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+</span><span id="L-248"><a href="#L-248"><span class="linenos">248</span></a>    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x1sq</span><span class="p">,</span> <span class="n">x2sq</span><span class="p">,</span> <span class="n">x1x2</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">const</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+</span><span id="L-249"><a href="#L-249"><span class="linenos">249</span></a>
+</span><span id="L-250"><a href="#L-250"><span class="linenos">250</span></a>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">@</span> <span class="n">y</span>
+</span><span id="L-251"><a href="#L-251"><span class="linenos">251</span></a>
+</span><span id="L-252"><a href="#L-252"><span class="linenos">252</span></a>
+</span><span id="L-253"><a href="#L-253"><span class="linenos">253</span></a><span class="k">def</span> <span class="nf">applyPolyV2D2</span><span class="p">(</span><span class="n">coeff</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span> <span class="n">x1</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span> <span class="n">x2</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">):</span>
+</span><span id="L-254"><a href="#L-254"><span class="linenos">254</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-255"><a href="#L-255"><span class="linenos">255</span></a><span class="sd">        Apply a degree-2 polynomial to a pair of variables `x1, x2`.</span>
+</span><span id="L-256"><a href="#L-256"><span class="linenos">256</span></a><span class="sd">        </span>
+</span><span id="L-257"><a href="#L-257"><span class="linenos">257</span></a><span class="sd">        `c[0] * x1**2 + c[1] * x2**2 + c[2] * x1 * x2 + c[3] * x1 + c[4] * x2 + c[5]`</span>
+</span><span id="L-258"><a href="#L-258"><span class="linenos">258</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-259"><a href="#L-259"><span class="linenos">259</span></a>    <span class="n">cripAssert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">coeff</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="s1">&#39;coeff should have length 5 or 6.&#39;</span><span class="p">)</span>
+</span><span id="L-260"><a href="#L-260"><span class="linenos">260</span></a>
+</span><span id="L-261"><a href="#L-261"><span class="linenos">261</span></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">coeff</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+</span><span id="L-262"><a href="#L-262"><span class="linenos">262</span></a>        <span class="n">bias</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="L-263"><a href="#L-263"><span class="linenos">263</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="L-264"><a href="#L-264"><span class="linenos">264</span></a>        <span class="n">bias</span> <span class="o">=</span> <span class="n">coeff</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+</span><span id="L-265"><a href="#L-265"><span class="linenos">265</span></a>
+</span><span id="L-266"><a href="#L-266"><span class="linenos">266</span></a>    <span class="k">return</span> <span class="n">coeff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">x1</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">coeff</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">x2</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">coeff</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">x1</span> <span class="o">*</span> <span class="n">x2</span> <span class="o">+</span> <span class="n">coeff</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">x1</span> <span class="o">+</span> <span class="n">coeff</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">*</span> <span class="n">x2</span> <span class="o">+</span> <span class="n">bias</span>
+</span><span id="L-267"><a href="#L-267"><span class="linenos">267</span></a>
+</span><span id="L-268"><a href="#L-268"><span class="linenos">268</span></a>
+</span><span id="L-269"><a href="#L-269"><span class="linenos">269</span></a><span class="k">def</span> <span class="nf">fitPolyV1D2</span><span class="p">(</span><span class="n">x1</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span> <span class="n">bias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+</span><span id="L-270"><a href="#L-270"><span class="linenos">270</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-271"><a href="#L-271"><span class="linenos">271</span></a><span class="sd">        Fit a degree-2 polynomial using pseudo-inverse to a variable `x1`.</span>
+</span><span id="L-272"><a href="#L-272"><span class="linenos">272</span></a><span class="sd">        Output 3 coefficients. If `bias` is False, the last coefficient will be 0.</span>
+</span><span id="L-273"><a href="#L-273"><span class="linenos">273</span></a>
+</span><span id="L-274"><a href="#L-274"><span class="linenos">274</span></a><span class="sd">        `c[0] * x1**2 + c[1] * x1 + c[2]`</span>
+</span><span id="L-275"><a href="#L-275"><span class="linenos">275</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-276"><a href="#L-276"><span class="linenos">276</span></a>    <span class="n">x1sq</span> <span class="o">=</span> <span class="n">x1</span><span class="o">.</span><span class="n">T</span><span class="o">**</span><span class="mi">2</span>
+</span><span id="L-277"><a href="#L-277"><span class="linenos">277</span></a>    <span class="n">x1</span> <span class="o">=</span> <span class="n">x1</span><span class="o">.</span><span class="n">T</span>
+</span><span id="L-278"><a href="#L-278"><span class="linenos">278</span></a>    <span class="n">const</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span> <span class="k">if</span> <span class="n">bias</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">)((</span><span class="n">x1</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+</span><span id="L-279"><a href="#L-279"><span class="linenos">279</span></a>    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x1sq</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">const</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+</span><span id="L-280"><a href="#L-280"><span class="linenos">280</span></a>
+</span><span id="L-281"><a href="#L-281"><span class="linenos">281</span></a>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">@</span> <span class="n">y</span>
+</span><span id="L-282"><a href="#L-282"><span class="linenos">282</span></a>
+</span><span id="L-283"><a href="#L-283"><span class="linenos">283</span></a>
+</span><span id="L-284"><a href="#L-284"><span class="linenos">284</span></a><span class="k">def</span> <span class="nf">applyPolyV1D2</span><span class="p">(</span><span class="n">coeff</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span> <span class="n">x1</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">):</span>
+</span><span id="L-285"><a href="#L-285"><span class="linenos">285</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-286"><a href="#L-286"><span class="linenos">286</span></a><span class="sd">        Apply a degree-2 polynomial to a variable `x1`.</span>
+</span><span id="L-287"><a href="#L-287"><span class="linenos">287</span></a><span class="sd">        </span>
+</span><span id="L-288"><a href="#L-288"><span class="linenos">288</span></a><span class="sd">        `c[0] * x1**2 + c[1] * x1 + c[2]`</span>
+</span><span id="L-289"><a href="#L-289"><span class="linenos">289</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-290"><a href="#L-290"><span class="linenos">290</span></a>    <span class="n">cripAssert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">coeff</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="s1">&#39;coeff should have length 2 or 3.&#39;</span><span class="p">)</span>
+</span><span id="L-291"><a href="#L-291"><span class="linenos">291</span></a>
+</span><span id="L-292"><a href="#L-292"><span class="linenos">292</span></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">coeff</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+</span><span id="L-293"><a href="#L-293"><span class="linenos">293</span></a>        <span class="n">bias</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="L-294"><a href="#L-294"><span class="linenos">294</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="L-295"><a href="#L-295"><span class="linenos">295</span></a>        <span class="n">bias</span> <span class="o">=</span> <span class="n">coeff</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+</span><span id="L-296"><a href="#L-296"><span class="linenos">296</span></a>
+</span><span id="L-297"><a href="#L-297"><span class="linenos">297</span></a>    <span class="k">return</span> <span class="n">coeff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">x1</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">coeff</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">x1</span> <span class="o">+</span> <span class="n">bias</span>
 </span></pre></div>
 
 
@@ -766,6 +843,149 @@ by <code>scale = (facH, facW)</code> using <code>interp</code> (bicubic, linear,
 
 
             <div class="docstring"><p>Generate the Shepp-Logan phantom.</p>
+</div>
+
+
+                </section>
+                <section id="fitPolyV1D2">
+                            <input id="fitPolyV1D2-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">fitPolyV1D2</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">x1</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span>, </span><span class="param"><span class="n">y</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span>, </span><span class="param"><span class="n">bias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="fitPolyV1D2-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#fitPolyV1D2"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="fitPolyV1D2-270"><a href="#fitPolyV1D2-270"><span class="linenos">270</span></a><span class="k">def</span> <span class="nf">fitPolyV1D2</span><span class="p">(</span><span class="n">x1</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span> <span class="n">bias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+</span><span id="fitPolyV1D2-271"><a href="#fitPolyV1D2-271"><span class="linenos">271</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="fitPolyV1D2-272"><a href="#fitPolyV1D2-272"><span class="linenos">272</span></a><span class="sd">        Fit a degree-2 polynomial using pseudo-inverse to a variable `x1`.</span>
+</span><span id="fitPolyV1D2-273"><a href="#fitPolyV1D2-273"><span class="linenos">273</span></a><span class="sd">        Output 3 coefficients. If `bias` is False, the last coefficient will be 0.</span>
+</span><span id="fitPolyV1D2-274"><a href="#fitPolyV1D2-274"><span class="linenos">274</span></a>
+</span><span id="fitPolyV1D2-275"><a href="#fitPolyV1D2-275"><span class="linenos">275</span></a><span class="sd">        `c[0] * x1**2 + c[1] * x1 + c[2]`</span>
+</span><span id="fitPolyV1D2-276"><a href="#fitPolyV1D2-276"><span class="linenos">276</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="fitPolyV1D2-277"><a href="#fitPolyV1D2-277"><span class="linenos">277</span></a>    <span class="n">x1sq</span> <span class="o">=</span> <span class="n">x1</span><span class="o">.</span><span class="n">T</span><span class="o">**</span><span class="mi">2</span>
+</span><span id="fitPolyV1D2-278"><a href="#fitPolyV1D2-278"><span class="linenos">278</span></a>    <span class="n">x1</span> <span class="o">=</span> <span class="n">x1</span><span class="o">.</span><span class="n">T</span>
+</span><span id="fitPolyV1D2-279"><a href="#fitPolyV1D2-279"><span class="linenos">279</span></a>    <span class="n">const</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span> <span class="k">if</span> <span class="n">bias</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">)((</span><span class="n">x1</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+</span><span id="fitPolyV1D2-280"><a href="#fitPolyV1D2-280"><span class="linenos">280</span></a>    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x1sq</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">const</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+</span><span id="fitPolyV1D2-281"><a href="#fitPolyV1D2-281"><span class="linenos">281</span></a>
+</span><span id="fitPolyV1D2-282"><a href="#fitPolyV1D2-282"><span class="linenos">282</span></a>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">@</span> <span class="n">y</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Fit a degree-2 polynomial using pseudo-inverse to a variable <code>x1</code>.
+Output 3 coefficients. If <code>bias</code> is False, the last coefficient will be 0.</p>
+
+<p><code>c[0] * x1**2 + c[1] * x1 + c[2]</code></p>
+</div>
+
+
+                </section>
+                <section id="fitPolyV2D2">
+                            <input id="fitPolyV2D2-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">fitPolyV2D2</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">x1</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span>,</span><span class="param">	<span class="n">x2</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span>,</span><span class="param">	<span class="n">y</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span>,</span><span class="param">	<span class="n">bias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="fitPolyV2D2-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#fitPolyV2D2"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="fitPolyV2D2-236"><a href="#fitPolyV2D2-236"><span class="linenos">236</span></a><span class="k">def</span> <span class="nf">fitPolyV2D2</span><span class="p">(</span><span class="n">x1</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span> <span class="n">x2</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span> <span class="n">bias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+</span><span id="fitPolyV2D2-237"><a href="#fitPolyV2D2-237"><span class="linenos">237</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="fitPolyV2D2-238"><a href="#fitPolyV2D2-238"><span class="linenos">238</span></a><span class="sd">        Fit a degree-2 polynomial using pseudo-inverse to a pair of variables `x1, x2`.</span>
+</span><span id="fitPolyV2D2-239"><a href="#fitPolyV2D2-239"><span class="linenos">239</span></a><span class="sd">        Output 6 coefficients. If `bias` is False, the last coefficient will be 0.</span>
+</span><span id="fitPolyV2D2-240"><a href="#fitPolyV2D2-240"><span class="linenos">240</span></a>
+</span><span id="fitPolyV2D2-241"><a href="#fitPolyV2D2-241"><span class="linenos">241</span></a><span class="sd">        `c[0] * x1**2 + c[1] * x2**2 + c[2] * x1 * x2 + c[3] * x1 + c[4] * x2 + c[5]`</span>
+</span><span id="fitPolyV2D2-242"><a href="#fitPolyV2D2-242"><span class="linenos">242</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="fitPolyV2D2-243"><a href="#fitPolyV2D2-243"><span class="linenos">243</span></a>    <span class="n">x1sq</span> <span class="o">=</span> <span class="n">x1</span><span class="o">.</span><span class="n">T</span><span class="o">**</span><span class="mi">2</span>
+</span><span id="fitPolyV2D2-244"><a href="#fitPolyV2D2-244"><span class="linenos">244</span></a>    <span class="n">x2sq</span> <span class="o">=</span> <span class="n">x2</span><span class="o">.</span><span class="n">T</span><span class="o">**</span><span class="mi">2</span>
+</span><span id="fitPolyV2D2-245"><a href="#fitPolyV2D2-245"><span class="linenos">245</span></a>    <span class="n">x1x2</span> <span class="o">=</span> <span class="p">(</span><span class="n">x1</span> <span class="o">*</span> <span class="n">x2</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+</span><span id="fitPolyV2D2-246"><a href="#fitPolyV2D2-246"><span class="linenos">246</span></a>    <span class="n">x1</span> <span class="o">=</span> <span class="n">x1</span><span class="o">.</span><span class="n">T</span>
+</span><span id="fitPolyV2D2-247"><a href="#fitPolyV2D2-247"><span class="linenos">247</span></a>    <span class="n">x2</span> <span class="o">=</span> <span class="n">x2</span><span class="o">.</span><span class="n">T</span>
+</span><span id="fitPolyV2D2-248"><a href="#fitPolyV2D2-248"><span class="linenos">248</span></a>    <span class="n">const</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span> <span class="k">if</span> <span class="n">bias</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">)((</span><span class="n">x1</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+</span><span id="fitPolyV2D2-249"><a href="#fitPolyV2D2-249"><span class="linenos">249</span></a>    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x1sq</span><span class="p">,</span> <span class="n">x2sq</span><span class="p">,</span> <span class="n">x1x2</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">const</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+</span><span id="fitPolyV2D2-250"><a href="#fitPolyV2D2-250"><span class="linenos">250</span></a>
+</span><span id="fitPolyV2D2-251"><a href="#fitPolyV2D2-251"><span class="linenos">251</span></a>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">@</span> <span class="n">y</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Fit a degree-2 polynomial using pseudo-inverse to a pair of variables <code>x1, x2</code>.
+Output 6 coefficients. If <code>bias</code> is False, the last coefficient will be 0.</p>
+
+<p><code>c[0] * x1**2 + c[1] * x2**2 + c[2] * x1 * x2 + c[3] * x1 + c[4] * x2 + c[5]</code></p>
+</div>
+
+
+                </section>
+                <section id="applyPolyV1D2">
+                            <input id="applyPolyV1D2-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">applyPolyV1D2</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">coeff</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span>, </span><span class="param"><span class="n">x1</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="applyPolyV1D2-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#applyPolyV1D2"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="applyPolyV1D2-285"><a href="#applyPolyV1D2-285"><span class="linenos">285</span></a><span class="k">def</span> <span class="nf">applyPolyV1D2</span><span class="p">(</span><span class="n">coeff</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span> <span class="n">x1</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">):</span>
+</span><span id="applyPolyV1D2-286"><a href="#applyPolyV1D2-286"><span class="linenos">286</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="applyPolyV1D2-287"><a href="#applyPolyV1D2-287"><span class="linenos">287</span></a><span class="sd">        Apply a degree-2 polynomial to a variable `x1`.</span>
+</span><span id="applyPolyV1D2-288"><a href="#applyPolyV1D2-288"><span class="linenos">288</span></a><span class="sd">        </span>
+</span><span id="applyPolyV1D2-289"><a href="#applyPolyV1D2-289"><span class="linenos">289</span></a><span class="sd">        `c[0] * x1**2 + c[1] * x1 + c[2]`</span>
+</span><span id="applyPolyV1D2-290"><a href="#applyPolyV1D2-290"><span class="linenos">290</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="applyPolyV1D2-291"><a href="#applyPolyV1D2-291"><span class="linenos">291</span></a>    <span class="n">cripAssert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">coeff</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="s1">&#39;coeff should have length 2 or 3.&#39;</span><span class="p">)</span>
+</span><span id="applyPolyV1D2-292"><a href="#applyPolyV1D2-292"><span class="linenos">292</span></a>
+</span><span id="applyPolyV1D2-293"><a href="#applyPolyV1D2-293"><span class="linenos">293</span></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">coeff</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+</span><span id="applyPolyV1D2-294"><a href="#applyPolyV1D2-294"><span class="linenos">294</span></a>        <span class="n">bias</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="applyPolyV1D2-295"><a href="#applyPolyV1D2-295"><span class="linenos">295</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="applyPolyV1D2-296"><a href="#applyPolyV1D2-296"><span class="linenos">296</span></a>        <span class="n">bias</span> <span class="o">=</span> <span class="n">coeff</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+</span><span id="applyPolyV1D2-297"><a href="#applyPolyV1D2-297"><span class="linenos">297</span></a>
+</span><span id="applyPolyV1D2-298"><a href="#applyPolyV1D2-298"><span class="linenos">298</span></a>    <span class="k">return</span> <span class="n">coeff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">x1</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">coeff</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">x1</span> <span class="o">+</span> <span class="n">bias</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Apply a degree-2 polynomial to a variable <code>x1</code>.</p>
+
+<p><code>c[0] * x1**2 + c[1] * x1 + c[2]</code></p>
+</div>
+
+
+                </section>
+                <section id="applyPolyV2D2">
+                            <input id="applyPolyV2D2-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">applyPolyV2D2</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">coeff</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span>, </span><span class="param"><span class="n">x1</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span>, </span><span class="param"><span class="n">x2</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="applyPolyV2D2-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#applyPolyV2D2"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="applyPolyV2D2-254"><a href="#applyPolyV2D2-254"><span class="linenos">254</span></a><span class="k">def</span> <span class="nf">applyPolyV2D2</span><span class="p">(</span><span class="n">coeff</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span> <span class="n">x1</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span> <span class="n">x2</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">):</span>
+</span><span id="applyPolyV2D2-255"><a href="#applyPolyV2D2-255"><span class="linenos">255</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="applyPolyV2D2-256"><a href="#applyPolyV2D2-256"><span class="linenos">256</span></a><span class="sd">        Apply a degree-2 polynomial to a pair of variables `x1, x2`.</span>
+</span><span id="applyPolyV2D2-257"><a href="#applyPolyV2D2-257"><span class="linenos">257</span></a><span class="sd">        </span>
+</span><span id="applyPolyV2D2-258"><a href="#applyPolyV2D2-258"><span class="linenos">258</span></a><span class="sd">        `c[0] * x1**2 + c[1] * x2**2 + c[2] * x1 * x2 + c[3] * x1 + c[4] * x2 + c[5]`</span>
+</span><span id="applyPolyV2D2-259"><a href="#applyPolyV2D2-259"><span class="linenos">259</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="applyPolyV2D2-260"><a href="#applyPolyV2D2-260"><span class="linenos">260</span></a>    <span class="n">cripAssert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">coeff</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="s1">&#39;coeff should have length 5 or 6.&#39;</span><span class="p">)</span>
+</span><span id="applyPolyV2D2-261"><a href="#applyPolyV2D2-261"><span class="linenos">261</span></a>
+</span><span id="applyPolyV2D2-262"><a href="#applyPolyV2D2-262"><span class="linenos">262</span></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">coeff</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+</span><span id="applyPolyV2D2-263"><a href="#applyPolyV2D2-263"><span class="linenos">263</span></a>        <span class="n">bias</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="applyPolyV2D2-264"><a href="#applyPolyV2D2-264"><span class="linenos">264</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="applyPolyV2D2-265"><a href="#applyPolyV2D2-265"><span class="linenos">265</span></a>        <span class="n">bias</span> <span class="o">=</span> <span class="n">coeff</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+</span><span id="applyPolyV2D2-266"><a href="#applyPolyV2D2-266"><span class="linenos">266</span></a>
+</span><span id="applyPolyV2D2-267"><a href="#applyPolyV2D2-267"><span class="linenos">267</span></a>    <span class="k">return</span> <span class="n">coeff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">x1</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">coeff</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">x2</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">coeff</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">x1</span> <span class="o">*</span> <span class="n">x2</span> <span class="o">+</span> <span class="n">coeff</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">x1</span> <span class="o">+</span> <span class="n">coeff</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">*</span> <span class="n">x2</span> <span class="o">+</span> <span class="n">bias</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Apply a degree-2 polynomial to a pair of variables <code>x1, x2</code>.</p>
+
+<p><code>c[0] * x1**2 + c[1] * x2**2 + c[2] * x1 * x2 + c[3] * x1 + c[4] * x2 + c[5]</code></p>
 </div>
 
 

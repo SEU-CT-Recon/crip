@@ -16,7 +16,7 @@ from .postprocess import gaussianSmooth
 from .utils import ConvertListNDArray, cripAssert, cripWarning, is2D, isOfSameShape
 from ._typing import *
 from .physics import Atten, DiagEnergyRange, Spectrum, calcAttenedSpec, calcPostLog
-from .shared import applyPolyV2L2, fitPolyV2L2
+from .shared import applyPolyV2D2, fitPolyV2D2
 
 
 def singleMatMuDecomp(src: Atten, base1: Atten, base2: Atten, method='coeff', energyRange=DiagEnergyRange) -> NDArray:
@@ -57,7 +57,7 @@ def deDecompGetCoeff(lowSpec: Spectrum, highSpec: Spectrum, base1: Atten, len1: 
             postlogLow.append(calcPostLog(lowSpec, [base1, base2], [i, j]))
             postlogHigh.append(calcPostLog(highSpec, [base1, base2], [i, j]))
 
-    beta, gamma = fitPolyV2L2(np.array(postlogLow), np.array(postlogHigh), np.array(lenCombo)).T
+    beta, gamma = fitPolyV2D2(np.array(postlogLow), np.array(postlogHigh), np.array(lenCombo)).T
 
     return beta, gamma
 
@@ -75,7 +75,7 @@ def deDecompProj(lowProj: TwoOrThreeD, highProj: TwoOrThreeD, coeff1: NDArray,
         len(coeff1) == 6 and len(coeff2) == 6,
         'Decomposing coefficients should have length 6 (2 variable, order 2 with bias).')
 
-    return applyPolyV2L2(coeff1, lowProj, highProj), applyPolyV2L2(coeff2, lowProj, highProj)
+    return applyPolyV2D2(coeff1, lowProj, highProj), applyPolyV2D2(coeff2, lowProj, highProj)
 
 
 @ConvertListNDArray
