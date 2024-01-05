@@ -9,6 +9,8 @@ An all-in-one tool for Cone-Beam CT Data IO, Pre/Post-process, Physics, Dual Ene
 
 - Via [PyPI](https://pypi.org/project/crip/)
 
+  [![Upload Python Package](https://github.com/SEU-CT-Recon/crip/actions/workflows/python-publish.yml/badge.svg)](https://github.com/SEU-CT-Recon/crip/actions/workflows/python-publish.yml)
+
   ```sh
   pip install crip
   ```
