@@ -131,11 +131,11 @@ def makeImageGrid(subimages: List[TwoD],
         'vmin0vmax1=False is not recommended because it might cause incorrect windowing. Make sure you know what you are doing.'
     )
 
-    cripAssert(len(subimages) == ncols * nrows)
-    cripAssert(crops is None or len(crops) == nrows)
-
     ncols = len(colTitles)
     nrows = len(rowTitles)
+
+    cripAssert(len(subimages) == ncols * nrows, 'Number of subimages should be equal to ncols * nrows.')
+    cripAssert(crops is None or len(crops) == nrows, 'Number of crops should be equal to nrows.')
 
     if isinstance(cropLocs, str):
         cropLocs = [cropLocs] * nrows
@@ -164,47 +164,47 @@ def makeImageGrid(subimages: List[TwoD],
         ax.get_xaxis().set_ticks([])
         list(map(lambda x: x.set_visible(False), ax.spines.values()))
 
-        if i % ncols == 0:
+        if len(rects) != 0 and i % ncols == 0:
             ax.add_patch(rects[i // ncols])
 
-        patch = zoomIn(im, *crops[i // ncols])
-        patch = resize(patch, (cropSize, cropSize))
-        cropLocs = cropLocs[i // ncols]
+            patch = zoomIn(im, *crops[i // ncols])
+            patch = resize(patch, (cropSize, cropSize))
+            cropLocs = cropLocs[i // ncols]
 
-        if cropLocs == 'bottom right':
-            im[-patch.shape[0]:, -patch.shape[1]:] = patch
-            patchRect = matplotlib.patches.Rectangle((im.shape[1] - patch.shape[1], im.shape[0] - patch.shape[0]),
-                                                     patch.shape[1],
-                                                     patch.shape[0],
-                                                     linewidth=1,
-                                                     edgecolor=cropEdgeColor,
-                                                     facecolor='none')
-        elif cropLocs == 'top left':
-            im[:patch.shape[0], :patch.shape[1]] = patch
-            patchRect = matplotlib.patches.Rectangle((0, 0),
-                                                     patch.shape[1],
-                                                     patch.shape[0],
-                                                     linewidth=1,
-                                                     edgecolor=cropEdgeColor,
-                                                     facecolor='none')
-        elif cropLocs == 'bottom left':
-            im[-patch.shape[0]:, :patch.shape[1]] = patch
-            patchRect = matplotlib.patches.Rectangle((0, im.shape[0] - patch.shape[0]),
-                                                     patch.shape[1],
-                                                     patch.shape[0],
-                                                     linewidth=1,
-                                                     edgecolor=cropEdgeColor,
-                                                     facecolor='none')
-        elif cropLocs == 'top right':
-            im[:patch.shape[0], -patch.shape[1]:] = patch
-            patchRect = matplotlib.patches.Rectangle((im.shape[1] - patch.shape[1], 0),
-                                                     patch.shape[1],
-                                                     patch.shape[0],
-                                                     linewidth=1,
-                                                     edgecolor=cropEdgeColor,
-                                                     facecolor='none')
+            if cropLocs == 'bottom right':
+                im[-patch.shape[0]:, -patch.shape[1]:] = patch
+                patchRect = matplotlib.patches.Rectangle((im.shape[1] - patch.shape[1], im.shape[0] - patch.shape[0]),
+                                                        patch.shape[1],
+                                                        patch.shape[0],
+                                                        linewidth=1,
+                                                        edgecolor=cropEdgeColor,
+                                                        facecolor='none')
+            elif cropLocs == 'top left':
+                im[:patch.shape[0], :patch.shape[1]] = patch
+                patchRect = matplotlib.patches.Rectangle((0, 0),
+                                                        patch.shape[1],
+                                                        patch.shape[0],
+                                                        linewidth=1,
+                                                        edgecolor=cropEdgeColor,
+                                                        facecolor='none')
+            elif cropLocs == 'bottom left':
+                im[-patch.shape[0]:, :patch.shape[1]] = patch
+                patchRect = matplotlib.patches.Rectangle((0, im.shape[0] - patch.shape[0]),
+                                                        patch.shape[1],
+                                                        patch.shape[0],
+                                                        linewidth=1,
+                                                        edgecolor=cropEdgeColor,
+                                                        facecolor='none')
+            elif cropLocs == 'top right':
+                im[:patch.shape[0], -patch.shape[1]:] = patch
+                patchRect = matplotlib.patches.Rectangle((im.shape[1] - patch.shape[1], 0),
+                                                        patch.shape[1],
+                                                        patch.shape[0],
+                                                        linewidth=1,
+                                                        edgecolor=cropEdgeColor,
+                                                        facecolor='none')
 
-        ax.add_patch(patchRect)
+            ax.add_patch(patchRect)
 
         if i < len(colTitles):
             ax.set_title(colTitles[i], loc='center', fontdict=fontdict)
