@@ -249,3 +249,7 @@ def plotMu(ax: matplotlib.axes.Axes, atten: Atten, startEnergy: int = 1, logScal
 
     ax.xlabel('Energy (keV)')
     ax.ylabel('LAC (1/mm)')
+
+def savefigTight(fig, path, dpi=200, pad=0.05):
+    fig.tight_layout()
+    fig.savefig(path, dpi=dpi, bbox_inches='tight', pad_inches=pad)
