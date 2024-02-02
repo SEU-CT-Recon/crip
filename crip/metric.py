@@ -5,7 +5,7 @@
 '''
 
 import numpy as np
-from .utils import cripWarning
+from .utils import cripWarning, cripAssert, is3D, isOfSameShape
 from ._typing import *
 from skimage.metrics import structural_similarity, peak_signal_noise_ratio
 
@@ -20,7 +20,7 @@ def calcMAPE(x, y, eps=1e-6):
     return np.mean(np.abs(x - y) / (y + eps)) * 100
 
 
-def calcPSNR(x, y, range_=1):
+def calcPSNR(x: TwoOrThreeD, y: TwoOrThreeD, range_=1):
     '''
         Compute the Peak Signal Noise Ratio (PSNR) (dB).
     '''
@@ -32,7 +32,7 @@ def calcPSNR(x, y, range_=1):
     return psnr
 
 
-def calcSSIM(x, y, range_=1):
+def calcSSIM(x: TwoOrThreeD, y: TwoOrThreeD, range_=1):
     '''
         Compute the Structural Similarity (SSIM).
     '''
@@ -40,7 +40,10 @@ def calcSSIM(x, y, range_=1):
         range_ == 1 or range_ == 255,
         'Common `range_` for SSIM computation is 1 or 255. Make sure you know what you are doing follows your intention.'
     )
-    ssim = structural_similarity(x, y, data_range=range_)
+    cripAssert(isOfSameShape(x, y), 'Input images must have the same shape.')
+
+    ssim = structural_similarity(x, y, data_range=range_, channel_axis=0 if is3D(x) else None)
+
     return ssim
 
 
