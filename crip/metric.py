@@ -5,7 +5,7 @@
 '''
 
 import numpy as np
-from .utils import cripWarning
+from .utils import cripWarning, cripAssert, is2D, is3D, isOfSameShape
 from ._typing import *
 from skimage.metrics import structural_similarity, peak_signal_noise_ratio
 
@@ -40,7 +40,15 @@ def calcSSIM(x, y, range_=1):
         range_ == 1 or range_ == 255,
         'Common `range_` for SSIM computation is 1 or 255. Make sure you know what you are doing follows your intention.'
     )
-    ssim = structural_similarity(x, y, data_range=range_)
+    cripAssert(isOfSameShape(x, y), 'Input images must have the same shape.')
+
+    if is2D(x):
+        ssim = structural_similarity(x, y, data_range=range_)
+    elif is3D(x):
+        ssim = structural_similarity(x, y, data_range=range_, channel_axis=0)
+    else:
+        cripAssert(False, 'Input images must be 2D or 3D.')
+
     return ssim
 
 
