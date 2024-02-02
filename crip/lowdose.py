@@ -96,7 +96,7 @@ def nps2D(roi: TwoOrThreeD, pixelSize: float, n: Or[int, None] = None):
     return mod2 * pixelSize * pixelSize / (h * w)
 
 
-def nps1D(roi: TwoOrThreeD, pixelSize: float, n: Or[int, None] = None):
+def nps2DRadialAvg(roi: TwoOrThreeD, pixelSize: float, n: Or[int, None] = None):
     '''
         Compute the radially averaged noise power spectrum (NPS) of a 2D region of interest (ROI).
         It's recommended that you provide multiple samples (realizations) of the ROI.
