@@ -98,127 +98,86 @@ def fontdict(family, weight, size):
     return {'family': family, 'weight': weight, 'size': size}
 
 
+
 def makeImageGrid(subimages: List[TwoD],
                   colTitles: List[str],
                   rowTitles: List[str],
-                  preprocessor=None,
+                  preproc=None,
                   fontdict=None,
                   crops=None,
-                  cropLocs='bottom right',
-                  cropEdgeColor='yellow',
-                  cropSize=64,
-                  figsize=None,
-                  vmin0vmax1=True):
-    '''
-        Make an Image Grid.
-        `preprocessor(index, subimage)` is applied to each subimage, e.g, perform windowing.
-        `figsize` accepts that for `plt.figure(figsize=...)`.
-        `vmin0vmax1=True` guarantees correct windowing when windowed image is not compactly supported in [0, 1].
-        Return the handle of plt.Figure.
-    ```
-               colTitles
-            +-------------+
-            |             |
-    row     |  subImages  |  ...
-    Titles  |       +-----|
-            |       |crop |
-            +-------------+
-                  ...
-    '''
-
-    cripWarning(
-        vmin0vmax1,
-        'vmin0vmax1=False is not recommended because it might cause incorrect windowing. Make sure you know what you are doing.'
-    )
-
+                  cropLoc='bottom right',
+                  cropSize=96 * 2,
+                  arrows=None,
+                  arrowLen=24):
+    # determine the number of rows and columns
     ncols = len(colTitles)
     nrows = len(rowTitles)
-
     cripAssert(len(subimages) == ncols * nrows, 'Number of subimages should be equal to ncols * nrows.')
     cripAssert(crops is None or len(crops) == nrows, 'Number of crops should be equal to nrows.')
+    cripAssert(arrows is None or len(arrows) == nrows, 'Number of arrows should be equal to nrows.')
 
-    if isinstance(cropLocs, str):
-        cropLocs = [cropLocs] * nrows
-
-    cripAssert(all(list(map(lambda x: x in ['bottom right', 'bottom left', 'top right', 'top left'], cropLocs))),
-               'Invalid cropLocs, not in `bottom right`, `bottom left`, `top right`, `top left`.')
-
-    fig = plt.figure(figsize=figsize or (ncols * 2, nrows * 2))
-
-    if preprocessor:
-        subimages = list(map(lambda ix: preprocessor(*ix), list(enumerate(subimages))))
-
+    # create the figure
+    fig = plt.figure(figsize=(ncols * 2, nrows * 2))
     grid = ImageGrid(fig, 111, nrows_ncols=(nrows, ncols), axes_pad=0)
 
-    if crops is not None:
-        rects = [
-            matplotlib.patches.Rectangle((x, y), hw, hw, linewidth=1, edgecolor=cropEdgeColor, facecolor='none')
-            for x, y, hw in crops
-        ]
-    else:
-        rects = []
+    # apply the preprocessor
+    if preproc:
+        subimages = list(map(lambda ix: preproc(*ix), list(enumerate(subimages))))
 
-    i = 0
-    for ax, im in zip(grid, subimages):
-        ax.get_yaxis().set_ticks([])
+    def overlayPatch(img, patch, loc):
+        if loc == 'bottom left':
+            img[-patch.shape[0]:, :patch.shape[1]] = patch
+            box = matplotlib.patches.Rectangle((0, img.shape[0] - patch.shape[0]),
+                                               patch.shape[1],
+                                               patch.shape[0],
+                                               linewidth=1,
+                                               edgecolor='yellow',
+                                               facecolor='none')
+            return box
+        else:
+            raise 'Invalid cropLoc, not in `bottom left`.'
+
+    # display the subimages
+    cur = 0
+    for ax, img in zip(grid, subimages):
+        # remove the ticks and spines
         ax.get_xaxis().set_ticks([])
+        ax.get_yaxis().set_ticks([])
         list(map(lambda x: x.set_visible(False), ax.spines.values()))
 
-        if len(rects) != 0 and i % ncols == 0:
-            ax.add_patch(rects[i // ncols])
+        # prepare the image crop
+        box = None
+        if crops is not None and crops[cur // ncols]:
+            r, c, hw = crops[cur // ncols]
+            patch = resize(zoomIn(img, r, c, hw, hw), (cropSize, cropSize))
+            box = overlayPatch(img, patch, cropLoc)
 
-            patch = zoomIn(im, *crops[i // ncols])
-            patch = resize(patch, (cropSize, cropSize))
-            cropLocs = cropLocs[i // ncols]
+        # display the image
+        ax.imshow(img, cmap='gray', vmin=0, vmax=1)
 
-            if cropLocs == 'bottom right':
-                im[-patch.shape[0]:, -patch.shape[1]:] = patch
-                patchRect = matplotlib.patches.Rectangle((im.shape[1] - patch.shape[1], im.shape[0] - patch.shape[0]),
-                                                        patch.shape[1],
-                                                        patch.shape[0],
-                                                        linewidth=1,
-                                                        edgecolor=cropEdgeColor,
-                                                        facecolor='none')
-            elif cropLocs == 'top left':
-                im[:patch.shape[0], :patch.shape[1]] = patch
-                patchRect = matplotlib.patches.Rectangle((0, 0),
-                                                        patch.shape[1],
-                                                        patch.shape[0],
-                                                        linewidth=1,
-                                                        edgecolor=cropEdgeColor,
-                                                        facecolor='none')
-            elif cropLocs == 'bottom left':
-                im[-patch.shape[0]:, :patch.shape[1]] = patch
-                patchRect = matplotlib.patches.Rectangle((0, im.shape[0] - patch.shape[0]),
-                                                        patch.shape[1],
-                                                        patch.shape[0],
-                                                        linewidth=1,
-                                                        edgecolor=cropEdgeColor,
-                                                        facecolor='none')
-            elif cropLocs == 'top right':
-                im[:patch.shape[0], -patch.shape[1]:] = patch
-                patchRect = matplotlib.patches.Rectangle((im.shape[1] - patch.shape[1], 0),
-                                                        patch.shape[1],
-                                                        patch.shape[0],
-                                                        linewidth=1,
-                                                        edgecolor=cropEdgeColor,
-                                                        facecolor='none')
+        # display the crop box
+        box and ax.add_patch(box)
+        if box and cur % ncols == 0:
+            r, c, hw = crops[cur // ncols]
+            box = matplotlib.patches.Rectangle((c, r), hw, hw, linewidth=0.8, edgecolor='yellow', facecolor='none')
+            ax.add_patch(box)
 
-            ax.add_patch(patchRect)
+        # display the arrow
+        if arrows is not None and arrows[cur // ncols]:
+            r, c = arrows[cur // ncols]
+            ax.arrow(c + arrowLen, r - arrowLen, -arrowLen, +arrowLen, color='yellow', head_width=10)
 
-        if i < len(colTitles):
-            ax.set_title(colTitles[i], loc='center', fontdict=fontdict)
-        i += 1
+        # display the column titles
+        if cur < len(colTitles):
+            ax.set_title(colTitles[cur], loc='center', fontdict=fontdict)
+        cur += 1
 
-        if vmin0vmax1:
-            ax.imshow(im, cmap='gray', vmin=0, vmax=1)
-        else:
-            ax.imshow(im, cmap='gray')
-
+    # display the row titles
     for i in range(nrows):
         grid[ncols * i].set_ylabel(rowTitles[i], fontdict=fontdict)
 
     return fig
+
 
 
 def plotSpectrum(ax: matplotlib.axes.Axes, spec: Spectrum):
