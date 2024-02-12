@@ -253,3 +253,7 @@ def plotMu(ax: matplotlib.axes.Axes, atten: Atten, startEnergy: int = 1, logScal
 def savefigTight(fig, path, dpi=200, pad=0.05):
     fig.tight_layout()
     fig.savefig(path, dpi=dpi, bbox_inches='tight', pad_inches=pad)
+
+
+def meanstd(x):
+    return np.mean(x), np.std(x)
