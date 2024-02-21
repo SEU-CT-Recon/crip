@@ -17,7 +17,7 @@ from .utils import cripAssert, is1D, isInt, cripWarning
 from .physics import Spectrum, DiagEnergyRange, Atten
 from .shared import resize
 
-__all__ = ['smooth', 'window', 'average', 'addFont', 'fontdict', 'zoomIn', 'plotSpectrum', 'makeImageGrid']
+__all__ = ['smooth', 'window', 'average', 'addFont', 'fontdict', 'zoomIn', 'plotSpectrum', 'makeImageGrid', 'windowFullRange']
 
 
 def smooth(data: NDArray, winSize: int = 5):
@@ -63,6 +63,12 @@ def window(img: TwoOrThreeD, win: Or[Tuple[int], Tuple[float]], style: str = 'lr
     return res
 
 
+def windowFullRange(img: TwoOrThreeD, normalize='01'):
+    '''Window `img` using full dynamic range of pixel values.
+    '''
+    return window(img, (np.max(img), np.min(img)), 'lr', normalize)
+
+
 def addFont(dir_: str):
     '''
         Add font files under `dir` to matplotlib.
@@ -96,7 +102,6 @@ def stddev(img, row, col, h, w):
 
 def fontdict(family, weight, size):
     return {'family': family, 'weight': weight, 'size': size}
-
 
 
 def makeImageGrid(subimages: List[TwoD],
@@ -179,7 +184,6 @@ def makeImageGrid(subimages: List[TwoD],
     return fig
 
 
-
 def plotSpectrum(ax: matplotlib.axes.Axes, spec: Spectrum):
     '''
         Plot the spectrum in `ax`. Example
@@ -208,6 +212,7 @@ def plotMu(ax: matplotlib.axes.Axes, atten: Atten, startEnergy: int = 1, logScal
 
     ax.xlabel('Energy (keV)')
     ax.ylabel('LAC (1/mm)')
+
 
 def savefigTight(fig, path, dpi=200, pad=0.05):
     fig.tight_layout()
