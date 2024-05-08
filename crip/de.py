@@ -5,7 +5,7 @@
 '''
 
 __all__ = [
-    'singleMatMuDecomp', 'calcAttenedSpec', 'calcPostLog', 'deDecompGetCoeff', 'deDecompProj', 'deDecompRecon',
+    'decompMaterial', 'calcAttenedSpec', 'calcPostLog', 'deDecompGetCoeff', 'deDecompProj', 'deDecompRecon',
     'genMaterialPhantom', 'deDecompReconVolCon', 'teDecompRecon', 'teDecompReconVolCon'
 ]
 
@@ -15,23 +15,20 @@ from scipy.ndimage import uniform_filter
 from .postprocess import gaussianSmooth
 from .utils import ConvertListNDArray, cripAssert, cripWarning, is2D, isOfSameShape
 from ._typing import *
-from .physics import Atten, DiagEnergyRange, Spectrum, calcAttenedSpec, calcPostLog
+from .physics import Atten, Spectrum, calcAttenedSpec, calcPostLog
 from .shared import applyPolyV2D2, fitPolyV2D2
 
 
-def singleMatMuDecomp(src: Atten, base1: Atten, base2: Atten, method='coeff', energyRange=DiagEnergyRange) -> NDArray:
+def decompMaterial(src: Atten, base1: Atten, base2: Atten, method='coeff') -> NDArray:
+    ''' Decompose a material `src`'s attenuation onto two materials `base1` and `base2`.
+
+        Return decomposing coefficients in `DiagEnergyRange` when `method=='coeff'`, or proportion when `method=='prop'`.
     '''
-        Decompose single material `src`'s attenuation onto `base1` and `base2`.
+    cripAssert(method in ['coeff', 'prop'], f'Invalid method: {method}.')
 
-        Return decomposing coefficients along energies when `method = 'coeff'`, or proportion when `method = 'prop'`.
-    '''
-    cripAssert(method in ['coeff', 'prop'], 'Invalid method.')
-
-    range_ = np.array(energyRange)
-    srcMu = src.mu[range_]
-    baseMu1 = base1.mu[range_]
-    baseMu2 = base2.mu[range_]
-
+    srcMu = src.mu
+    baseMu1 = base1.mu
+    baseMu2 = base2.mu
     M = np.array([baseMu1, baseMu2], dtype=DefaultFloatDType).T
 
     if method == 'prop':
@@ -45,8 +42,7 @@ def singleMatMuDecomp(src: Atten, base1: Atten, base2: Atten, method='coeff', en
 
 def deDecompGetCoeff(lowSpec: Spectrum, highSpec: Spectrum, base1: Atten, len1: Or[NDArray, Iterable], base2: Atten,
                      len2: Or[NDArray, Iterable]):
-    '''
-        Calculate the decomposing coefficient (Order 2 with bias term) of two spectra onto two material bases.
+    ''' Calculate the decomposing coefficient (Order 2 with bias term) of two spectra onto two material bases.
     '''
     lenCombo = []
     postlogLow = []
@@ -65,8 +61,7 @@ def deDecompGetCoeff(lowSpec: Spectrum, highSpec: Spectrum, base1: Atten, len1: 
 @ConvertListNDArray
 def deDecompProj(lowProj: TwoOrThreeD, highProj: TwoOrThreeD, coeff1: NDArray,
                  coeff2: NDArray) -> Tuple[TwoOrThreeD, TwoOrThreeD]:
-    '''
-        Perform dual-energy decompose in projection domain point-by-point using coeffs.
+    ''' Perform dual-energy decompose in projection domain point-by-point using coeffs.
 
         Coefficients can be generated using @see `deDecompGetCoeff`.
     '''
@@ -86,8 +81,7 @@ def deDecompRecon(low: TwoOrThreeD,
                   muBase2Low: float,
                   muBase2High: float,
                   checkCond: bool = True):
-    '''
-        Perform dual-energy decompose in reconstruction domain. \\mu values can be calculated using @see `calcMu`.
+    ''' Perform dual-energy decompose in reconstruction domain. \\mu values can be calculated using @see `calcMu`.
 
         The values of input volumes should be \\mu value. The outputs are decomposing coefficients.
     '''
@@ -186,8 +180,8 @@ def deDecompReconVolCon(low: TwoOrThreeD, high: TwoOrThreeD, muBase1, muBase2, m
 
 @ConvertListNDArray
 def teDecompRecon(low: TwoOrThreeD, mid: TwoOrThreeD, high: TwoOrThreeD, muBase1, muBase2, muBase3):
-    '''Triple-Energy Triple-Material decomposition.
-       muBase* = [low, mid, high]
+    ''' Triple-Energy Triple-Material decomposition.
+        muBase* = [low, mid, high]
     '''
     cripAssert(isOfSameShape(low, mid) and isOfSameShape(low, high), 'Volumes should have same shape.')
 
@@ -213,8 +207,8 @@ def teDecompRecon(low: TwoOrThreeD, mid: TwoOrThreeD, high: TwoOrThreeD, muBase1
 
 @ConvertListNDArray
 def teDecompReconVolCon(low: TwoOrThreeD, mid: TwoOrThreeD, high: TwoOrThreeD, muBase1, muBase2, muBase3):
-    '''Triple-Energy Triple-Material decomposition with Volume Conservation.
-       muBase* = [low, mid, high]
+    ''' Triple-Energy Triple-Material decomposition with Volume Conservation.
+        muBase* = [low, mid, high]
     '''
     cripAssert(isOfSameShape(low, mid) and isOfSameShape(low, high), 'Volumes should have same shape.')
 

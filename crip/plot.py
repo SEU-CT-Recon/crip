@@ -17,7 +17,7 @@ from .utils import cripAssert, is1D, isInt, cripWarning
 from .physics import Spectrum, DiagEnergyRange, Atten
 from .shared import resize
 
-__all__ = ['smooth', 'window', 'average', 'addFont', 'fontdict', 'zoomIn', 'plotSpectrum', 'makeImageGrid', 'windowFullRange']
+__all__ = ['smooth', 'window', 'average', 'addFont', 'fontdict', 'zoomIn', 'plotSpectrum', 'makeImageGrid', 'windowFullRange', 'saveFigTight']
 
 
 def smooth(data: NDArray, winSize: int = 5):

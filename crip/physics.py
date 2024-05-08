@@ -47,7 +47,7 @@ def getCommonDensity(materialName: str):
     '''
         Get the common value of density of a specified material (g/cm^3) from built-in dataset.
     '''
-    rhoObject = json.loads(readFileText(path.join(getAsset('atten'), 'commonDensity.json')))
+    rhoObject = json.loads(readFileText(path.join(getAsset('atten'), 'density.json')))
 
     if materialName in AttenAliases:
         materialName = AttenAliases[materialName]
@@ -257,8 +257,7 @@ WaterAtten = Atten.fromBuiltIn('Water')
 
 
 def calcMu(atten: Atten, spec: Spectrum, energyConversion: str) -> float:
-    '''
-        Calculate the LAC \mu value (mm-1) of certain atten under a specific spectrum.
+    ''' Calculate the LAC \mu value (mm-1) of certain atten under a specific spectrum.
         energyConversion determines the energy conversion efficiency of the detector,
         can be "PCD" (Photon Counting), "EID" (Energy Integrating)
     '''
@@ -271,8 +270,7 @@ def calcMu(atten: Atten, spec: Spectrum, energyConversion: str) -> float:
 
 
 def calcAttenedSpec(spec: Spectrum, attens: Or[Atten, List[Atten]], Ls: Or[float, List[float]]) -> Spectrum:
-    '''
-        Calculate the attenuated spectrum using polychromatic Beer-Lambert law. Supports multiple materials.
+    ''' Calculate the attenuated spectrum using polychromatic Beer-Lambert law. Supports multiple materials.
 
         I.e., `\\Omega(E) \\exp (- \\mu(E) L) through all E`. L in mm.
     '''
@@ -294,8 +292,7 @@ def calcAttenedSpec(spec: Spectrum, attens: Or[Atten, List[Atten]], Ls: Or[float
 
 
 def calcPostLog(spec: Spectrum, atten: Or[Atten, List[Atten]], L: Or[float, List[float]]) -> float:
-    '''
-        Calculate post-log value after attenuation of `L` length `atten`. L in mm.
+    ''' Calculate post-log value after attenuation of `L` length `atten`. L in mm.
     '''
     attenSpec = calcAttenedSpec(spec, atten, L)
 
@@ -303,8 +300,7 @@ def calcPostLog(spec: Spectrum, atten: Or[Atten, List[Atten]], L: Or[float, List
 
 
 def forwardProjectWithSpectrum(lengths: List[TwoD], materials: List[Atten], spec: Spectrum, energyConversion: str):
-    '''
-        Perform forward projection using `spec`. `lengths` is a list of corresponding length [mm] images 
+    ''' Perform forward projection using `spec`. `lengths` is a list of corresponding length [mm] images 
         (projection or sinogram) of `materials`. 
         This function would simulate attenuation and Beam Hardening but no scatter.
         
@@ -354,8 +350,7 @@ def brewPowderSolution(solute: Atten,
                        concentration: float,
                        concentrationUnit='mg/mL',
                        rhoSolution: Or[float, None] = None) -> Atten:
-    '''
-        Generate the Atten of powder solution with certain concentration (mg/mL by default).
+    ''' Generate the Atten of powder solution with certain concentration (mg/mL by default).
     '''
     cripAssert(inArray(concentrationUnit, ['mg/mL', 'g/mL']), f'Invalid concentration unit: {concentrationUnit}')
 
@@ -367,8 +362,7 @@ def brewPowderSolution(solute: Atten,
 
 
 def calcContrastHU(contrast: Atten, spec: Spectrum, energyConversion: str, base: Atten = WaterAtten):
-    '''
-        Calculate HU difference resulted by contrast.
+    ''' Calculate HU difference resulted by contrast.
     '''
     cripAssert(energyConversion in ['EID', 'PCD'], 'Invalid energyConversion.')
 
@@ -387,8 +381,7 @@ def calcContrastHU(contrast: Atten, spec: Spectrum, energyConversion: str, base:
 
 
 def calcPathLength(thickness: float, SID: float, detH: int, detW: int, detElementSize: float):
-    '''
-        Calculate the X-ray peneration pathlength of an cuboid object based on geometry.
+    ''' Calculate the X-ray peneration pathlength of an cuboid object based on geometry.
         SID is source-isocenter distance. Currently no offset can be assumed.
     '''
     detCenter = (detW / 2, detH / 2)
@@ -404,3 +397,46 @@ def calcPathLength(thickness: float, SID: float, detH: int, detW: int, detElemen
     rayIntersect = rayIntersect.reshape((detW, detH)).T
 
     return rayIntersect
+
+
+NA = 6.02214076e23  # Avogadro's number
+
+
+def atomsFromMolecule(molecule):
+    '''e.g. H2O is 'H2 O1'
+    '''
+    atoms = {}
+    for part in molecule.split(' '):
+        count = ''.join(filter(str.isdigit, part))
+        element = ''.join(filter(str.isalpha, part))
+        atoms[element] = int(count)
+
+    return atoms
+
+
+def zeffTheoretical(molecule, m=2.94):
+    '''Compute the THEORETICAL effective atomic number of a molecule.
+    '''
+    atoms = atomsFromMolecule(molecule)
+    totalElectrons = 0
+    for atom in atoms:
+        totalElectrons += atoms[atom] * pt.elements.symbol(atom).number
+
+    sumUnderSqrt = 0
+    for atom in atoms:
+        Z = pt.elements.symbol(atom).number  # atomic number
+        f = atoms[atom] * Z / totalElectrons  # fraction
+        sumUnderSqrt += f * (Z**m)
+
+    return sumUnderSqrt**(1 / m)
+
+
+def zeffExperimental(a1, a2, rhoe1, rhoe2, zeff1, zeff2, m=2.94):
+    '''Compute the EXPERIMENTAL effective atomic number from material decomposition.
+    '''
+    n1 = a1 * rhoe1 * zeff1**m
+    n2 = a2 * rhoe2 * zeff2**m
+    d1 = a1 * rhoe1
+    d2 = a2 * rhoe2
+
+    return ((n1 + n2) / (d1 + d2))**(1 / m)

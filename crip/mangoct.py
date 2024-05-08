@@ -1,5 +1,7 @@
 '''
-    MangoCT integration interface. See https://github.com/SEU-CT-Recon/mandoct
+    MangoCT integration interface.
+    See more at:
+        TODO
 
     https://github.com/SEU-CT-Recon/crip
 '''
@@ -11,39 +13,45 @@ import json
 import tempfile
 import subprocess
 
-from .utils import cripAssert, isType
+from .utils import cripAssert, getAttrKeysOfObject, isType
 from ._typing import *
 
 
-class _MgConfig(object):
+class _MgCLIConfig(object):
+    ''' The base class for configuration of CLI version of MangoCT.
+    '''
 
     def __init__(self):
         pass
 
     def dumpJSON(self):
-        attrs = [
-            a for a in (set(dir(self)) - set(dir(object)))
-            if not a.startswith('__') and not callable(getattr(self, a)) and getattr(self, a) is not None
-        ]
-        dict_ = dict([(k, getattr(self, k)) for k in attrs])
+        ''' Dump the configuration to JSON string.
+        '''
+        dict_ = dict([(k, getattr(self, k)) for k in getAttrKeysOfObject(self)])
 
         return json.dumps(dict_, indent=2)
 
     def dumpJSONFile(self, path: str):
+        ''' Dump the configuration to JSON file.
+        '''
         with open(path, 'w') as fp:
             fp.write(self.dumpJSON())
 
     def fromJSON(self, json_: str):
+        ''' Load the configuration from JSON string.
+        '''
         obj = json.loads(json_)
         for key in obj:
-            self[key] = obj
+            self[key] = obj[key]
 
     def fromJSONFile(self, path: str):
+        ''' Load the configuration from JSON file.
+        '''
         with open(path, 'r') as fp:
             self.fromJSON(fp.read())
 
 
-class MgfbpConfig(_MgConfig):
+class MgfbpCLIConfig(_MgCLIConfig):
 
     def __init__(self):
         super().__init__()
@@ -219,7 +227,7 @@ class MgfpjConfig(_MgConfig):
         self.DetectorZOffcenter = DetectorZOffcenter
 
 
-class _Mgbin(object):
+class _MgCLIBin(object):
 
     def __init__(self, exe: str, name: str, cudaDevice: int = 0, tempDir: str = None):
         self.exe = exe
@@ -251,7 +259,7 @@ class _Mgbin(object):
                 os.system(cmd[0])
 
 
-class Mgfbp(_Mgbin):
+class MgFbp(_MgCLIBin):
 
     def __init__(self, exe: str = 'mgfbp', cudaDevice: int = 0, tempDir: str = None):
         '''
@@ -261,7 +269,7 @@ class Mgfbp(_Mgbin):
         super().__init__(exe, 'mgfbp', cudaDevice, tempDir)
 
 
-class Mgfpj(_Mgbin):
+class MgFpj(_MgCLIBin):
 
     def __init__(self, exe: str = 'mgfpj', cudaDevice=0, tempDir: str = None) -> None:
         '''

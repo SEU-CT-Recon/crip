@@ -4,9 +4,7 @@
     https://github.com/SEU-CT-Recon/crip
 '''
 
-__all__ = [
-    'drawCircle', 'fovCropRadius', 'fovCrop', 'muToHU', 'huToMu', 'huNoRescale', 'postlogsToProjections', 'binning'
-]
+__all__ = ['fovCropRadius', 'fovCrop', 'muToHU', 'huToMu', 'huNoRescale', 'postlogsToProjections', 'binning']
 
 import numpy as np
 
@@ -15,27 +13,8 @@ from ._typing import *
 from .utils import *
 
 
-def drawCircle(slice: TwoD, radius: int, center=None) -> Tuple[NDArray, NDArray]:
-    '''
-        Return points of a circle on `center` (slice center if `None`) with `radius`.
-
-        This function can be used for preview FOV crop.
-    '''
-    cripAssert(radius >= 1, 'radius should >= 1.')
-
-    theta = np.arange(0, 2 * np.pi, 0.01)
-    if center is None:
-        center = (slice.shape[0] // 2, slice.shape[1] // 2)
-
-    x = center[0] + radius * np.cos(theta)
-    y = center[1] + radius * np.sin(theta)
-
-    return x, y
-
-
 def fovCropRadius(SOD: float, SDD: float, detWidth: float, reconPixSize: float, roundOff=True) -> float:
-    '''
-        Get the radius (in pixel) of the circle valid FOV of the reconstructed volume.
+    ''' Get the radius (in pixel) of the circle valid FOV of the reconstructed volume.
 
         Geometry:
             - SOD: Source Object Distance

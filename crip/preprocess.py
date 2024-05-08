@@ -24,15 +24,12 @@ from .lowdose import injectGaussianNoise, injectPoissonNoise
 
 
 @ConvertListNDArray
-def averageProjections(projections: TwoOrThreeD) -> TwoD:
+def averageProjections(projections: ThreeD) -> TwoD:
+    ''' Average projections.
     '''
-        Average projections. For example, to calculate the flat field.
-        Projections can be either `(views, H, W)` shaped numpy array, or
-        `views * (H, W)` Python List.
-    '''
-    cripAssert(is3D(projections), '`projections` should be 3D array.')
-    projections = asFloat(projections)
+    cripAssert(is3D(projections), f'`projections` should be 3D, but got {len(projections.shape)}-D.')
 
+    projections = asFloat(projections)
     res = projections.sum(axis=0) / projections.shape[0]
 
     return res
@@ -80,8 +77,7 @@ correctFlatDarkField = flatDarkFieldCorrection
 
 @ConvertListNDArray
 def projectionsToSinograms(projections: ThreeD):
-    '''
-        Permute projections to sinograms by axes swapping `(views, h, w) -> (h, views, w)`.
+    ''' Permute projections to sinograms by axes swapping `(views, h, w) -> (h, views, w)`.
 
         Note that the width direction is along detector channels of a row.
     '''

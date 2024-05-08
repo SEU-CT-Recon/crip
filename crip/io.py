@@ -25,12 +25,12 @@ def listDirectory(folder: str,
                   match: Or[re.Pattern, str, None] = None,
                   sort='nat',
                   reverse=False) -> Or[List[str], Iterable[Tuple[str, str]]]:
-    '''
-        List files under `folder` and sort in `nat`(ural) or `dict`(ionary) order. 
+    ''' List files under `folder` and `sort` in `nat`(ural) or `dict`(ionary) order.
         Return `style` can be `filename`, `fullpath` or `both` (path, name) tuple.
+        Results can be filtered by `match` and reversed by `reverse`.
     '''
-    cripAssert(sort in ['nat', 'dict'], 'Invalid sort.')
-    cripAssert(style in ['filename', 'fullpath', 'both'], 'Invalid style.')
+    cripAssert(sort in ['nat', 'dict'], f'Invalid `sort`: {sort}.')
+    cripAssert(style in ['filename', 'fullpath', 'both'], f'Invalid `style`: {style}.')
 
     files = os.listdir(folder)
 
@@ -51,8 +51,7 @@ def listDirectory(folder: str,
 
 
 def imreadDicom(path: str, dtype=None, attrs: Or[None, Dict[str, Any]] = None) -> np.ndarray:
-    '''
-        Read DICOM file. Return numpy array. Use `attrs` to supplement DICOM tags for non-standard images.
+    ''' Read DICOM file. Return numpy array. Use `attrs` to supplement DICOM tags for non-standard images.
         You should be very careful about the whether Rescale Slope is cancelled for CT images.
     
         Convert dtype with `dtype != None`.
@@ -70,8 +69,7 @@ def imreadDicom(path: str, dtype=None, attrs: Or[None, Dict[str, Any]] = None) -
 
 
 def imreadDicoms(dir_: str, dtype=None, attrs: Or[None, Dict[str, Any]] = None) -> np.ndarray:
-    '''
-        Read series of DICOM files in directory.
+    ''' Read series of DICOM files in directory.
     '''
     imgs = [imreadDicom(x, dtype, attrs) for x in listDirectory(dir_, style='fullpath')]
 
@@ -79,8 +77,7 @@ def imreadDicoms(dir_: str, dtype=None, attrs: Or[None, Dict[str, Any]] = None) 
 
 
 def readDicom(path: str) -> pydicom.Dataset:
-    '''
-        Read DICOM file as pydicom object.
+    ''' Read DICOM file as pydicom object.
     '''
     return pydicom.read_file(path)
 
@@ -93,8 +90,7 @@ def imreadRaw(path: str,
               offset: int = 0,
               gap: int = 0,
               order='CHW') -> np.ndarray:
-    '''
-        Read binary raw file. Return numpy array with shape `(nSlice, h, w)`. `offset` from head in bytes.
+    ''' Read binary raw file. Return numpy array with shape `(nSlice, h, w)`. `offset` from head in bytes.
         `gap` between images in bytes.
     '''
     cripAssert(order in ['CHW', 'HWC'], 'Invalid order.')
@@ -184,8 +180,7 @@ def imwriteTiff(img: TwoOrThreeD, path: str, dtype=None):
 
 
 def readEVI(path: str):
-    '''
-        Read EVI file saved by XCounter Hydra PCD detector. Return the images and metadata.
+    ''' Read EVI file saved by XCounter Hydra PCD detector. Return the images and metadata.
     '''
     metadata = {
         'ImageType': None,
@@ -239,8 +234,7 @@ def readEVI(path: str):
 
 
 def imreadEVI(path: str):
-    '''
-        Read EVI file saved by XCounter Hydra PCD detector. Return the images only.
+    ''' Read EVI file saved by XCounter Hydra PCD detector. Return the images only.
     '''
     return readEVI(path)[0]
 

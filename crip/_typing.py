@@ -7,13 +7,12 @@
 import numpy as np
 from typing import List, Union, Any, Dict, Callable, Iterable, Tuple
 
-Or = Union
-
 DefaultFloatDType = np.float32
 DefaultEnergyUnit = 'keV'
 BuiltInAttenEnergyUnit = 'MeV'
 DefaultMuUnit = 'mm-1'
 
+Or = Union
 UintLike = Or[np.uint8, np.uint16, np.uint32, np.uint64]
 SignedIntLike = Or[int, np.int8, np.int16, np.int32, np.int64]
 IntLike = Or[UintLike, SignedIntLike]

@@ -1,5 +1,5 @@
 '''
-    Low Dose CT (LDCT) module of crip.
+    Low Dose CT module of crip.
 
     https://github.com/SEU-CT-Recon/crip
 '''
@@ -14,18 +14,16 @@ from .utils import *
 
 @ConvertListNDArray
 def injectGaussianNoise(projections: TwoOrThreeD, sigma: float, mu: float = 0) -> TwoOrThreeD:
+    ''' Inject additive Gaussian noise ~ `N(mu, sigma^2)` where `sigma` is the standard deviation and `mu` is the mean.
     '''
-        Inject Gaussian noise which obeys distribution `N(\\mu, \\sigma^2)`.
-    '''
-    cripAssert(is2or3D(projections), '`projections` should be 2D or 3D.')
-    cripAssert(sigma > 0, 'sigma should > 0.')
+    cripAssert(is2or3D(projections), f'`projections` should be 2 or 3-D, but got {projections.ndim}-D.')
+    cripAssert(sigma > 0, 'sigma should be greater than 0.')
 
-    injectOne = lambda img: (np.random.randn(*img.shape) * sigma + mu) + img
-
+    _inject1 = lambda img: (np.random.randn(*img.shape) * sigma + mu) + img
     if is3D(projections):
-        res = np.array(list(map(injectOne, projections)))
+        res = np.array(list(map(_inject1, projections)))
     else:
-        res = injectOne(projections)
+        res = _inject1(projections)
 
     return res
 
@@ -35,8 +33,7 @@ def injectPoissonNoise(projections: TwoOrThreeD,
                        type_: str = 'postlog',
                        nPhoton: Or[int, float] = 1,
                        suppressWarning=False) -> TwoOrThreeD:
-    '''
-        Inject Poisson noise which obeys distribution `P(\\lambda)` where \\lambda is the ground-truth quanta in `projections`.
+    ''' Inject Poisson noise which obeys distribution `P(\\lambda)` where \\lambda is the ground-truth quanta in `projections`.
         `projections` must have int type whose value stands for the photon quanta in some way. Floating projections
         should be manually properly rescaled ahead and scale back as you need since Poisson Distribution only deals with
         positive integers. `type_` (postlog or raw) gives the content type of `projections`, usually you should use
@@ -68,8 +65,7 @@ def injectPoissonNoise(projections: TwoOrThreeD,
 
 @ConvertListNDArray
 def totalVariation(img: TwoOrThreeD) -> TwoOrThreeD:
-    '''
-        Computes the Total Variation (TV) of image or images.
+    ''' Computes the Total Variation (TV) of image or images.
     '''
     cripAssert(is2or3D(img), 'img should be 2 or 3D.')
 
@@ -81,11 +77,10 @@ def totalVariation(img: TwoOrThreeD) -> TwoOrThreeD:
 
 
 def nps2D(roi: TwoOrThreeD, pixelSize: float, n: Or[int, None] = None):
-    '''
-        Compute the noise power spectrum (NPS) of a 2D region of interest (ROI).
+    ''' Compute the noise power spectrum (NPS) of a 2D region of interest (ROI).
         It's recommended that you provide multiple samples (realizations) of the ROI.
     '''
-    h, w = getHW(roi)
+    h, w = getHnW(roi)
     cripAssert(h == w, 'h == w required.')
     dots = n or nextPow2(h)
 
@@ -97,8 +92,7 @@ def nps2D(roi: TwoOrThreeD, pixelSize: float, n: Or[int, None] = None):
 
 
 def nps2DRadialAvg(roi: TwoOrThreeD, pixelSize: float, n: Or[int, None] = None):
-    '''
-        Compute the radially averaged noise power spectrum (NPS) of a 2D region of interest (ROI).
+    ''' Compute the radially averaged noise power spectrum (NPS) of a 2D region of interest (ROI).
         It's recommended that you provide multiple samples (realizations) of the ROI.
     '''
     nps = nps2D(roi, pixelSize, n)

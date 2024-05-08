@@ -20,8 +20,7 @@ from os import path
 
 @ConvertListNDArray
 def rotate(img: TwoOrThreeD, deg: int) -> TwoOrThreeD:
-    '''
-        Rotate the image or each image in a volume by deg [DEG] (multiple of 90) clockwise.
+    ''' Rotate the image or each image in a volume by deg [DEG] (multiple of 90) clockwise.
     '''
     deg = int(deg % 360)
     cripAssert(deg % 90 == 0, 'deg should be multiple of 90.')
@@ -34,8 +33,7 @@ def rotate(img: TwoOrThreeD, deg: int) -> TwoOrThreeD:
 
 @ConvertListNDArray
 def verticalFlip(img: TwoOrThreeD, copy=False) -> TwoOrThreeD:
-    '''
-        Vertical flip one image, or each image in a volume.
+    ''' Vertical flip one image, or each image in a volume.
 
         Set `copy = True` to get a copy of array, otherwise a view only.
     '''
@@ -49,8 +47,7 @@ def verticalFlip(img: TwoOrThreeD, copy=False) -> TwoOrThreeD:
 
 @ConvertListNDArray
 def horizontalFlip(img: TwoOrThreeD, copy=False) -> TwoOrThreeD:
-    '''
-        Horizontal flip one image, or each image in a volume.
+    ''' Horizontal flip one image, or each image in a volume.
         
         Set `copy = True` to get a copy of array, otherwise a view only.
     '''
@@ -64,8 +61,7 @@ def horizontalFlip(img: TwoOrThreeD, copy=False) -> TwoOrThreeD:
 
 @ConvertListNDArray
 def stackFlip(img: ThreeD, copy=False) -> ThreeD:
-    '''
-        Flip a stack w.r.t. z-axis, i.e., reverse slices.
+    ''' Flip a stack w.r.t. z-axis, i.e., reverse slices.
 
         Set `copy = True` to get a copy of array, otherwise a view only.
     '''
@@ -82,8 +78,7 @@ def resize(img: TwoOrThreeD,
            dsize: Tuple[int] = None,
            scale: Tuple[Or[float, int]] = None,
            interp: str = 'bicubic') -> TwoOrThreeD:
-    '''
-        Resize the image or each image in a volume to `dsize = (H, W)` (if dsize is not None) or scale 
+    ''' Resize the image or each image in a volume to `dsize = (H, W)` (if dsize is not None) or scale 
         by `scale = (facH, facW)` using `interp` (bicubic, linear, nearest available).
     '''
     cripAssert(inArray(interp, ['bicubic', 'linear', 'nearest']), 'Invalid interp method.')
@@ -110,8 +105,7 @@ def resize(img: TwoOrThreeD,
 
 @ConvertListNDArray
 def gaussianSmooth(img: TwoOrThreeD, sigma: Or[float, int, Tuple[Or[float, int]]], ksize: int = None):
-    '''
-        Perform Gaussian smooth with kernel size = ksize and Gaussian \sigma = sigma (int or tuple (x, y)).
+    ''' Perform Gaussian smooth with kernel size = ksize and Gaussian \sigma = sigma (int or tuple (x, y)).
         
         Leave `ksize = None` to auto determine to include the majority of Gaussian energy.
     '''
@@ -131,8 +125,7 @@ def gaussianSmooth(img: TwoOrThreeD, sigma: Or[float, int, Tuple[Or[float, int]]
 
 @ConvertListNDArray
 def stackImages(imgList: ListNDArray, dtype=None) -> NDArray:
-    '''
-        Stack seperate image into one numpy array. I.e., views * (h, w) -> (views, h, w).
+    ''' Stack seperate image into one numpy array. I.e., views * (h, w) -> (views, h, w).
 
         Convert dtype with `dtype != None`.
     '''
@@ -143,8 +136,7 @@ def stackImages(imgList: ListNDArray, dtype=None) -> NDArray:
 
 
 def splitImages(imgs: ThreeD, dtype=None) -> List[NDArray]:
-    '''
-        Split stacked image into seperate numpy arrays. I.e., (views, h, w) -> views * (h, w).
+    ''' Split stacked image into seperate numpy arrays. I.e., (views, h, w) -> views * (h, w).
 
         Convert dtype with `dtype != None`.
     '''
@@ -158,8 +150,7 @@ def splitImages(imgs: ThreeD, dtype=None) -> List[NDArray]:
 
 @ConvertListNDArray
 def binning(img: TwoOrThreeD, rates: Tuple[int]) -> TwoOrThreeD:
-    '''
-        Perform binning with `rates = (c, h, w) / (h, w)`.
+    ''' Perform binning with `rates = (c, h, w) / (h, w)`.
     '''
     for rate in rates:
         cripAssert(isInt(rate) and rate > 0, 'rates should be positive int.')
@@ -180,8 +171,7 @@ def binning(img: TwoOrThreeD, rates: Tuple[int]) -> TwoOrThreeD:
 
 @ConvertListNDArray
 def transpose(vol: TwoOrThreeD, order: Tuple[int]) -> TwoOrThreeD:
-    '''
-        Transpose vol with axes swapping `order`.
+    ''' Transpose vol with axes swapping `order`.
     '''
     if is2D(vol):
         cripAssert(len(order) == 2, 'order should have length 2 for 2D input.')
@@ -193,8 +183,7 @@ def transpose(vol: TwoOrThreeD, order: Tuple[int]) -> TwoOrThreeD:
 
 @ConvertListNDArray
 def permute(vol: ThreeD, from_: str, to: str) -> ThreeD:
-    '''
-        Permute axes (transpose) from `from_` to `to`, reslicing the reconstructed volume.
+    ''' Permute axes (transpose) from `from_` to `to`, reslicing the reconstructed volume.
 
         Valid directions are: 'sagittal', 'coronal', 'transverse'.
     '''
@@ -222,8 +211,7 @@ def permute(vol: ThreeD, from_: str, to: str) -> ThreeD:
 
 
 def shepplogan(size: int = 512):
-    '''
-        Generate the Shepp-Logan phantom.
+    ''' Generate the Shepp-Logan phantom.
     '''
     cripAssert(size in [256, 512, 1024], 'Shepp-Logan can only have size in 256 / 512 / 1024.')
 
@@ -233,8 +221,7 @@ def shepplogan(size: int = 512):
 
 
 def fitPolyV2D2(x1: NDArray, x2: NDArray, y: NDArray, bias: bool = True):
-    '''
-        Fit a degree-2 polynomial using pseudo-inverse to a pair of variables `x1, x2`.
+    ''' Fit a degree-2 polynomial using pseudo-inverse to a pair of variables `x1, x2`.
         Output 6 coefficients. If `bias` is False, the last coefficient will be 0.
 
         `c[0] * x1**2 + c[1] * x2**2 + c[2] * x1 * x2 + c[3] * x1 + c[4] * x2 + c[5]`
@@ -251,8 +238,7 @@ def fitPolyV2D2(x1: NDArray, x2: NDArray, y: NDArray, bias: bool = True):
 
 
 def applyPolyV2D2(coeff: NDArray, x1: NDArray, x2: NDArray):
-    '''
-        Apply a degree-2 polynomial to a pair of variables `x1, x2`.
+    ''' Apply a degree-2 polynomial to a pair of variables `x1, x2`.
         
         `c[0] * x1**2 + c[1] * x2**2 + c[2] * x1 * x2 + c[3] * x1 + c[4] * x2 + c[5]`
     '''
@@ -267,8 +253,7 @@ def applyPolyV2D2(coeff: NDArray, x1: NDArray, x2: NDArray):
 
 
 def fitPolyV1D2(x1: NDArray, y: NDArray, bias: bool = True):
-    '''
-        Fit a degree-2 polynomial using pseudo-inverse to a variable `x1`.
+    ''' Fit a degree-2 polynomial using pseudo-inverse to a variable `x1`.
         Output 3 coefficients. If `bias` is False, the last coefficient will be 0.
 
         `c[0] * x1**2 + c[1] * x1 + c[2]`
@@ -282,8 +267,7 @@ def fitPolyV1D2(x1: NDArray, y: NDArray, bias: bool = True):
 
 
 def applyPolyV1D2(coeff: NDArray, x1: NDArray):
-    '''
-        Apply a degree-2 polynomial to a variable `x1`.
+    ''' Apply a degree-2 polynomial to a variable `x1`.
         
         `c[0] * x1**2 + c[1] * x1 + c[2]`
     '''

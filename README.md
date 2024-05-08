@@ -38,8 +38,6 @@ All functions are (or will be) with clear documentation. Just consider the funct
 - `crip.metric` for metrics computation.
 - `crip.plot` for figure drawing.
 
-crip is still under development. More features will be added in the future. And contributions are strongly welcomed.
-
 ## Documentation and Example
 
 The [Official documentation](seu-ct-recon.github.io/crip), and [Official example](./example). Ask everything in [issue](https://github.com/SEU-CT-Recon/crip/issues).
@@ -51,8 +49,8 @@ MIT
 ## Cite This
 
 ```
-@software{ZHUO_crip,
-  author = {ZHUO, Xu and LU, Yuchen and SEU-CT-Recon},
+@software{crip,
+  author = {SEU-CT-Recon},
   license = {MIT},
   title = {{crip}},
   url = {https://github.com/SEU-CT-Recon/crip}
@@ -60,5 +58,3 @@ MIT
 ```
 
 We appreciate if you [let us know](https://github.com/SEU-CT-Recon/crip/issues) you are using crip in your workflow or publications.
-
-We are considering publishing crip to [Journal of Open Source Software](https://joss.theoj.org/) and/or apply for a Software Copyright in China in the future.

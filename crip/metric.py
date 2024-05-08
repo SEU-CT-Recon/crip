@@ -1,5 +1,5 @@
 '''
-    Metrics calculator module of crip.
+    Metrics module of crip.
 
     https://github.com/SEU-CT-Recon/crip
 '''
@@ -9,20 +9,18 @@ from .utils import cripWarning, cripAssert, is3D, isOfSameShape
 from ._typing import *
 from skimage.metrics import structural_similarity, peak_signal_noise_ratio
 
-__all__ = ['calcMAPE', 'calcPSNR', 'calcSSIM', 'calcRMSE']
+__all__ = ['computeMAPE', 'computePSNR', 'computeSSIM', 'computeRMSE']
 
 
-def calcMAPE(x, y, eps=1e-6):
-    '''
-        Compute the Mean Absolution Percentage Error (%) where `x` is the prediction
+def computeMAPE(x, y, eps=1e-6):
+    ''' Compute the Mean Absolution Percentage Error (%) where `x` is the prediction
         and `y` is the ground truth.
     '''
     return np.mean(np.abs(x - y) / (y + eps)) * 100
 
 
-def calcPSNR(x: TwoOrThreeD, y: TwoOrThreeD, range_=1):
-    '''
-        Compute the Peak Signal Noise Ratio (PSNR) (dB).
+def computePSNR(x: TwoOrThreeD, y: TwoOrThreeD, range_=1):
+    ''' Compute the Peak Signal Noise Ratio (PSNR) (dB).
     '''
     cripWarning(
         range_ == 1 or range_ == 255,
@@ -32,9 +30,8 @@ def calcPSNR(x: TwoOrThreeD, y: TwoOrThreeD, range_=1):
     return psnr
 
 
-def calcSSIM(x: TwoOrThreeD, y: TwoOrThreeD, range_=1):
-    '''
-        Compute the Structural Similarity (SSIM).
+def computeSSIM(x: TwoOrThreeD, y: TwoOrThreeD, range_=1):
+    ''' Compute the Structural Similarity (SSIM).
     '''
     cripWarning(
         range_ == 1 or range_ == 255,
@@ -47,9 +44,8 @@ def calcSSIM(x: TwoOrThreeD, y: TwoOrThreeD, range_=1):
     return ssim
 
 
-def calcRMSE(x, y):
-    '''
-        Compute the Root Mean Squared Error.
+def computeRMSE(x, y):
+    ''' Compute the Root Mean Squared Error.
     '''
     sq = (x - y)**2
     return np.sqrt(sq.mean())

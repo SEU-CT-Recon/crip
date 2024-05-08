@@ -8,22 +8,24 @@ __all__ = [
     'readFileText', 'CripException', 'cripAssert', 'cripWarning', 'ConvertListNDArray', 'asFloat', 'is2D', 'is3D',
     'is2or3D', 'isInt', 'isIntDtype', 'isFloatDtype', 'isIntType', 'isFloatType', 'isType', 'isNumber', 'isList',
     'isListNDArray', 'isOfSameShape', 'inRange', 'inArray', 'getAsset', 'cvtEnergyUnit', 'cvtLengthUnit', 'cvtMuUnit',
-    'radToDeg', 'degToRad', 'sysPlatform', 'getHW', 'is1D', 'as3D', 'nextPow2'
+    'getHnW', 'is1D', 'as3D', 'nextPow2'
 ]
 
 import os
 import logging
 import math
 import numpy as np
-import sys
 import functools
 from ._typing import *
 from ._rc import *
 
 
-def readFileText(path_):
+def readFileText(path_: str) -> str:
+    ''' Read text file.
+    '''
     with open(path_, 'r') as fp:
         content = fp.read()
+
     return content
 
 
@@ -35,32 +37,29 @@ class CripException(BaseException):
         The universal expection class for crip.
     '''
 
-    def __init__(self, *args: object) -> None:
+    def __init__(self, *args) -> None:
         super().__init__(*args)
 
 
-def cripAssert(cond, hint):
-    '''
-        The only assert method for crip.
+def cripAssert(cond, hint: str):
+    ''' The only assert method for crip.
     '''
     if not cond:
         raise CripException(hint)
 
 
-def cripWarning(ensure, hint, dumpStack=False):
-    '''
-        The only warning method for crip.
+def cripWarning(ensure, hint: str, stackTrace=False):
+    ''' The only warning method for crip.
     '''
     if not SUPPRESS_WARNING and not ensure:
-        logging.warning(hint, stack_info=dumpStack)
+        logging.warning(hint, stack_info=stackTrace)
 
 
 ### Type check ###
 
 
 def ConvertListNDArray(f):
-    '''
-        Decorator to convert List[ndarray] to ndarray.
+    ''' Function decorator to convert List[ndarray] to ndarray.
     '''
 
     @functools.wraps(f)
@@ -82,11 +81,11 @@ def ConvertListNDArray(f):
 
 
 def asFloat(arr):
+    ''' Make sure `arr` has `DefaultFloatDType` dtype.
     '''
-        Make sure `arr` has floating type.
-    '''
-    if isType(arr, np.ndarray) and isIntType(arr):
+    if isType(arr, np.ndarray):
         arr = arr.astype(DefaultFloatDType)
+
     return arr
 
 
@@ -132,12 +131,15 @@ def isFloatType(arr: np.ndarray):
 
 
 def isType(x, t):
-    '''
-        Check if `x` has type `t` or isinstance of `t`.
+    ''' Check if `x` has type `t` or isinstance of `t`.
     '''
     if t is Callable:
         return callable(x)
     return type(x) == t or isinstance(x, t)
+
+
+def isNDArray(x):
+    return isType(x, NDArray)
 
 
 def isNumber(a):
@@ -165,113 +167,96 @@ def inRange(a, range_=None, low=None, high=None):
     return low <= a and a < high
 
 
-def inArray(a, arr):
-    return a in arr
-
-
-def getAsset(folder, prefix='_asset'):
+def getAsset(folder: str, prefix='_asset'):
+    ''' Get asset path under `crip/<prefix>/<folder>`.
+    '''
     return os.path.join(os.path.dirname(os.path.abspath(__file__)), f'{prefix}/{folder}')
 
 
-def cvtEnergyUnit(arr, from_, to):
-    '''
-        Convert between energy units. (ev, keV, MeV)
+def convertEnergyUnit(arr: NDArray, from_: str, to: str):
+    ''' Convert between energy units. [ev, keV, MeV]
     '''
     units = ['eV', 'keV', 'MeV']
+    cripAssert(from_ in units and to in units, f'Invalid unit: from_={from_}, to={to}.')
+
     from_ = units.index(from_)
     to = units.index(to)
-
     a = 1000
     b = 1 / a
-    mat = np.array([
+    M = np.array([
         [1, b, b**2],
         [a, 1, b],
         [a**2, a, 1],
-    ])  # mat[from, to]
+    ])  # M[from_, to]
 
-    return arr * mat[from_, to]
+    return arr * M[from_, to]
 
 
-def cvtLengthUnit(arr, from_, to):
+def convertLengthUnit(arr: NDArray, from_: str, to: str):
     '''
-        Convert between length units. (um, mm, cm, m)
+        Convert between length units. [um, mm, cm, m]
     '''
     units = ['um', 'mm', 'cm', 'm']
+    cripAssert(from_ in units and to in units, f'Invalid unit: from_={from_}, to={to}.')
+
     from_ = units.index(from_)
     to = units.index(to)
-
-    mat = np.array([
+    M = np.array([
         [1, 1e-3, 1e-4, 1e-6],
         [1e3, 1, 1e-1, 1e-3],
         [1e4, 1e1, 1, 1e-2],
         [1e6, 1e3, 1e2, 1],
-    ])  # mat[from, to]
+    ])  # M[from_, to]
 
-    return arr * mat[from_, to]
+    return arr * M[from_, to]
 
 
-def cvtMuUnit(arr, from_, to):
+def convertMuUnit(arr: NDArray, from_: str, to: str):
+    ''' Convert between mu value units. [um-1, mm-1, cm-1, m-1]
     '''
-        Convert between mu value units. (um-1, mm-1, cm-1, m-1)
-    '''
-    from_ = from_.replace('-1', '')
-    to = to.replace('-1', '')
+    units = ['um-1', 'mm-1', 'cm-1', 'm-1']
+    cripAssert(from_ in units and to in units, f'Invalid unit: from_={from_}, to={to}.')
 
-    return cvtLengthUnit(arr, to, from_)
+    return convertLengthUnit(arr, to.replace('-1', ''), from_.replace('-1', ''))
 
 
-def cvtConcentrationUnit(arr, from_, to):
-    '''
-        Convert between concentration units. (g/mL, mg/mL)
+def convertConcentrationUnit(arr: NDArray, from_: str, to: str):
+    ''' Convert between concentration units. [g/mL, mg/mL]
     '''
     units = ['g/mL', 'mg/mL']
+    cripAssert(from_ in units and to in units, f'Invalid unit: from_={from_}, to={to}.')
+
     from_ = units.index(from_)
     to = units.index(to)
-
-    # g/mL, mg/mL
-    mat = np.array([
+    # to g/mL, mg/mL
+    M = np.array([
         [1, 1000],  # from g/mL
         [1 / 1000, 1]  # from mg/mL
     ])
 
-    return arr * mat[from_, to]
+    return arr * M[from_, to]
 
 
-def radToDeg(x):
-    return x / np.pi * 180
-
-
-def degToRad(x):
-    return x / 180 * np.pi
-
-
-def sysPlatform():
-    platform = sys.platform
-
-    if platform.find('win32') != -1:
-        return 'Windows'
-    elif platform.find('linux') != -1:
-        return 'Linux'
-
-    cripAssert(False, f'Unsupported platform: {platform}.')
-
-
-def getHW(img: np.ndarray):
+def getHnW(img: NDArray):
+    ''' Get height and width of `img` with shape [CHW] or [HW].
     '''
-        Get height and width of `img`.
-    '''
-    if is3D(img):
-        _, h, w = img.shape
-    elif is2D(img):
-        h, w = img.shape
-    else:
-        cripAssert(False, 'img should be 2D or 3D.')
+    cripAssert(is2or3D(img), 'img should be 2D or 3D.')
 
-    return h, w
+    return img.shape[-2], img.shape[-1]
 
 
-def nextPow2(x):
-    '''
-        Get the next power of 2 of `x`.
+def nextPow2(x: int):
+    ''' Get the next power of 2 of integer `x`.
     '''
     return 1 if x == 0 else 2**math.ceil(math.log2(x))
+
+
+def getAttrKeysOfObject(obj):
+    ''' Get all attribute keys of `obj` excluding methods, private and default attributes.
+    '''
+    keys = [
+        a for a in (set(dir(obj)) - set(dir(object)))
+        if not a.startswith('__') and not callable(getattr(obj, a)) and getattr(obj, a) is not None
+    ]
+
+    return keys
