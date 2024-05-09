@@ -29,11 +29,10 @@ def averageProjections(projections: ThreeD) -> TwoD:
 
 
 @ConvertListNDArray
-def flatDarkFieldCorrection(projections: TwoOrThreeD,
-                            flat: Or[TwoD, ThreeD, float, None] = None,
-                            dark: Or[TwoD, ThreeD, float] = 0) -> TwoOrThreeD:
-    '''
-        Perform flat field (air) and dark field correction to get post-log value.
+def correctFlatDarkField(projections: TwoOrThreeD,
+                         flat: Or[TwoD, ThreeD, float, None] = None,
+                         dark: Or[TwoD, ThreeD, float] = 0) -> TwoOrThreeD:
+    ''' Perform flat field (air) and dark field correction to get post-log projections.
         If `flat` is 3D and `projections` is also 3D, the correction will be performed view by view.
         I.e., `- log [(X - D) / (F - D)]`. Multi projections accepted.
         If flat is None, air is estimated using the brightest pixel by default.
@@ -64,10 +63,6 @@ def flatDarkFieldCorrection(projections: TwoOrThreeD,
     return res
 
 
-# a recommended alias
-correctFlatDarkField = flatDarkFieldCorrection
-
-
 @ConvertListNDArray
 def projectionsToSinograms(projections: ThreeD):
     ''' Permute projections to sinograms by axes swapping `(views, h, w) -> (h, views, w)`.
@@ -86,8 +81,7 @@ def projectionsToSinograms(projections: ThreeD):
 
 @ConvertListNDArray
 def sinogramsToProjections(sinograms: ThreeD):
-    '''
-        Permute sinograms back to projections by axes swapping `(h, views, w) -> (views, h, w)`.
+    ''' Permute sinograms back to projections by axes swapping `(h, views, w) -> (views, h, w)`.
 
         Note that the width direction is along detector channels of a row.
     '''
@@ -122,7 +116,7 @@ def padImage(img: TwoOrThreeD,
             if ascend else 0.5 * np.cos(np.linspace(0, np.pi, dot)) + 0.5
     }
 
-    h, w = getHW(img)
+    h, w = getHnW(img)
     nPadU, nPadR, nPadD, nPadL = padding
     padH = h + nPadU + nPadD
     padW = w + nPadL + nPadR
@@ -161,15 +155,6 @@ def padSinogram(sgms: TwoOrThreeD, padding: Or[int, Tuple[int, int]], mode='symm
     l, r = padding
 
     return padImage(sgms, (0, r, 0, l), mode, decay)
-
-
-@ConvertListNDArray
-def correctBeamHardeningPolynomial(postlog: TwoOrThreeD, coeffs: Or[Tuple, np.poly1d], bias=True):
-    '''
-        Apply the polynomial (\\mu L vs. PostLog fit) on postlog to perform basic beam hardening correction.
-        `coeffs` can be either `tuple` or `np.poly1d`. Set `bias=True` if your coeffs includes the bias (order 0) term.
-    '''
-    cripAssert(False, 'The implementation of this function is being re-investigating now.')
 
 
 @ConvertListNDArray

@@ -9,6 +9,7 @@ import logging
 import math
 import numpy as np
 import functools
+
 from ._typing import *
 
 
@@ -143,7 +144,9 @@ def isListNDArray(arr):
     return isType(arr, list) and isType(arr[0], np.ndarray)
 
 
-def isOfSameShape(a: np.ndarray, b: np.ndarray):
+def isOfSameShape(a: NDArray, b: NDArray) -> bool:
+    ''' Check if two NDArray have the same shape.
+    '''
     return np.array_equal(a.shape, b.shape)
 
 
@@ -156,13 +159,13 @@ def inRange(a, range_=None, low=None, high=None):
     return low <= a and a < high
 
 
-def getAsset(folder: str, prefix='_asset'):
+def getAsset(folder: str, prefix='_asset') -> str:
     ''' Get asset path under `crip/<prefix>/<folder>`.
     '''
     return os.path.join(os.path.dirname(os.path.abspath(__file__)), f'{prefix}/{folder}')
 
 
-def convertEnergyUnit(arr: NDArray, from_: str, to: str):
+def convertEnergyUnit(arr: Or[NDArray, float], from_: str, to: str) -> Or[NDArray, float]:
     ''' Convert between energy units. [ev, keV, MeV]
     '''
     units = ['eV', 'keV', 'MeV']
@@ -181,7 +184,7 @@ def convertEnergyUnit(arr: NDArray, from_: str, to: str):
     return arr * M[from_, to]
 
 
-def convertLengthUnit(arr: NDArray, from_: str, to: str):
+def convertLengthUnit(arr: Or[NDArray, float], from_: str, to: str) -> Or[NDArray, float]:
     ''' Convert between length units. [um, mm, cm, m]
     '''
     units = ['um', 'mm', 'cm', 'm']
@@ -199,7 +202,7 @@ def convertLengthUnit(arr: NDArray, from_: str, to: str):
     return arr * M[from_, to]
 
 
-def convertMuUnit(arr: NDArray, from_: str, to: str):
+def convertMuUnit(arr: Or[NDArray, float], from_: str, to: str) -> Or[NDArray, float]:
     ''' Convert between mu value units. [um-1, mm-1, cm-1, m-1]
     '''
     units = ['um-1', 'mm-1', 'cm-1', 'm-1']
@@ -208,7 +211,7 @@ def convertMuUnit(arr: NDArray, from_: str, to: str):
     return convertLengthUnit(arr, to.replace('-1', ''), from_.replace('-1', ''))
 
 
-def convertConcentrationUnit(arr: NDArray, from_: str, to: str):
+def convertConcentrationUnit(arr: Or[NDArray, float], from_: str, to: str) -> Or[NDArray, float]:
     ''' Convert between concentration units. [g/mL, mg/mL]
     '''
     units = ['g/mL', 'mg/mL']
@@ -225,7 +228,7 @@ def convertConcentrationUnit(arr: NDArray, from_: str, to: str):
     return arr * M[from_, to]
 
 
-def getHnW(img: NDArray):
+def getHnW(img: NDArray) -> Tuple[int, int]:
     ''' Get height and width of `img` with shape [CHW] or [HW].
     '''
     cripAssert(is2or3D(img), 'img should be 2D or 3D.')
@@ -233,13 +236,13 @@ def getHnW(img: NDArray):
     return img.shape[-2], img.shape[-1]
 
 
-def nextPow2(x: int):
+def nextPow2(x: int) -> int:
     ''' Get the next power of 2 of integer `x`.
     '''
     return 1 if x == 0 else 2**math.ceil(math.log2(x))
 
 
-def getAttrKeysOfObject(obj):
+def getAttrKeysOfObject(obj: object) -> List[str]:
     ''' Get all attribute keys of `obj` excluding methods, private and default attributes.
     '''
     keys = [
@@ -250,7 +253,7 @@ def getAttrKeysOfObject(obj):
     return keys
 
 
-def chw2hwc(img):
+def chw2hwc(img: ThreeD) -> ThreeD:
     ''' Convert CHW to HWC.
     '''
     cripAssert(is3D(img), 'img should be 3D.')
@@ -258,7 +261,7 @@ def chw2hwc(img):
     return np.moveaxis(img, 0, -1)
 
 
-def hwc2chw(img):
+def hwc2chw(img: ThreeD) -> ThreeD:
     ''' Convert HWC to CHW.
     '''
     cripAssert(is3D(img), 'img should be 3D.')

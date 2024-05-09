@@ -35,7 +35,7 @@ def decompMaterial(src: Atten, base1: Atten, base2: Atten, mode='coeff') -> NDAr
 
 
 def deDecompCoeff(lowSpec: Spectrum, highSpec: Spectrum, base1: Atten, len1: Or[NDArray, Iterable], base2: Atten,
-                     len2: Or[NDArray, Iterable]):
+                  len2: Or[NDArray, Iterable]):
     ''' Compute the decomposing coefficient (Order 2 with bias term) of two spectra onto two material bases.
     '''
     lenCombo = []
@@ -74,9 +74,8 @@ def deDecompRecon(low: TwoOrThreeD,
                   muBase2Low: float,
                   muBase2High: float,
                   checkCond: bool = True):
-    ''' Perform dual-energy decompose in reconstruction domain. \\mu values can be calculated using @see `calcMu`.
-
-        The values of input volumes should be \\mu value. The outputs are decomposing coefficients.
+    ''' Perform Dual-Energy Two-Material decomposition in image domain.
+        The outputs are decomposing coefficients.
     '''
     cripAssert(isOfSameShape(low, high), 'Two volumes should have same shape.')
     COND_TOLERANCE = 1000
@@ -87,66 +86,20 @@ def deDecompRecon(low: TwoOrThreeD,
             np.linalg.cond(A) <= COND_TOLERANCE, 'The material decomposition matrix possesses high condition number.')
     M = np.linalg.inv(A)
 
-    def decompOne(low, high):
+    def decomp1(low, high):
         c1 = M[0, 0] * low + M[0, 1] * high
         c2 = M[1, 0] * low + M[1, 1] * high
         return c1, c2
 
     if is2D(low):
-        return decompOne(low, high)
+        return decomp1(low, high)
     else:
-        return np.array(list(map(lambda args: decompOne(*args), zip(low, high)))).transpose((1, 0, 2, 3))
-
-
-def softThreshold(img: np.ndarray, l, h, mode='lower'):
-    shape = img.shape
-    img = img.flatten()
-
-    lower = img < l
-    upper = img >= h
-
-    transitional = (img >= l) * (img < h)
-    if mode == 'upper':
-        transitional = transitional * (img - l) / (h - l)
-        res = upper + transitional
-    elif mode == 'lower':
-        transitional = transitional * (h - img) / (h - l)
-        res = lower + transitional
-
-    return res.reshape(shape)
-
-
-def genMaterialPhantom(img, zsmooth=3, sigma=1, l=80, h=300, base=1000):
-    '''
-        Generate the phantom of material bases (one is water) from SECT using soft-thresholding.
-        zsmooth: smooth window in slice direction.
-        sigma: Gaussian smooth sigma in single slice.
-        [l, h] defines the fuzzy range of another material, e.g., bone.
-        base: the reference HU of another material.
-    '''
-    assert np.min(img) < 0  # HU
-
-    kernel = (zsmooth, 1, 1) if zsmooth is not None else (1, 1)
-    img = uniform_filter(img, kernel, mode='reflect')
-    img = gaussianSmooth(img, sigma)
-
-    water = (img + 1000) / 1000 * softThreshold(img, l, h, 'lower')
-    b2 = (img + 1000) / (base + 1000) * softThreshold(img, l, h, 'upper')
-
-    return water, b2
-
-
-def compose2(b1, b2, v1, v2):
-    return b1 * v1 + b2 * v2
-
-
-def compose3(b1, b2, b3, v1, v2, v3):
-    return b1 * v1 + b2 * v2 + b3 * v3
+        return np.array(list(map(lambda args: decomp1(*args), zip(low, high)))).transpose((1, 0, 2, 3))
 
 
 @ConvertListNDArray
 def deDecompReconVolCon(low: TwoOrThreeD, high: TwoOrThreeD, muBase1, muBase2, muBase3):
-    '''Dual-Energy Triple-Material decomposition with Volume Conservation.
+    '''Dual-Energy Three-Material decomposition with Volume Conservation.
        muBase* = [low, high]
     '''
     cripAssert(isOfSameShape(low, high), 'Volumes should have same shape.')
@@ -224,3 +177,49 @@ def teDecompReconVolCon(low: TwoOrThreeD, mid: TwoOrThreeD, high: TwoOrThreeD, m
         return decompOne(low, mid, high)
     else:
         return np.array(list(map(lambda args: decompOne(*args), zip(low, mid, high)))).transpose((1, 0, 2, 3))
+
+
+def softThreshold(img: np.ndarray, l, h, mode='lower'):
+    shape = img.shape
+    img = img.flatten()
+
+    lower = img < l
+    upper = img >= h
+
+    transitional = (img >= l) * (img < h)
+    if mode == 'upper':
+        transitional = transitional * (img - l) / (h - l)
+        res = upper + transitional
+    elif mode == 'lower':
+        transitional = transitional * (h - img) / (h - l)
+        res = lower + transitional
+
+    return res.reshape(shape)
+
+
+def genMaterialPhantom(img, zsmooth=3, sigma=1, l=80, h=300, base=1000):
+    '''
+        Generate the phantom of material bases (one is water) from SECT using soft-thresholding.
+        zsmooth: smooth window in slice direction.
+        sigma: Gaussian smooth sigma in single slice.
+        [l, h] defines the fuzzy range of another material, e.g., bone.
+        base: the reference HU of another material.
+    '''
+    assert np.min(img) < 0  # HU
+
+    kernel = (zsmooth, 1, 1) if zsmooth is not None else (1, 1)
+    img = uniform_filter(img, kernel, mode='reflect')
+    img = gaussianSmooth(img, sigma)
+
+    water = (img + 1000) / 1000 * softThreshold(img, l, h, 'lower')
+    b2 = (img + 1000) / (base + 1000) * softThreshold(img, l, h, 'upper')
+
+    return water, b2
+
+
+def compose2(b1, b2, v1, v2):
+    return b1 * v1 + b2 * v2
+
+
+def compose3(b1, b2, b3, v1, v2, v3):
+    return b1 * v1 + b2 * v2 + b3 * v3

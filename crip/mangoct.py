@@ -1,7 +1,5 @@
 '''
     MangoCT integration interface.
-    See more at:
-        TODO
 
     https://github.com/SEU-CT-Recon/crip
 '''
@@ -263,7 +261,7 @@ class _MgCliBin(object):
 class MgCliFbp(_MgCliBin):
 
     def __init__(self, exe='mgfbp', cudaDevice=0, tempDir: Or[str, None] = None):
-        ''' Initialize a handler object to use the FBP tool in mangoct.
+        ''' Initialize a handler object to use the CLI version FBP tool in mangoct.
             `exe` is the path to the executable.
         '''
         super().__init__(exe, 'mgfbp', cudaDevice, tempDir)
@@ -272,7 +270,9 @@ class MgCliFbp(_MgCliBin):
 class MgCliFpj(_MgCliBin):
 
     def __init__(self, exe='mgfpj', cudaDevice=0, tempDir: Or[str, None] = None):
-        ''' Initialize a handler object to use the FPJ tool in mangoct.
+        ''' Initialize a handler object to use the CLI version FPJ tool in mangoct.
             `exe` is the path to the executable.
         '''
         super().__init__(exe, 'mgfpj', cudaDevice, tempDir)
+
+# TODO Add supports for Taichi version mangoct.

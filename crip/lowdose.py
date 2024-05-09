@@ -5,8 +5,9 @@
 '''
 
 import numpy as np
-from .shared import *
+
 from ._typing import *
+from .shared import *
 from .utils import *
 
 
@@ -67,40 +68,48 @@ def totalVariation(img: TwoOrThreeD) -> TwoOrThreeD:
     return tv
 
 
-def nps2D(roi: TwoOrThreeD, pixelSize: float, detrend='individual', n: Or[int, None] = None):
+def nps2D(roi: TwoOrThreeD, pixelSize: float, detrend='individual', n: Or[int, None] = None) -> TwoD:
     ''' Compute the noise power spectrum (NPS) of a 2D square ROI using `n`-dots DFT.
-        Recommended to provide multiple realizations of that ROI.
         `pixelSize` is the pixel size of reconstructed image ([mm] recommended).
+        `detrend` method can be `individual` (by mean value subtraction) or `mutual` (by foreground subtraction).
     '''
-    cripWarning(is3D(roi), "It's highly recommended to...")
+    cripAssert(detrend in ['individual', 'mutual'], f'Invalid detrend method: {detrend}.')
+    cripWarning(is3D(roi), "It's highly recommended to provide multiple realizations of the ROI.")
+    if detrend == 'mutual':
+        cripAssert(is3D(roi), '`mutual` detrend method requires multiple realizations of the ROI.')
 
     roi = as3D(roi)
     h, w = getHnW(roi)
-    cripAssert(h == w, 'Width and height of ROI should be the same.')
-    cripAssert(detrend in ['individual', 'mutual'], f'Invalid detrend method: {detrend}.')
+    cripAssert(h == w, 'ROI should be the square.')
     dots = n or nextPow2(h)
 
+    # de-trend the signal
     if detrend == 'individual':
-        detrended = roi - np.mean(roi)
+        detrended = roi - np.mean(roi, axis=0)
+        s = 1
+    elif detrend == 'mutual':
+        detrended = roi[:-1, ...] - roi[1:, ...]
+        detrended = detrended - np.mean(detrended, axis=0)
+        s = 1 / 2
 
-    dft = np.fft.fftshift(np.fft.fft2(deTrend, n=dots))
-    mod2 = np.real(dft * np.conj(dft))
+    dft = np.fft.fftshift(np.fft.fft2(detrended, n=dots))
+    dft = np.mean(dft, axis=0)  # averaged NPS
+    mod2 = np.real(dft * np.conj(dft))  # square of modulus
 
-    return mod2 * pixelSize * pixelSize / (h * w)
+    return (pixelSize * pixelSize) / (h * w) * mod2 * s
 
 
-def nps2DRadialAvg(roi: TwoOrThreeD, pixelSize: float, n: Or[int, None] = None):
-    ''' Compute the radially averaged noise power spectrum (NPS) of a 2D region of interest (ROI).
-        It's recommended that you provide multiple samples (realizations) of the ROI.
+def nps2DRadialAvg(nps: TwoD) -> NDArray:
+    ''' Compute the radially averaged noise power spectrum (NPS) where `nps` can be the output from `nps2D`.
     '''
-    nps = nps2D(roi, pixelSize, n)
-    n = nps.shape[0]
+    cripAssert(is2D(nps), '`nps` should be 2D.')
+    cripAssert(nps.shape[0] == nps.shape[1], '`nps` should be square.')
 
-    x, y = np.meshgrid(np.arange(nps.shape[1]), np.arange(nps.shape[0]))
+    N = nps.shape[0]
+    x, y = np.meshgrid(np.arange(N), np.arange(N))
     R = np.sqrt(x**2 + y**2)
 
-    f = lambda r: nps[(R >= r - .5) & (R < r + .5)].mean()
-    r = np.linspace(1, n, num=n)
-    mean = np.vectorize(f)(r)
+    _f = lambda r: nps[(R >= r - .5) & (R < r + .5)].mean()
+    _args = np.linspace(1, N, num=N)
 
-    return mean
+    return np.vectorize(_f)(_args)

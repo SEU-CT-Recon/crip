@@ -10,7 +10,6 @@ class test_itJustImports(unittest.TestCase):
         self.assertEqual(0, 0)
 
         import crip
-        import crip._rc
         import crip.spec
         import crip.io
         import crip.lowdose

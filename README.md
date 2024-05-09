@@ -1,9 +1,9 @@
 <p align="center">
   <img src="crip.png" />
 </p>
-An all-in-one tool for Cone-Beam CT Data IO, Pre/Post-process, Physics, Dual Energy, Low Dose and everything only except Reconstruction.
+An all-in-one tool for Cone-Beam CT Data IO, Pre/Post-process, Physics, Dual Energy, Low Dose and everything.
 
-:warning: crip is still under very "agile" development and **no** API consistency between versions are guaranteed. Use at your own risk! :construction:
+:warning: crip is still under very "agile" development and **no** API consistency and correctness validation between versions are guaranteed. Use at your own risk! :construction:
 
 ## Install
 
@@ -23,24 +23,9 @@ An all-in-one tool for Cone-Beam CT Data IO, Pre/Post-process, Physics, Dual Ene
   pip install /path/to/latest/release.whl
   ```
 
-## Modules
+## Documentation
 
-All functions are (or will be) with clear documentation. Just consider the function name and explore the source code, or refer to examples to start.
-
-- `crip.de` for Dual-Energy CT.
-- `crip.io` for file read/write (RAW, DICOM and TIFF supported).
-- `crip.physics` for attenuation, spectrum, coefficient calculation, etc.
-- `crip.postprocess` for data post-processing.
-- `crip.preprocess` for data pre-processing.
-- `crip.shared` for other common operations.
-- `crip.lowdose` for Low-Dose researches.
-- `crip.mangoct` for [mangoct](https://github.com/SEU-CT-Recon/mandoct) reconstruction tool package integration.
-- `crip.metric` for metrics computation.
-- `crip.plot` for figure drawing.
-
-## Documentation and Example
-
-The [Official documentation](seu-ct-recon.github.io/crip), and [Official example](./example). Ask everything in [issue](https://github.com/SEU-CT-Recon/crip/issues).
+The [Official documentation](seu-ct-recon.github.io/crip). Ask everything in [issue](https://github.com/SEU-CT-Recon/crip/issues).
 
 ## License
 

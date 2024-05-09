@@ -32,6 +32,7 @@ AttenAliases = {
     'Gadolinium': 'Gd',
 }
 
+
 class EnergyConversion(enum.Enum):
     ''' Energy conversion efficiency marker of the detector.
     '''

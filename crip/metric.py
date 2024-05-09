@@ -11,10 +11,12 @@ from .utils import cripWarning, cripAssert, is3D, isOfSameShape
 from ._typing import *
 
 
-def computeMAPE(x, y, eps=1e-6) -> float:
+def computeMAPE(x: TwoOrThreeD, y: TwoOrThreeD, eps=1e-6) -> float:
     ''' Compute the Mean Absolution Percentage Error (%) where `x` is the prediction
         and `y` is the ground truth.
     '''
+    cripAssert(isOfSameShape(x, y), 'Input images must have the same shape.')
+
     return np.mean(np.abs(x - y) / (y + eps)) * 100
 
 

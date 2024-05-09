@@ -4,18 +4,14 @@
     https://github.com/SEU-CT-Recon/crip
 '''
 
-__all__ = [
-    'rotate', 'verticalFlip', 'horizontalFlip', 'stackFlip', 'resize', 'gaussianSmooth', 'stackImages', 'splitImages',
-    'binning', 'transpose', 'permute', 'shepplogan', 'fitPolyV1D2', 'fitPolyV2D2', 'applyPolyV1D2', 'applyPolyV2D2'
-]
-
 import numpy as np
+from os import path
 import cv2
+import scipy.ndimage
 
-from .utils import ConvertListNDArray, cripAssert, getAsset, inArray, is2D, is2or3D, is3D, isInt, isType
+from .utils import *
 from ._typing import *
 from .io import imreadTiff
-from os import path
 
 
 @ConvertListNDArray
@@ -67,40 +63,52 @@ def stackFlip(img: ThreeD, copy=False) -> ThreeD:
 
 
 @ConvertListNDArray
-def resize(img: TwoOrThreeD,
-           dsize: Tuple[int] = None,
-           scale: Tuple[Or[float, int]] = None,
-           interp: str = 'bicubic') -> TwoOrThreeD:
-    ''' Resize each image to `dsize=(H, W)` if dsize is not `None` or scale 
-        by `scale=(facH, facW)` using `interp` [bicubic, linear, nearest].
+def resizeTo(img: TwoOrThreeD, dsize: Tuple[int], interp='bicubic') -> TwoOrThreeD:
+    ''' Resize each image to `dsize=(H, W)` using `interp` [bicubic, linear, nearest].
     '''
     cripAssert(interp in ['bicubic', 'linear', 'nearest'], f'Invalid interp method: {interp}.')
+    cripAssert(len(dsize) == 2, '`dsize` should be 2D.')
 
-    if dsize is None:
-        cripAssert(scale is not None, 'dsize and scale cannot be None at the same time.')
-        cripAssert(len(scale) == 2, 'scale should have length 2.')
-        fH, fW = scale
-    else:
-        cripAssert(scale is None, 'scale should not be set when dsize is set.')
-        # OpenCV dsize is in (W, H) form, so we reverse it.
-        dsize = dsize[::-1]
-        fH = fW = None
-
+    dsize = dsize[::-1]  # OpenCV dsize is in (W, H) form, so we reverse it.
     interp_ = {'bicubic': cv2.INTER_CUBIC, 'linear': cv2.INTER_LINEAR, 'nearest': cv2.INTER_NEAREST}
 
     if is3D(img):
-        c, _, _ = img.shape
-        res = [cv2.resize(img[i, ...], dsize, None, fW, fH, interpolation=interp_[interp]) for i in range(c)]
+        res = [cv2.resize(img[i, ...], dsize, None, interpolation=interp_[interp]) for i in range(img.shape[0])]
         return np.array(res)
     else:
-        return cv2.resize(img, dsize, None, fW, fH, interpolation=interp_[interp])
+        return cv2.resize(img, dsize, None, interpolation=interp_[interp])
 
 
 @ConvertListNDArray
-def gaussianSmooth(img: TwoOrThreeD, sigma: Or[float, int, Tuple[Or[float, int]]], ksize: int = None):
-    ''' Perform Gaussian smooth with kernel size = ksize and Gaussian \sigma = sigma (int or tuple (x, y)).
-        
-        Leave `ksize = None` to auto determine to include the majority of Gaussian energy.
+def resizeBy(img: TwoOrThreeD, factor: Tuple[int], interp='bicubic') -> TwoOrThreeD:
+    ''' Resize each image by `factor=(fH, fW)` using `interp` [bicubic, linear, nearest].
+    '''
+    cripAssert(interp in ['bicubic', 'linear', 'nearest'], f'Invalid interp method: {interp}.')
+    cripAssert(len(factor) == 2, '`factor` should be 2D.')
+
+    interp_ = {'bicubic': cv2.INTER_CUBIC, 'linear': cv2.INTER_LINEAR, 'nearest': cv2.INTER_NEAREST}
+    fH, fW = factor
+
+    if is3D(img):
+        res = [cv2.resize(img[i, ...], None, None, fW, fH, interpolation=interp_[interp]) for i in range(img.shape[0])]
+        return np.array(res)
+    else:
+        return cv2.resize(img, None, None, fW, fH, interpolation=interp_[interp])
+
+
+@ConvertListNDArray
+def resize3D(img: ThreeD, factor: Tuple[int], order=3) -> ThreeD:
+    ''' Resize 3D `img` by `factor=(fSlice, fH, fW)` using `order`-spline interpolation.
+    '''
+    cripAssert(len(factor) == 3, '`factor` should be 3D.')
+
+    return scipy.ndimage.zoom(img, factor, None, order, mode='mirror')
+
+
+@ConvertListNDArray
+def gaussianSmooth(img: TwoOrThreeD, sigma: Or[float, int, Tuple[Or[float, int]]], ksize: int = None) -> TwoOrThreeD:
+    ''' Perform Gaussian smooth with kernel size `ksize` and Gaussian sigma = `sigma` [int or tuple (row, col)].
+        Leave `ksize=None` to auto determine it to include the majority of kernel energy.
     '''
     if ksize is not None:
         cripAssert(isInt(ksize), 'ksize should be int.')
@@ -109,18 +117,16 @@ def gaussianSmooth(img: TwoOrThreeD, sigma: Or[float, int, Tuple[Or[float, int]]
         sigma = (sigma, sigma)
 
     if is3D(img):
-        c, _, _ = img.shape
-        res = [cv2.GaussianBlur(img[i, ...], ksize, sigmaX=sigma[0], sigmaY=sigma[1]) for i in range(c)]
+        res = [cv2.GaussianBlur(img[i, ...], ksize, sigmaX=sigma[1], sigmaY=sigma[0]) for i in range(img.shape[0])]
         return np.array(res)
     else:
-        return cv2.GaussianBlur(img, ksize, sigmaX=sigma[0], sigmaY=sigma[1])
+        return cv2.GaussianBlur(img, ksize, sigmaX=sigma[1], sigmaY=sigma[0])
 
 
 @ConvertListNDArray
 def stackImages(imgList: ListNDArray, dtype=None) -> NDArray:
     ''' Stack seperate image into one numpy array. I.e., views * (h, w) -> (views, h, w).
-
-        Convert dtype with `dtype != None`.
+        Convert dtype when `dtype` is not `None`.
     '''
     if dtype is not None:
         imgList = imgList.astype(dtype)
@@ -128,10 +134,9 @@ def stackImages(imgList: ListNDArray, dtype=None) -> NDArray:
     return imgList
 
 
-def splitImages(imgs: ThreeD, dtype=None) -> List[NDArray]:
+def splitImages(imgs: ThreeD, dtype=None) -> ListNDArray:
     ''' Split stacked image into seperate numpy arrays. I.e., (views, h, w) -> views * (h, w).
-
-        Convert dtype with `dtype != None`.
+        Convert dtype when `dtype` is not `None`.
     '''
     cripAssert(is3D(imgs), 'imgs should be 3D.')
 
@@ -204,21 +209,22 @@ def permute(vol: ThreeD, from_: str, to: str) -> ThreeD:
 
 
 def shepplogan(size: int = 512):
-    ''' Generate the Shepp-Logan phantom.
+    ''' Generate a `size x size` Shepp-Logan phantom.
     '''
-    cripAssert(size in [256, 512, 1024], 'Shepp-Logan can only have size in 256 / 512 / 1024.')
+    cripAssert(size in [256, 512, 1024], 'Shepp-Logan size should be in [256, 512, 1024]')
 
-    phantomPath = path.join(getAsset('shepplogan'), f'{size}.tif')
-
-    return imreadTiff(phantomPath)
+    return imreadTiff(path.join(getAsset('shepplogan'), f'{size}.tif'))
 
 
-def fitPolyV2D2(x1: NDArray, x2: NDArray, y: NDArray, bias: bool = True):
+def fitPolyV2D2(x1: NDArray, x2: NDArray, y: NDArray, bias: bool = True) -> NDArray:
     ''' Fit a degree-2 polynomial using pseudo-inverse to a pair of variables `x1, x2`.
-        Output 6 coefficients. If `bias` is False, the last coefficient will be 0.
-
-        `c[0] * x1**2 + c[1] * x2**2 + c[2] * x1 * x2 + c[3] * x1 + c[4] * x2 + c[5]`
+        Output 6 coefficients `c[0~5]`, minimize the error of `y` and
+        `c[0] * x1**2 + c[1] * x2**2 + c[2] * x1 * x2 + c[3] * x1 + c[4] * x2 + c[5]`.
+        If `bias` is False, `c[5]` will be 0.
     '''
+    cripAssert(is1D(x1) and is1D(x2) and is1D(y), 'Inputs should be 1D sequence.')
+    cripAssert(isOfSameShape(x1, x2) and isOfSameShape(x1, y), '`x1`, `x2` and `y` should have same shape.')
+
     x1sq = x1.T**2
     x2sq = x2.T**2
     x1x2 = (x1 * x2).T

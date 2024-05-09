@@ -18,24 +18,23 @@ from .physics import Spectrum, DiagEnergyRange, Atten
 from .shared import resize
 
 
-def smooth1D(data: NDArray, winSize: int = 5):
-    ''' Smooth an 1D array by moving averaging window. This name follows MATLAB.
-
+def smooth1D(data: NDArray, winSize: int = 5) -> NDArray:
+    ''' Smooth an 1D array using moving average window.
         The implementation is from https://stackoverflow.com/questions/40443020
     '''
     cripAssert(is1D(data), '`data` should be 1D array.')
-    cripAssert(isInt(winSize) and winSize % 2 == 1, '`winSize` should be odd integer.')
+    cripAssert(isInt(winSize) and winSize % 2 == 1, '`winSize` should be odd positive integer.')
 
     out0 = np.convolve(data, np.ones(winSize, dtype=int), 'valid') / winSize
     r = np.arange(1, winSize - 1, 2)
     start = np.cumsum(data[:winSize - 1])[::2] / r
     stop = (np.cumsum(data[:-winSize:-1])[::2] / r)[::-1]
+
     return np.concatenate((start, out0, stop))
 
 
 def window(img: TwoOrThreeD, win: Or[Tuple[int], Tuple[float]], style: str = 'lr', normalize: Or[str, None] = None):
-    '''
-        Window `img` using `win` (ww, wl) with style 'wwwl' or (left, right) with style 'lr'.
+    ''' Window `img` using `win` (ww, wl) with style 'wwwl' or (left, right) with style 'lr'.
         Set `normalize` to '0255' to convert to 8-bit image, or '01' to [0, 1] float image.
     '''
     cripAssert(len(win) == 2, '`win` should have length of 2.')
@@ -60,38 +59,27 @@ def window(img: TwoOrThreeD, win: Or[Tuple[int], Tuple[float]], style: str = 'lr
     return res
 
 
-def windowFullRange(img: TwoOrThreeD, normalize='01'):
-    '''Window `img` using full dynamic range of pixel values.
+def windowFullRange(img: TwoOrThreeD, normalize='01') -> TwoOrThreeD:
+    ''' Window `img` using full dynamic range of pixel values.
     '''
     return window(img, (np.max(img), np.min(img)), 'lr', normalize)
 
 
-def addFont(dir_: str):
-    '''
-        Add font files under `dir` to matplotlib.
-    '''
-    for file in font_manager.findSystemFonts(fontpaths=[dir_]):
-        font_manager.fontManager.addfont(file)
-
-
 def average(imgs: ThreeD, i: int, r: int):
-    '''
-        Average along `channel` dimension [i - r, i + r].
+    ''' Average along `channel` dimension [i - r, i + r].
         Use for example, show CT slices smoother.
     '''
     return np.mean(imgs[i - r:i + r], axis=0)
 
 
 def zoomIn(img, row, col, h, w):
-    '''
-        Crop a patch. (row, col) determines the left-top point. (h, w) gives height and width.
+    ''' Crop a patch. (row, col) determines the left-top point. (h, w) gives height and width.
     '''
     return img[row:row + h, col:col + w]
 
 
 def stddev(img, row, col, h, w):
-    '''
-        Compute the standard deviation of a image crop.
+    ''' Compute the standard deviation of a image crop.
         (row, col) determines the left-top point. (h, w) gives height and width.
     '''
     return np.std(zoomIn(img, row, col, h, w))
@@ -182,8 +170,7 @@ def makeImageGrid(subimages: List[TwoD],
 
 
 def plotSpectrum(ax: matplotlib.axes.Axes, spec: Spectrum):
-    '''
-        Plot the spectrum in `ax`. Example
+    ''' Plot the spectrum in `ax`. Example
         ```
         fig = plt.figure()
         ax = fig.add_subplot(111)
@@ -198,8 +185,7 @@ def plotSpectrum(ax: matplotlib.axes.Axes, spec: Spectrum):
 
 
 def plotMu(ax: matplotlib.axes.Axes, atten: Atten, startEnergy: int = 1, logScale=True):
-    '''
-        Plot the LACs of `atten` from `startEnergy` keV in ax in `logScale` if true.
+    ''' Plot the LACs of `atten` from `startEnergy` keV in ax in `logScale` if true.
     '''
     x = list(DiagEnergyRange)[startEnergy:]
     ax.plot(x, atten.mu[startEnergy:])
