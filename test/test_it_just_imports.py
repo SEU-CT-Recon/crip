@@ -11,7 +11,7 @@ class test_itJustImports(unittest.TestCase):
 
         import crip
         import crip._rc
-        import crip.de
+        import crip.spec
         import crip.io
         import crip.lowdose
         import crip.physics

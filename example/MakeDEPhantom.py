@@ -2,7 +2,7 @@ import os
 import numpy as np
 from crip.io import imreadDicoms, imwriteTiff, listDirectory
 from crip.postprocess import fovCrop
-from crip.de import genMaterialPhantom
+from crip.spec import genMaterialPhantom
 
 # 全数据集路径
 dir_ = '/mnt/new_no1/zhuoxu/AAPM-LowDoseCT/Reconstruction'

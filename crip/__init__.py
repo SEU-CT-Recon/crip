@@ -7,11 +7,10 @@ https://github.com/SEU-CT-Recon/crip
 '''
 
 __all__ = [
-    'de', 'io', 'lowdose', 'physics', 'postprocess', 'preprocess', 'shared', 'utils', 'mangoct', 'plot', 'metric', '_rc'
+    'spec', 'io', 'lowdose', 'physics', 'postprocess', 'preprocess', 'shared', 'utils', 'mangoct', 'plot', 'metric'
 ]
 
-from . import _rc
-from . import de
+from . import spec
 from . import io
 from . import lowdose
 from . import physics

@@ -6,19 +6,16 @@
     https://github.com/SEU-CT-Recon/crip
 '''
 
-__all__ = ['Mgfbp', 'Mgfpj', 'MgfbpConfig', 'MgfpjConfig']
-
 import os
 import json
 import tempfile
 import subprocess
-
 from .utils import cripAssert, getAttrKeysOfObject, isType
 from ._typing import *
 
 
-class _MgCLIConfig(object):
-    ''' The base class for configuration of CLI version of MangoCT.
+class _MgCliConfig(object):
+    ''' The base class for configuration of CLI version of mangoct.
     '''
 
     def __init__(self):
@@ -51,7 +48,9 @@ class _MgCLIConfig(object):
             self.fromJSON(fp.read())
 
 
-class MgfbpCLIConfig(_MgCLIConfig):
+class MgfbpCliConfig(_MgCliConfig):
+    ''' Configuration class for CLI version `mgfbp`.
+    '''
 
     def __init__(self):
         super().__init__()
@@ -159,7 +158,9 @@ class MgfbpCLIConfig(_MgCLIConfig):
         self.ImageCenterZ = ImageCenterZ
 
 
-class MgfpjConfig(_MgConfig):
+class MgfpjCliConfig(_MgCliConfig):
+    ''' Configuration class for CLI version `mgfpj`.
+    '''
 
     def __init__(self):
         super().__init__()
@@ -227,18 +228,19 @@ class MgfpjConfig(_MgConfig):
         self.DetectorZOffcenter = DetectorZOffcenter
 
 
-class _MgCLIBin(object):
+class _MgCliBin(object):
+    ''' The base class for execution of CLI version of mangoct.
+    '''
 
     def __init__(self, exe: str, name: str, cudaDevice: int = 0, tempDir: str = None):
         self.exe = exe
         self.name = name
         self.cudaDevice = cudaDevice
         self.tempDir = tempDir
-        self.cmd = []
-        self.cmd.append([f'{self.exe}', '<1>'])
+        self.cmd = [f'{self.exe}', '<1>']
 
-    def exec(self, conf: Or[str, _MgConfig], verbose=True):
-        if isType(conf, _MgConfig):
+    def exec(self, conf: Or[str, _MgCliConfig], verbose=True):
+        if isType(conf, _MgCliConfig):
             tmp = tempfile.NamedTemporaryFile('w',
                                               prefix='crip_mangoct_',
                                               suffix=f'.{self.name}.jsonc',
@@ -250,7 +252,6 @@ class _MgCLIBin(object):
 
         os.environ['CUDA_VISIBLE_DEVICES'] = str(self.cudaDevice)
         stdout = stderr = None if verbose else subprocess.DEVNULL
-
         for cmd in self.cmd:
             if len(cmd) == 2:  # include args
                 cmd[1] = cmd[1].replace('<1>', conf)
@@ -259,21 +260,19 @@ class _MgCLIBin(object):
                 os.system(cmd[0])
 
 
-class MgFbp(_MgCLIBin):
+class MgCliFbp(_MgCliBin):
 
-    def __init__(self, exe: str = 'mgfbp', cudaDevice: int = 0, tempDir: str = None):
-        '''
-            Initialize a handler object to use the FBP tool in mangoct.
+    def __init__(self, exe='mgfbp', cudaDevice=0, tempDir: Or[str, None] = None):
+        ''' Initialize a handler object to use the FBP tool in mangoct.
             `exe` is the path to the executable.
         '''
         super().__init__(exe, 'mgfbp', cudaDevice, tempDir)
 
 
-class MgFpj(_MgCLIBin):
+class MgCliFpj(_MgCliBin):
 
-    def __init__(self, exe: str = 'mgfpj', cudaDevice=0, tempDir: str = None) -> None:
-        '''
-            Initialize a handler object to use the FPJ tool in mangoct.
+    def __init__(self, exe='mgfpj', cudaDevice=0, tempDir: Or[str, None] = None):
+        ''' Initialize a handler object to use the FPJ tool in mangoct.
             `exe` is the path to the executable.
         '''
         super().__init__(exe, 'mgfpj', cudaDevice, tempDir)

@@ -4,12 +4,6 @@
     https://github.com/SEU-CT-Recon/crip
 '''
 
-__all__ = [
-    'Spectrum', 'Atten', 'Material', 'calcMu', 'DiagEnergyLow', 'DiagEnergyHigh', 'DiagEnergyRange', 'DiagEnergyLen',
-    'forwardProjectWithSpectrum', 'brewPowderSolution', 'calcContrastHU', 'getCommonDensity', 'EnergyConversion',
-    'calcPathLength'
-]
-
 import json
 import re
 import numpy as np
@@ -23,10 +17,12 @@ from .postprocess import muToHU
 
 ## Constants ##
 
-DiagEnergyLow = 0  # keV
-DiagEnergyHigh = 150  # keV
-DiagEnergyRange = range(DiagEnergyLow, DiagEnergyHigh + 1)  # Diagonstic energy range, [low, high)
+DiagEnergyLow = 0  # [keV] Lowest energy of diagnostic X-ray
+DiagEnergyHigh = 150  # [keV] Highest energy of diagnostic X-ray
+DiagEnergyRange = range(DiagEnergyLow, DiagEnergyHigh + 1)  # Diagonstic energy range, [0, 150] keV
 DiagEnergyLen = DiagEnergyHigh - DiagEnergyLow + 1
+
+# Alias for built-in materials
 AttenAliases = {
     'Gold': 'Au',
     'Carbon': 'C',
@@ -36,29 +32,27 @@ AttenAliases = {
     'Gadolinium': 'Gd',
 }
 
-
-# recommended
 class EnergyConversion(enum.Enum):
+    ''' Energy conversion efficiency marker of the detector.
+    '''
     EID = 'EID'  # Energy-Integrating Detector
     PCD = 'PCD'  # Photon-Counting Detector
 
 
 def getCommonDensity(materialName: str):
+    ''' Get the common density of a material [g/cm^3] from built-in dataset.
     '''
-        Get the common value of density of a specified material (g/cm^3) from built-in dataset.
-    '''
-    rhoObject = json.loads(readFileText(path.join(getAsset('atten'), 'density.json')))
+    db = json.loads(readFileText(path.join(getAsset('atten'), 'density.json')))
 
     if materialName in AttenAliases:
         materialName = AttenAliases[materialName]
-    cripAssert(materialName in rhoObject, f'Material not found in density dataset: {materialName}')
+    cripAssert(materialName in db, f'Material not found in density dataset: {materialName}')
 
-    return rhoObject[materialName]
+    return db[materialName]
 
 
 class Spectrum:
-    '''
-        Construct Spectrum object with omega array of every energy.
+    ''' Construct Spectrum object with omega array of every energy.
 
         Get \\omega of certain energy (keV):
         ```py
@@ -147,8 +141,7 @@ class Spectrum:
 
 
 class Atten:
-    '''
-        Parse atten text as `Atten` class object. Interpolation is performed to fill `DiagEnergyRange`.
+    ''' Parse atten text as `Atten` class object. Interpolation is performed to fill `DiagEnergyRange`.
         Refer to the document for atten text format (NIST ASCII). The density is in g/cm^3.
 
         Get \\mu (mm-1) of certain energy (keV):

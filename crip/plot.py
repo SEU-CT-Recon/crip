@@ -17,12 +17,9 @@ from .utils import cripAssert, is1D, isInt, cripWarning
 from .physics import Spectrum, DiagEnergyRange, Atten
 from .shared import resize
 
-__all__ = ['smooth', 'window', 'average', 'addFont', 'fontdict', 'zoomIn', 'plotSpectrum', 'makeImageGrid', 'windowFullRange', 'saveFigTight']
 
-
-def smooth(data: NDArray, winSize: int = 5):
-    '''
-        Smooth an 1D array by moving averaging window. This name follows MATLAB.
+def smooth1D(data: NDArray, winSize: int = 5):
+    ''' Smooth an 1D array by moving averaging window. This name follows MATLAB.
 
         The implementation is from https://stackoverflow.com/questions/40443020
     '''

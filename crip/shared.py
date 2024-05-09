@@ -20,12 +20,11 @@ from os import path
 
 @ConvertListNDArray
 def rotate(img: TwoOrThreeD, deg: int) -> TwoOrThreeD:
-    ''' Rotate the image or each image in a volume by deg [DEG] (multiple of 90) clockwise.
+    ''' Rotate each image by deg [DEG] (multiple of 90) clockwise.
     '''
-    deg = int(deg % 360)
-    cripAssert(deg % 90 == 0, 'deg should be multiple of 90.')
+    cripAssert(deg % 90 == 0, f'`deg` should be multiple of 90, but got {deg}.')
 
-    k = deg // 90
+    k = int(deg % 360) // 90
     axes = (1, 2) if is3D(img) else (0, 1)
 
     return np.rot90(img, -k, axes)
@@ -33,28 +32,24 @@ def rotate(img: TwoOrThreeD, deg: int) -> TwoOrThreeD:
 
 @ConvertListNDArray
 def verticalFlip(img: TwoOrThreeD, copy=False) -> TwoOrThreeD:
-    ''' Vertical flip one image, or each image in a volume.
-
-        Set `copy = True` to get a copy of array, otherwise a view only.
+    ''' Vertical flip each image.
     '''
-    cripAssert(is2or3D(img), 'img should be 2D or 3D.')
+    cripAssert(is2or3D(img), f'img should be 2D or 3D, but got {img.ndim}-D.')
 
     if copy:
-        return np.array(img[..., ::-1, :], copy=True)
+        return np.array(img[..., ::-1, :])
     else:
         return img[..., ::-1, :]
 
 
 @ConvertListNDArray
 def horizontalFlip(img: TwoOrThreeD, copy=False) -> TwoOrThreeD:
-    ''' Horizontal flip one image, or each image in a volume.
-        
-        Set `copy = True` to get a copy of array, otherwise a view only.
+    ''' Horizontal flip each image.
     '''
-    cripAssert(is2or3D(img), 'img should be 2D or 3D.')
+    cripAssert(is2or3D(img), f'img should be 2D or 3D, but got {img.ndim}-D.')
 
     if copy:
-        return np.array(img[..., ::-1], copy=True)
+        return np.array(img[..., ::-1])
     else:
         return img[..., ::-1]
 
@@ -62,13 +57,11 @@ def horizontalFlip(img: TwoOrThreeD, copy=False) -> TwoOrThreeD:
 @ConvertListNDArray
 def stackFlip(img: ThreeD, copy=False) -> ThreeD:
     ''' Flip a stack w.r.t. z-axis, i.e., reverse slices.
-
-        Set `copy = True` to get a copy of array, otherwise a view only.
     '''
     cripAssert(is3D(img), 'img should be 3D.')
 
     if copy:
-        return np.array(np.flip(img, axis=0), copy=True)
+        return np.array(np.flip(img, axis=0))
     else:
         return np.flip(img, axis=0)
 
@@ -78,10 +71,10 @@ def resize(img: TwoOrThreeD,
            dsize: Tuple[int] = None,
            scale: Tuple[Or[float, int]] = None,
            interp: str = 'bicubic') -> TwoOrThreeD:
-    ''' Resize the image or each image in a volume to `dsize = (H, W)` (if dsize is not None) or scale 
-        by `scale = (facH, facW)` using `interp` (bicubic, linear, nearest available).
+    ''' Resize each image to `dsize=(H, W)` if dsize is not `None` or scale 
+        by `scale=(facH, facW)` using `interp` [bicubic, linear, nearest].
     '''
-    cripAssert(inArray(interp, ['bicubic', 'linear', 'nearest']), 'Invalid interp method.')
+    cripAssert(interp in ['bicubic', 'linear', 'nearest'], f'Invalid interp method: {interp}.')
 
     if dsize is None:
         cripAssert(scale is not None, 'dsize and scale cannot be None at the same time.')

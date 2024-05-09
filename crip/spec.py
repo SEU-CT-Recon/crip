@@ -1,13 +1,8 @@
 '''
-    Dual-Energy CT module of crip.
+    Spectrum CT module of crip.
 
     https://github.com/SEU-CT-Recon/crip
 '''
-
-__all__ = [
-    'decompMaterial', 'calcAttenedSpec', 'calcPostLog', 'deDecompGetCoeff', 'deDecompProj', 'deDecompRecon',
-    'genMaterialPhantom', 'deDecompReconVolCon', 'teDecompRecon', 'teDecompReconVolCon'
-]
 
 import numpy as np
 from scipy.ndimage import uniform_filter
@@ -19,19 +14,18 @@ from .physics import Atten, Spectrum, calcAttenedSpec, calcPostLog
 from .shared import applyPolyV2D2, fitPolyV2D2
 
 
-def decompMaterial(src: Atten, base1: Atten, base2: Atten, method='coeff') -> NDArray:
-    ''' Decompose a material `src`'s attenuation onto two materials `base1` and `base2`.
-
-        Return decomposing coefficients in `DiagEnergyRange` when `method=='coeff'`, or proportion when `method=='prop'`.
+def decompMaterial(src: Atten, base1: Atten, base2: Atten, mode='coeff') -> NDArray:
+    ''' Decompose material `src`'s attenuation onto two materials `base1` and `base2`.
+        Return decomposing coefficients in `DiagEnergyRange` when `mode='coeff'`, or proportion when `mode='prop'`.
     '''
-    cripAssert(method in ['coeff', 'prop'], f'Invalid method: {method}.')
+    cripAssert(mode in ['coeff', 'prop'], f'Invalid mode: {mode}.')
 
     srcMu = src.mu
     baseMu1 = base1.mu
     baseMu2 = base2.mu
     M = np.array([baseMu1, baseMu2], dtype=DefaultFloatDType).T
 
-    if method == 'prop':
+    if mode == 'prop':
         M /= srcMu
         srcMu = np.ones_like(srcMu)
 
@@ -40,9 +34,9 @@ def decompMaterial(src: Atten, base1: Atten, base2: Atten, method='coeff') -> ND
     return res
 
 
-def deDecompGetCoeff(lowSpec: Spectrum, highSpec: Spectrum, base1: Atten, len1: Or[NDArray, Iterable], base2: Atten,
+def deDecompCoeff(lowSpec: Spectrum, highSpec: Spectrum, base1: Atten, len1: Or[NDArray, Iterable], base2: Atten,
                      len2: Or[NDArray, Iterable]):
-    ''' Calculate the decomposing coefficient (Order 2 with bias term) of two spectra onto two material bases.
+    ''' Compute the decomposing coefficient (Order 2 with bias term) of two spectra onto two material bases.
     '''
     lenCombo = []
     postlogLow = []
@@ -62,8 +56,7 @@ def deDecompGetCoeff(lowSpec: Spectrum, highSpec: Spectrum, base1: Atten, len1: 
 def deDecompProj(lowProj: TwoOrThreeD, highProj: TwoOrThreeD, coeff1: NDArray,
                  coeff2: NDArray) -> Tuple[TwoOrThreeD, TwoOrThreeD]:
     ''' Perform dual-energy decompose in projection domain point-by-point using coeffs.
-
-        Coefficients can be generated using @see `deDecompGetCoeff`.
+        Coefficients can be generated using @see `deDecompCoeff`.
     '''
     cripAssert(isOfSameShape(lowProj, highProj), 'Two projection sets should have same shape.')
     cripAssert(

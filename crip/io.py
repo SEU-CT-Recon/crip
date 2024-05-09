@@ -4,11 +4,6 @@
     https://github.com/SEU-CT-Recon/crip
 '''
 
-__all__ = [
-    'listDirectory', 'imreadDicom', 'readDicom', 'imreadRaw', 'imwriteRaw', 'imreadTiff', 'imwriteTiff', 'CTPARAMS',
-    'fetchCTParam', 'readEVI', 'imreadEVI'
-]
-
 import os
 import re
 import numpy as np
@@ -50,11 +45,10 @@ def listDirectory(folder: str,
         return zip([os.path.join(folder, file) for file in files], files)
 
 
-def imreadDicom(path: str, dtype=None, attrs: Or[None, Dict[str, Any]] = None) -> np.ndarray:
-    ''' Read DICOM file. Return numpy array. Use `attrs` to supplement DICOM tags for non-standard images.
-        You should be very careful about the whether Rescale Slope is cancelled for CT images.
-    
-        Convert dtype with `dtype != None`.
+def imreadDicom(path: str, dtype=None, attrs: Or[None, Dict[str, Any]] = None) -> NDArray:
+    ''' Read DICOM file, return numpy array. Use `attrs` to supplement DICOM tags for non-standard images.
+        You should be very careful whether the Rescale is cancelled for CT images.
+        Convert dtype when `dtype` is not `None`.
     '''
     dcm = pydicom.dcmread(path)
 
@@ -68,16 +62,16 @@ def imreadDicom(path: str, dtype=None, attrs: Or[None, Dict[str, Any]] = None) -
         return np.array(dcm.pixel_array)
 
 
-def imreadDicoms(dir_: str, dtype=None, attrs: Or[None, Dict[str, Any]] = None) -> np.ndarray:
-    ''' Read series of DICOM files in directory.
+def imreadDicoms(dir_: str, **kwargs) -> NDArray:
+    ''' Read series of DICOM files in a directory. `kwargs` is forwarded to `imreadDicom`.
     '''
-    imgs = [imreadDicom(x, dtype, attrs) for x in listDirectory(dir_, style='fullpath')]
+    imgs = [imreadDicom(x, **kwargs) for x in listDirectory(dir_, style='fullpath')]
 
     return np.array(imgs)
 
 
 def readDicom(path: str) -> pydicom.Dataset:
-    ''' Read DICOM file as pydicom object.
+    ''' Read DICOM file as pydicom Dataset object.
     '''
     return pydicom.read_file(path)
 
@@ -89,65 +83,67 @@ def imreadRaw(path: str,
               nSlice: int = 1,
               offset: int = 0,
               gap: int = 0,
-              order='CHW') -> np.ndarray:
-    ''' Read binary raw file. Return numpy array with shape `(nSlice, h, w)`. `offset` from head in bytes.
-        `gap` between images in bytes.
+              swapEndian=False) -> NDArray:
+    ''' Read binary raw file stored in `dtype`.
+        Return numpy array with shape `(min(nSlice, actualNSlice), h, w)`.
+        Input `nSlice` can be unequal to the actual number of slices.
+        Allow setting `offset` from head and `gap` between images in bytes.
+        Allow change the endian-ness to the contrary of your machine by `swapEndian`.
+        This function acts like ImageJ's `Import Raw`.
     '''
-    cripAssert(order in ['CHW', 'HWC'], 'Invalid order.')
+    simpleValidate([
+        offset >= 0,
+        h > 0 and w > 0 and nSlice > 0,
+    ])
 
-    with open(path, 'rb') as fp:
-        fp.seek(offset)
-        if gap == 0:
-            arr = np.frombuffer(fp.read(), dtype=dtype).reshape((nSlice, h, w)).squeeze()
-        else:
-            cripAssert(order == 'CHW', 'gap is only availble in CHW order.')
-            imageBytes = h * w * np.dtype(dtype).itemsize
-            arr = np.zeros((nSlice, h, w), dtype=dtype)
-            for i in range(nSlice):
-                arr[i, ...] = np.frombuffer(fp.read(imageBytes), dtype=dtype).reshape((h, w)).squeeze()
-                fp.seek(gap, os.SEEK_CUR)
+    slices = []
+    sliceBytes = h * w * np.dtype(dtype).itemsize  # bytes per slice
+    fileBytes = os.path.getsize(path)  # actual bytes of the file
 
-    if order == 'HWC':
-        arr = np.transpose(arr, (2, 0, 1))
+    fp = open(path, 'rb')
+    fp.seek(offset)
+    for _ in range(nSlice):
+        slices.append(np.frombuffer(fp.read(sliceBytes), dtype=dtype).reshape((h, w)).squeeze())
+        fp.seek(gap, os.SEEK_CUR)
+        if fp.tell() >= fileBytes:
+            break
+    fp.close()
 
-    return arr
+    slices = np.array(slices).astype(dtype)
+
+    return slices if not swapEndian else slices.byteswap(inplace=True)
 
 
-def imreadRaws(dir_: str,
-               h: int,
-               w: int,
-               dtype=DefaultFloatDType,
-               nSlice: int = 1,
-               offset: int = 0,
-               gap: int = 0,
-               order='CHW'):
+def imreadRaws(dir_: str, **kwargs: Any) -> NDArray:
+    ''' Read series of raw images in directory. `kwargs` will be forwarded to `imreadRaw`.
     '''
-        Read series of raw images in directory.
-    '''
-    imgs = [imreadRaw(x, h, w, dtype, nSlice, offset, gap, order) for x in listDirectory(dir_, style='fullpath')]
+    imgs = [imreadRaw(x, **kwargs) for x in listDirectory(dir_, style='fullpath')]
 
     return np.array(imgs)
 
 
 @ConvertListNDArray
-def imwriteRaw(img: TwoOrThreeD, path: str, dtype=None, order='CHW'):
+def imwriteRaw(img: TwoOrThreeD, path: str, dtype=None, order='CHW', swapEndian=False, fortranOrder=False):
+    ''' Write `img` to raw file `path`. Convert dtype when `dtype` is not `None`.
+        `order` can be [CHW or HWC].
+        Allow change the endian-ness to the contrary of your machine by `swapEndian`.
+        Allow using Fortran order (Column-major) by setting `fortranOrder`.
     '''
-        Write raw file. Convert dtype with `dtype != None`.
-    '''
-    cripAssert(order in ['CHW', 'HWC'], 'Invalid order.')
+    cripAssert(order in ['CHW', 'HWC'], f'Invalid order: {order}.')
 
     if dtype is not None:
         img = img.astype(dtype)
+    if order == 'HWC':
+        img = chw2hwc(img)
+    if swapEndian:
+        img = img.byteswap(inplace=False)
 
     with open(path, 'wb') as fp:
-        if order == 'HWC':
-            img = np.transpose(img, (1, 2, 0))
-        fp.write(img.flatten().tobytes())
+        fp.write(img.tobytes('F' if fortranOrder else 'C'))
 
 
-def imreadTiff(path: str, dtype=None):
-    '''
-        Read TIFF file. Return numpy array. Convert dtype with `dtype != None`.
+def imreadTiff(path: str, dtype=None) -> NDArray:
+    ''' Read TIFF file, return numpy array. Convert dtype when `dtype` is not `None`.
     '''
     if dtype is not None:
         return np.array(tifffile.imread(path)).astype(dtype)
@@ -155,31 +151,28 @@ def imreadTiff(path: str, dtype=None):
         return np.array(tifffile.imread(path))
 
 
-def imreadTiffs(dir_: str, dtype=None):
+def imreadTiffs(dir_: str, **kwargs) -> NDArray:
+    ''' Read series of tiff images in directory. `kwargs` will be forwarded to `imreadTiff`.
     '''
-        Read series of tiff images in directory. Will add one dim.
-    '''
-    imgs = [imreadTiff(x, dtype) for x in listDirectory(dir_, style='fullpath')]
+    imgs = [imreadTiff(x, **kwargs) for x in listDirectory(dir_, style='fullpath')]
 
     return np.array(imgs)
 
 
 @ConvertListNDArray
 def imwriteTiff(img: TwoOrThreeD, path: str, dtype=None):
-    '''
-        Write TIFF file. Convert dtype with `dtype != None`.
-        
-        Note that any floating dtype will be converted to float32.
+    ''' Write TIFF file. Convert dtype if `dtype` is not `None`.
+        All floating dtype will be converted to float32.
     '''
     if dtype is not None:
         img = img.astype(dtype)
     if isFloatDtype(img.dtype):
-        img = img.astype(np.float32)  # always use float32 for floating image.
+        img = img.astype(np.float32)
 
     tifffile.imwrite(path, img)
 
 
-def readEVI(path: str):
+def readEVI(path: str) -> Tuple[NDArray, Dict[str, Any]]:
     ''' Read EVI file saved by XCounter Hydra PCD detector. Return the images and metadata.
     '''
     metadata = {
@@ -194,14 +187,14 @@ def readEVI(path: str):
         'HighThreshold': None,
     }
 
+    # mapping between EVI file prelude and metadata to fill in
     mapping = {
         'Image_Type': 'ImageType',
         'Width': 'Width',
         'Height': 'Height',
         'Nr_of_images': 'NumberOfImages',
         'Offset_To_First_Image': 'OffsetToFirstImage',
-        # interesting
-        'Gap_between_iamges_in_bytes': 'GapBetweenImages',
+        'Gap_between_iamges_in_bytes': 'GapBetweenImages',  # for compatibility
         'Gap_between_images_in_bytes': 'GapBetweenImages',
         'Frame_Rate_HZ': 'FrameRate',
         'Low_Thresholds_KV': 'LowThreshold',
@@ -225,88 +218,72 @@ def readEVI(path: str):
     nones = list(filter(lambda x: x[1] is None, metadata.items()))
     cripAssert(len(nones) == 0, f'Failed to find metadata for {list(map(lambda x: x[0], nones))}')
     cripAssert(metadata['ImageType'] in ['Single', 'Double'], f'Unsupported ImageType: {metadata["ImageType"]}')
-    dtype = {'Single': np.float32, 'Double': np.float64}
 
+    dtype = {'Single': np.float32, 'Double': np.float64}
     img = imreadRaw(path, metadata['Height'], metadata['Width'], dtype[metadata['ImageType']],
                     metadata['NumberOfImages'], metadata['OffsetToFirstImage'], metadata['GapBetweenImages'])
 
     return img, metadata
 
 
-def imreadEVI(path: str):
+def imreadEVI(path: str) -> NDArray:
     ''' Read EVI file saved by XCounter Hydra PCD detector. Return the images only.
     '''
     return readEVI(path)[0]
 
 
-def _CTPARAM(loc, type_):
-    return {'loc': loc, 'type': type_}
-
-
-# These CT parameters will be retrieved.
+# These CT parameters can be retrieved.
 CTPARAMS = {
-    # For WC sometimes two values will be fetched. Usually they are the same.
-    # If not, it means that the view is recommended to be displayed using to windows.
-    # So as WD.
-    'Window Center': _CTPARAM([0x0028, 0x1050], str),
-    'Window Width': _CTPARAM([0x0028, 0x1051], str),
-
     # Manufacturer
-    'Manufacturer': _CTPARAM([0x0008, 0x0070], str),
-    'Manufacturer Model Name': _CTPARAM([0x0008, 0x1090], str),
+    'Manufacturer': ([0x0008, 0x0070], str),
+    'Manufacturer Model Name': ([0x0008, 0x1090], str),
 
     # Study
-    'Series Instance UID': _CTPARAM([0x0020, 0x000E], str),
+    'Series Instance UID': ([0x0020, 0x000E], str),
 
     # Patient status
-    'Body Part Examined': _CTPARAM([0x0018, 0x0015], str),
-    'Patient Position': _CTPARAM([0x0018, 0x5100], str),  # (H/F)F(S/P)
+    'Body Part Examined': ([0x0018, 0x0015], str),
+    'Patient Position': ([0x0018, 0x5100], str),  # (H/F)F(S/P)
 
     # X-Ray exposure
-    'KVP': _CTPARAM([0x0018, 0x0060], float),  # kVpeak
-    'X Ray Tube Current': _CTPARAM([0x0018, 0x1151], float),  # mA
-    'Exposure Time': _CTPARAM([0x0018, 0x1150], float),
-    'Exposure': _CTPARAM([0x0018, 0x1152], float),
+    'KVP': ([0x0018, 0x0060], float),
+    'X Ray Tube Current': ([0x0018, 0x1151], float),  # mA
+    'Exposure Time': ([0x0018, 0x1150], float),
+    'Exposure': ([0x0018, 0x1152], float),
 
     # CT Reconstruction
-    'Slice Thickness': _CTPARAM([0x0018, 0x0050], float),
-    'Data Collection Diameter': _CTPARAM([0x0018, 0x0090], float),
-    'Reconstruction Diameter': _CTPARAM([0x0018, 0x1100], float),
-    'Rows': _CTPARAM([0x0028, 0x0010], int),
-    'Columns': _CTPARAM([0x0028, 0x0011], int),
-    'Pixel Spacing': _CTPARAM([0x0028, 0x0030], str),  # u/v, mm
-    'Distance Source To Detector': _CTPARAM([0x0018, 0x1110], float),  # SDD (S-Image-D), mm
-    'Distance Source To Patient': _CTPARAM([0x0018, 0x1111], float),  # SOD (S-Isocenter-D), mm
-    'Rotation Direction': _CTPARAM([0x0018, 0x1140], str),  # CW/CCW
-    'Bits Allocated': _CTPARAM([0x0028, 0x0100], int),
+    'Slice Thickness': ([0x0018, 0x0050], float),
+    'Data Collection Diameter': ([0x0018, 0x0090], float),
+    'Reconstruction Diameter': ([0x0018, 0x1100], float),
+    'Rows': ([0x0028, 0x0010], int),
+    'Columns': ([0x0028, 0x0011], int),
+    'Pixel Spacing': ([0x0028, 0x0030], str),  # u/v, mm
+    'Distance Source To Detector': ([0x0018, 0x1110], float),  # mm
+    'Distance Source To Patient': ([0x0018, 0x1111], float),  # mm
+    'Rotation Direction': ([0x0018, 0x1140], str),  # CW/CCW
+    'Bits Allocated': ([0x0028, 0x0100], int),
 
     # Table
-    'Table Height': _CTPARAM([0x0018, 0x1130], float),
-    'Table Speed': _CTPARAM([0x0018, 0x9309], float),
-    'Table Feed Per Rotation': _CTPARAM([0x0018, 0x9310], float),
+    'Table Height': ([0x0018, 0x1130], float),
+    'Table Speed': ([0x0018, 0x9309], float),
+    'Table Feed Per Rotation': ([0x0018, 0x9310], float),
 
-    # CT Value rescaling
-    # e.g.  HU = 1X-1024
-    'Rescale Intercept': _CTPARAM([0x0028, 0x1052], float),  # b
-    'Rescale Slope': _CTPARAM([0x0028, 0x1053], float),  # k
-    'Rescale Type': _CTPARAM([0x0028, 0x1054], str),
+    # CT value rescaling
+    'Rescale Intercept': ([0x0028, 0x1052], float),
+    'Rescale Slope': ([0x0028, 0x1053], float),
+    'Rescale Type': ([0x0028, 0x1054], str),
 
-    # For helical CT
-    'Spiral Pitch Factor': _CTPARAM([0x0018, 0x9311], float)
+    # Helical CT
+    'Spiral Pitch Factor': ([0x0018, 0x9311], float)
 }
 
 
-def fetchCTParam(dicom: pydicom.Dataset, key: str):
+def fetchCTParam(dicom: pydicom.Dataset, key: str) -> Any:
+    ''' Fetch CT metadata from DICOM Dataset read by `readDicom`
+        Refer to `CTPARAMS` for available keys.
     '''
-        Fetch CT related parameter from DICOM file. Use `readDicom` to get DICOM Dataset.
+    cripAssert(key in CTPARAMS.keys(), f'Invalid key: {key}.')
 
-        @see CTPARAMS in the source code for available keys.
-    '''
-    metaParam = CTPARAMS[key]
-    if metaParam is None:
-        return None
-    try:
-        value = metaParam['type'](dicom[metaParam['loc'][0], metaParam['loc'][1]].value)
-    except:
-        return None
-    return value
+    addr, cast = CTPARAMS[key]
+
+    return cast(dicom[addr[0], addr[1]].value)

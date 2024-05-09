@@ -4,12 +4,6 @@
     https://github.com/SEU-CT-Recon/crip
 '''
 
-__all__ = [
-    'averageProjections', 'flatDarkFieldCorrection', 'projectionsToSinograms', 'sinogramsToProjections', 'padImage',
-    'padSinogram', 'correctBeamHardeningPolynomial', 'injectGaussianNoise', 'injectPoissonNoise', 'binning',
-    'fanToPara', 'correctRingArtifactInProj', 'correctFlatDarkField'
-]
-
 import numpy as np
 import warnings
 
@@ -20,12 +14,11 @@ import cv2
 from .shared import *
 from ._typing import *
 from .utils import *
-from .lowdose import injectGaussianNoise, injectPoissonNoise
 
 
 @ConvertListNDArray
 def averageProjections(projections: ThreeD) -> TwoD:
-    ''' Average projections.
+    ''' Average projections along the first axis (views) to get a single projection.
     '''
     cripAssert(is3D(projections), f'`projections` should be 3D, but got {len(projections.shape)}-D.')
 

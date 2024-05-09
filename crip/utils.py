@@ -4,20 +4,12 @@
     https://github.com/SEU-CT-Recon/crip
 '''
 
-__all__ = [
-    'readFileText', 'CripException', 'cripAssert', 'cripWarning', 'ConvertListNDArray', 'asFloat', 'is2D', 'is3D',
-    'is2or3D', 'isInt', 'isIntDtype', 'isFloatDtype', 'isIntType', 'isFloatType', 'isType', 'isNumber', 'isList',
-    'isListNDArray', 'isOfSameShape', 'inRange', 'inArray', 'getAsset', 'cvtEnergyUnit', 'cvtLengthUnit', 'cvtMuUnit',
-    'getHnW', 'is1D', 'as3D', 'nextPow2'
-]
-
 import os
 import logging
 import math
 import numpy as np
 import functools
 from ._typing import *
-from ._rc import *
 
 
 def readFileText(path_: str) -> str:
@@ -33,25 +25,24 @@ def readFileText(path_: str) -> str:
 
 
 class CripException(BaseException):
-    '''
-        The universal expection class for crip.
+    ''' The universal expection class for crip.
     '''
 
     def __init__(self, *args) -> None:
         super().__init__(*args)
 
 
-def cripAssert(cond, hint: str):
+def cripAssert(cond: Any, hint=''):
     ''' The only assert method for crip.
     '''
     if not cond:
         raise CripException(hint)
 
 
-def cripWarning(ensure, hint: str, stackTrace=False):
+def cripWarning(ensure: Any, hint='', stackTrace=False):
     ''' The only warning method for crip.
     '''
-    if not SUPPRESS_WARNING and not ensure:
+    if not ensure:
         logging.warning(hint, stack_info=stackTrace)
 
 
@@ -64,49 +55,51 @@ def ConvertListNDArray(f):
 
     @functools.wraps(f)
     def fn(*args, **kwargs):
-        # args and kwargs are immutable
         argsn = []
         for a in args:
             if isListNDArray(a):
                 a = np.array(a)
             argsn.append(a)
+
         kwargsn = {}
         for k in kwargs:
             if isListNDArray(kwargs[k]):
                 kwargs[k] = np.array(kwargs[k])
             kwargsn[k] = kwargs[k]
+
         return f(*argsn, **kwargsn)
 
     return fn
 
 
 def asFloat(arr):
-    ''' Make sure `arr` has `DefaultFloatDType` dtype.
+    ''' Ensure `arr` has `DefaultFloatDType` dtype.
     '''
-    if isType(arr, np.ndarray):
+    if isType(arr, NDArray):
         arr = arr.astype(DefaultFloatDType)
 
     return arr
 
 
-def as3D(x: np.ndarray):
+def as3D(x: NDArray):
     cripAssert(is2or3D(x))
+
     return x if len(x.shape) == 3 else x[np.newaxis, ...]
 
 
-def is1D(x: np.ndarray):
+def is1D(x: NDArray):
     return isType(x, NDArray) and len(x.shape) == 1
 
 
-def is2D(x: np.ndarray):
+def is2D(x: NDArray):
     return isType(x, NDArray) and len(x.shape) == 2
 
 
-def is3D(x: np.ndarray):
+def is3D(x: NDArray):
     return isType(x, NDArray) and len(x.shape) == 3
 
 
-def is2or3D(x: np.ndarray):
+def is2or3D(x: NDArray):
     return is2D(x) or is3D(x)
 
 
@@ -122,12 +115,8 @@ def isFloatDtype(dtype):
     return np.issubdtype(dtype, np.floating)
 
 
-def isIntType(arr: np.ndarray):
+def hasIntDtype(arr: np.ndarray):
     return isIntDtype(arr.dtype)
-
-
-def isFloatType(arr: np.ndarray):
-    return isFloatDtype(arr.dtype)
 
 
 def isType(x, t):
@@ -193,8 +182,7 @@ def convertEnergyUnit(arr: NDArray, from_: str, to: str):
 
 
 def convertLengthUnit(arr: NDArray, from_: str, to: str):
-    '''
-        Convert between length units. [um, mm, cm, m]
+    ''' Convert between length units. [um, mm, cm, m]
     '''
     units = ['um', 'mm', 'cm', 'm']
     cripAssert(from_ in units and to in units, f'Invalid unit: from_={from_}, to={to}.')
@@ -260,3 +248,26 @@ def getAttrKeysOfObject(obj):
     ]
 
     return keys
+
+
+def chw2hwc(img):
+    ''' Convert CHW to HWC.
+    '''
+    cripAssert(is3D(img), 'img should be 3D.')
+
+    return np.moveaxis(img, 0, -1)
+
+
+def hwc2chw(img):
+    ''' Convert HWC to CHW.
+    '''
+    cripAssert(is3D(img), 'img should be 3D.')
+
+    return np.moveaxis(img, -1, 0)
+
+
+def simpleValidate(conds: List[bool]):
+    ''' Validate conditions.
+    '''
+    for i in range(len(conds)):
+        cripAssert(conds[i], f'Condition {i} validation failed.')

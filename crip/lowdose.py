@@ -4,8 +4,6 @@
     https://github.com/SEU-CT-Recon/crip
 '''
 
-__all__ = ['injectGaussianNoise', 'injectPoissonNoise', 'totalVariation']
-
 import numpy as np
 from .shared import *
 from ._typing import *
@@ -29,33 +27,26 @@ def injectGaussianNoise(projections: TwoOrThreeD, sigma: float, mu: float = 0) -
 
 
 @ConvertListNDArray
-def injectPoissonNoise(projections: TwoOrThreeD,
-                       type_: str = 'postlog',
-                       nPhoton: Or[int, float] = 1,
-                       suppressWarning=False) -> TwoOrThreeD:
-    ''' Inject Poisson noise which obeys distribution `P(\\lambda)` where \\lambda is the ground-truth quanta in `projections`.
-        `projections` must have int type whose value stands for the photon quanta in some way. Floating projections
-        should be manually properly rescaled ahead and scale back as you need since Poisson Distribution only deals with
-        positive integers. `type_` (postlog or raw) gives the content type of `projections`, usually you should use
-        postlog as input. If you input postlog, the output will also be postlog.
+def injectPoissonNoise(
+    projections: TwoOrThreeD,
+    type_: str = 'postlog',
+    nPhoton: int = 1e5,
+) -> TwoOrThreeD:
+    ''' Inject Poisson noise ~ `P(lambda)` where `lambda` is the ground-truth quanta deduced from arguments.
+        `type_` [postlog or raw] gives the content type of `projections`, usually you use
+        postlog as input and get postlog as output. `nPhoton` is the photon count for each pixel.
     '''
-    cripAssert(type_ in ['postlog', 'raw'], "type_ should be 'postlog' or 'raw'.")
+    cripAssert(type_ in ['postlog', 'raw'], f'Invalid type_: {type_}.')
+    cripAssert(is2or3D(projections), '`projections` should be 2D or 3D.')
+
     img = projections
-    cripAssert(is2or3D(img), '`projections` should be 2D or 3D.')
-
     if type_ == 'postlog':
-        img = np.exp(-projections)
+        img = np.exp(-img)
 
-    img = img * nPhoton  # N0 exp(-\sum \mu L)
-
-    cripAssert(np.min(img >= 0), '`img` should not contain negative values.')
-    if not suppressWarning:
-        # temporary workaround
-        cripWarning(isIntType(img), '`img` should have int dtype. It will be floored after rescaling.')
-
-    img = np.random.poisson(img.astype(np.uint32)).astype(DefaultFloatDType)
+    img = nPhoton * img  # N0 exp(-\sum \mu L), i.e., ground-truth quanta
+    img = np.random.poisson(img.astype(np.uint32)).astype(DefaultFloatDType)  # noisy quanta
     img[img <= 0] = 1
-    img /= nPhoton
+    img /= nPhoton  # cancel the rescaling from N0
 
     if type_ == 'postlog':
         img = -np.log(img)
@@ -65,7 +56,7 @@ def injectPoissonNoise(projections: TwoOrThreeD,
 
 @ConvertListNDArray
 def totalVariation(img: TwoOrThreeD) -> TwoOrThreeD:
-    ''' Computes the Total Variation (TV) of image or images.
+    ''' Computes the Total Variation (TV) of images.
     '''
     cripAssert(is2or3D(img), 'img should be 2 or 3D.')
 
@@ -76,15 +67,22 @@ def totalVariation(img: TwoOrThreeD) -> TwoOrThreeD:
     return tv
 
 
-def nps2D(roi: TwoOrThreeD, pixelSize: float, n: Or[int, None] = None):
-    ''' Compute the noise power spectrum (NPS) of a 2D region of interest (ROI).
-        It's recommended that you provide multiple samples (realizations) of the ROI.
+def nps2D(roi: TwoOrThreeD, pixelSize: float, detrend='individual', n: Or[int, None] = None):
+    ''' Compute the noise power spectrum (NPS) of a 2D square ROI using `n`-dots DFT.
+        Recommended to provide multiple realizations of that ROI.
+        `pixelSize` is the pixel size of reconstructed image ([mm] recommended).
     '''
+    cripWarning(is3D(roi), "It's highly recommended to...")
+
+    roi = as3D(roi)
     h, w = getHnW(roi)
-    cripAssert(h == w, 'h == w required.')
+    cripAssert(h == w, 'Width and height of ROI should be the same.')
+    cripAssert(detrend in ['individual', 'mutual'], f'Invalid detrend method: {detrend}.')
     dots = n or nextPow2(h)
 
-    deTrend = roi - np.mean(roi)  # order 0
+    if detrend == 'individual':
+        detrended = roi - np.mean(roi)
+
     dft = np.fft.fftshift(np.fft.fft2(deTrend, n=dots))
     mod2 = np.real(dft * np.conj(dft))
 

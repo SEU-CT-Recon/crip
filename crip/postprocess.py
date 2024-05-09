@@ -4,8 +4,6 @@
     https://github.com/SEU-CT-Recon/crip
 '''
 
-__all__ = ['fovCropRadius', 'fovCrop', 'muToHU', 'huToMu', 'huNoRescale', 'postlogsToProjections', 'binning']
-
 import numpy as np
 
 from .shared import *
@@ -13,40 +11,29 @@ from ._typing import *
 from .utils import *
 
 
-def fovCropRadius(SOD: float, SDD: float, detWidth: float, reconPixSize: float, roundOff=True) -> float:
-    ''' Get the radius (in pixel) of the circle valid FOV of the reconstructed volume.
-
-        Geometry:
-            - SOD: Source Object Distance
-            - SDD: Source Detector Distance
-            - detWidth: Width of the detector, i.e., nElements * detElementWidth
-            - reconPixSize: Pixel size of the reconstructed image
+def fovCropRadius(sid: float, sdd: float, detectorWidth: float, pixelSize: float, roundOff=True) -> float:
+    ''' Compute the radius [pixel] of the valid FOV of the reconstruction.
+        `sid` and `sdd` are Source-Isocenter-Distance and Source-Detector-Distance, respectively.
+        `detectorWidth` is the width of the detector, i.e., `#elements * elementWidth`.
+        `pixelSize` is the pixel size of the reconstructed image.
+        Recommended length unit is [mm].
     '''
-    halfDW = detWidth / 2
-    L = np.sqrt(halfDW**2 + SDD**2)
+    halfDW = detectorWidth / 2
+    L = np.sqrt(halfDW**2 + sdd**2)
 
-    # Treat table as arc, L_arc = r \times \theta.
-    Larc = SOD * np.arcsin(halfDW / L)
-    r1 = Larc / reconPixSize
+    r1 = sid * np.arcsin(halfDW / L)  # table as arc
+    r2 = sid / (sdd / detectorWidth) / 2  # table as plane
+    r3 = sid / (L / halfDW)
 
-    # Treat table as plane, L_flat = \tan(\theta) \times r
-    Lflat = SOD / (SDD / detWidth) / 2
-    r2 = Lflat / reconPixSize
-
-    # As we all know, tanx = x+x^3/3 + O(x^3), (|x| < pi/2).
-    # So under no circumstances will r1 greater than r2.
-    r3 = SOD / (L / halfDW) / reconPixSize
-
-    r = min(r1, r2, r3)
+    r = min(r1, r2, r3) / pixelSize
 
     return round(r) if roundOff else r
 
 
 @ConvertListNDArray
-def fovCrop(img: TwoOrThreeD, radius: int, fill: Or[int, float] = 0) -> ThreeD:
-    '''
-        Crop a circle FOV on reconstructed image `img` with `radius` (pixel) \\
-        and `fill` value for outside FOV.
+def fovCrop(img: TwoOrThreeD, radius: int, fill: Or[int, float] = 0) -> TwoOrThreeD:
+    ''' Crop a circle FOV on reconstructed image `img` with `radius` [pixel]
+        and `fill` outside FOV.
     '''
     cripAssert(radius >= 1 and isInt(radius), 'Invalid radius. Radius should be positive int.')
     cripAssert(is2or3D(img), 'img should be 2D or 3D.')
@@ -55,10 +42,9 @@ def fovCrop(img: TwoOrThreeD, radius: int, fill: Or[int, float] = 0) -> ThreeD:
     x = np.array(range(N), dtype=DefaultFloatDType) - N / 2 - 0.5
     y = np.array(range(M), dtype=DefaultFloatDType) - M / 2 - 0.5
     xx, yy = np.meshgrid(x, y)
-
     outside = xx**2 + yy**2 > radius**2
-    cropped = img.copy()
 
+    cropped = img.copy()
     if is3D(img):
         cropped[:, outside] = fill
     else:
@@ -69,35 +55,27 @@ def fovCrop(img: TwoOrThreeD, radius: int, fill: Or[int, float] = 0) -> ThreeD:
 
 @ConvertListNDArray
 def muToHU(image: TwoOrThreeD, muWater: float, b=1000) -> TwoOrThreeD:
-    '''
-        Convert \\mu map to HU.
-        
-        `HU = (\\mu - \\muWater) / \\muWater * b`
+    ''' Convert mu to HU using `HU = (mu - muWater) / muWater * b`
     '''
     return (image - muWater) / muWater * b
 
 
 @ConvertListNDArray
 def huToMu(image: TwoOrThreeD, muWater: float, b=1000) -> TwoOrThreeD:
-    '''
-        Convert HU to mu. (Invert of `MuToHU`.)
+    ''' Convert HU to mu (invert `muToHU`).
     '''
     return image / b * muWater + muWater
 
 
 @ConvertListNDArray
 def huNoRescale(image: TwoOrThreeD, b: float = -1000, k: float = 1) -> TwoOrThreeD:
-    '''
-        Invert the rescale-slope (y = kx + b) of HU value to get linear relationship between HU and mu.
+    ''' Invert the rescale-slope (y = kx + b) of HU value to get linear relationship between HU and mu.
     '''
     return (image - b) / k
 
 
 @ConvertListNDArray
 def postlogsToProjections(postlogs: TwoOrThreeD, flat: Or[TwoD, float]) -> TwoOrThreeD:
+    ''' Invert `postlog` images to the original projections according to `flat` field.
     '''
-        Invert postlog images to the original projections.
-    '''
-    res = np.exp(-postlogs) * flat
-
-    return res
+    return np.exp(-postlogs) * flat
