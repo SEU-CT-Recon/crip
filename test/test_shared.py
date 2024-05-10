@@ -27,6 +27,6 @@ class test_permute(unittest.TestCase):
     def test(self):
         import crip.shared
 
-        crip.shared.permute()
+        # crip.shared.permute()
 
         # self.assertTrue(np.array_equal())

@@ -10,7 +10,7 @@ from scipy.ndimage import uniform_filter
 from .postprocess import gaussianSmooth
 from .utils import ConvertListNDArray, cripAssert, cripWarning, is2D, isOfSameShape
 from ._typing import *
-from .physics import Atten, Spectrum, calcAttenedSpec, calcPostLog
+from .physics import Atten, Spectrum, computeAttenedSpectrum
 from .shared import applyPolyV2D2, fitPolyV2D2
 
 
@@ -38,14 +38,21 @@ def deDecompCoeff(lowSpec: Spectrum, highSpec: Spectrum, base1: Atten, len1: Or[
                   len2: Or[NDArray, Iterable]):
     ''' Compute the decomposing coefficient (Order 2 with bias term) of two spectra onto two material bases.
     '''
+
+    def computePostlog(spec, attens, Ls):
+        flat = np.sum(spec.omega)
+        attenedSpec = computeAttenedSpectrum(spec, attens, Ls)
+
+        return -np.log(attenedSpec.omega / flat)
+
     lenCombo = []
     postlogLow = []
     postlogHigh = []
     for i in len1:
         for j in len2:
             lenCombo.append([i, j])
-            postlogLow.append(calcPostLog(lowSpec, [base1, base2], [i, j]))
-            postlogHigh.append(calcPostLog(highSpec, [base1, base2], [i, j]))
+            postlogLow.append(computePostlog(lowSpec, [base1, base2], [i, j]))
+            postlogHigh.append(computePostlog(highSpec, [base1, base2], [i, j]))
 
     beta, gamma = fitPolyV2D2(np.array(postlogLow), np.array(postlogHigh), np.array(lenCombo)).T
 
@@ -69,8 +76,8 @@ def deDecompProj(lowProj: TwoOrThreeD, highProj: TwoOrThreeD, coeff1: NDArray,
 @ConvertListNDArray
 def deDecompRecon(low: TwoOrThreeD,
                   high: TwoOrThreeD,
-                  muB1: List[float, float],
-                  muB2: List[float, float],
+                  muB1: List[float],
+                  muB2: List[float],
                   checkCond: bool = True) -> TwoOrThreeD:
     ''' Perform Dual-Energy Two-Material decomposition in image domain.
         The outputs are decomposing coefficients. Used values can be LAC (mu), or HU+1000.

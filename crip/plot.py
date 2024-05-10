@@ -15,7 +15,7 @@ from mpl_toolkits.axes_grid1 import ImageGrid
 from ._typing import *
 from .utils import *
 from .physics import Spectrum, DiagEnergyRange, Atten
-from .shared import resize
+from .shared import resizeTo
 
 
 def smooth1D(data: NDArray, winSize: int = 5) -> NDArray:
@@ -147,7 +147,7 @@ def makeImageGrid(subimages: List[TwoD],
         box = None
         if crops is not None and crops[cur // ncols]:
             r, c, hw = crops[cur // ncols]
-            patch = resize(zoomIn(img, r, c, hw, hw), (cropSize, cropSize))
+            patch = resizeTo(zoomIn(img, r, c, hw, hw), (cropSize, cropSize))
             box = overlayPatch(img, patch, cropLoc)
 
         # display the image
