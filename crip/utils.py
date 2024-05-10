@@ -157,15 +157,6 @@ def isOfSameShape(a: NDArray, b: NDArray) -> bool:
     return np.array_equal(a.shape, b.shape)
 
 
-def inRange(a, range_=None, low=None, high=None):
-    if range_:
-        if isType(range_, range):
-            range_ = (range_[0], range_[-1])
-        low, high = range_
-
-    return low <= a and a < high
-
-
 def getAsset(folder: str, prefix='_asset') -> str:
     ''' Get asset path under `crip/<prefix>/<folder>`.
     '''

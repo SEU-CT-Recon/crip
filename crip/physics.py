@@ -54,14 +54,10 @@ def getCommonDensity(materialName: str):
 
 
 class Spectrum:
-    ''' To get omega of certain energy (keV):
-        ```py
-            omega = spec.omega[E]
-        ```
-    '''
 
     def __init__(self, omega: NDArray, unit='keV'):
         ''' Construct a Spectrum object with omega array describing every energy bin in DiagEnergyRange.
+            To access omega of certain energy E [keV], use `spec.omega[E]`.
         '''
         cripAssert(
             len(omega) == DiagEnergyLen,
@@ -73,6 +69,8 @@ class Spectrum:
         self.sumOmega = np.sum(self.omega)
 
     def isMonochromatic(self):
+        ''' Test if the spectrum is monochromatic. If so, return True and the energy.
+        '''
         at = -1
         for i in DiagEnergyRange:
             if self.omega[i] > 0:
@@ -84,10 +82,11 @@ class Spectrum:
 
     @staticmethod
     def fromText(specText: str, unit='keV'):
-        '''
-            Parse spectrum text as `Spectrum` class object.
-            
-            Refer to the document for spectrum text format. @see https://github.com/SEU-CT-Recon/crip      
+        ''' Parse spectrum text into `Spectrum` object.
+            The text should be in the format of `<energy> <omega>`, one pair per line.
+            Leading lines starting with non-digit will be ignored.
+            All `<energy>` should be in ascending order and continous by 1 keV and inside `DiagEnergyRange`.
+            Recommend you to end the last line with `omega=-1` to indicate the end of spectrum.
         '''
         cripAssert(unit in EnergyUnits, f'Invalid unit: {unit}.')
         omega = np.zeros(DiagEnergyLen, dtype=DefaultFloatDType)
@@ -98,42 +97,36 @@ class Spectrum:
                    list(map(lambda x: x.strip(),
                             specText.replace('\r\n', '\n').split('\n')))))
 
-        def procSpecLine(line: str):
+        # process each line
+        def proc1(line: str):
             tup = tuple(map(float, re.split(r'\s+', line)))
-            cripAssert(len(tup) == 2, f'Invalid line in spectrum: \n{line}\n')
+            cripAssert(len(tup) == 2, f'Invalid line in spectrum: {line}.')
             return tup  # (energy, omega)
 
-        # parse the spectrum text
-        content = np.array(list(map(procSpecLine, content)), dtype=DefaultFloatDType)
+        # parse the spectrum text to get provided omega array
+        content = np.array(list(map(proc1, content)), dtype=DefaultFloatDType)
         specEnergy, specOmega = content.T
-        specOmega[specOmega < 0] = 0
-
-        # to keV
         specEnergy = convertEnergyUnit(specEnergy, unit, DefaultEnergyUnit)
-
+        cripAssert(np.all(np.diff(specEnergy) == 1), 'Energy should be in ascending order and continous by 1 keV.')
+        specOmega[specOmega < 0] = 0
         startEnergy, cutOffEnergy = int(specEnergy[0]), int(specEnergy[-1])
-        cripAssert(inRange(startEnergy, DiagEnergyRange),
-                   f'startEnergy is out of DiagEnergyRange: {DiagEnergyRange} keV')
-        cripAssert(inRange(cutOffEnergy, DiagEnergyRange),
-                   f'cutOffEnergy is out of DiagEnergyRange: {DiagEnergyRange} keV')
-        cripAssert(cutOffEnergy + 1 - startEnergy == len(specOmega),
-                   'The spectrum is not continous by 1 keV from start to cutoff.')
+        cripAssert(startEnergy in DiagEnergyRange, f'startEnergy is out of DiagEnergyRange: {startEnergy} keV')
+        cripAssert(cutOffEnergy in DiagEnergyRange, f'cutOffEnergy is out of DiagEnergyRange: {cutOffEnergy} keV')
 
+        # fill omega array
         omega[startEnergy:cutOffEnergy + 1] = specOmega[:]
 
         return Spectrum(omega, unit)
 
     @staticmethod
     def fromFile(path: str, unit='keV'):
-        ''' Construct a Spectrum object from spectrum file (first column is energy while second is omega).
+        ''' Construct a Spectrum object from spectrum file whose format follows `fromText`.
         '''
-        spec = readFileText(path)
-
-        return Spectrum.fromText(spec, unit)
+        return Spectrum.fromText(readFileText(path), unit)
 
     @staticmethod
     def monochromatic(at: int, unit='keV', omega=10**5):
-        ''' Construct a monochromatic spectrum.
+        ''' Construct a monochromatic spectrum at `at`.
         '''
         text = '{} {}\n{} -1'.format(str(at), str(omega), str(at + 1))
 
@@ -141,16 +134,16 @@ class Spectrum:
 
 
 class Atten:
-    ''' Parse atten text as `Atten` class object. Interpolation is performed to fill `DiagEnergyRange`.
+
+    def __init__(self, muArray: NDArray, density: Or[None, float] = None) -> None:
+        ''' Parse atten text into `Atten` object. Interpolation is performed to fill `DiagEnergyRange`.
         Refer to the document for atten text format (NIST ASCII). The density is in g/cm^3.
 
         Get \\mu (mm-1) of certain energy (keV):
         ```py
             mu = atten.mu[E]
         ```
-    '''
-
-    def __init__(self, muArray: NDArray, density: Or[None, float] = None) -> None:
+        '''
         cripAssert(len(muArray) == DiagEnergyLen, f'muArray should have length of {DiagEnergyLen} energy bins')
         self.mu = muArray
         self.rho = density
@@ -241,11 +234,10 @@ class Atten:
         return Atten.fromText(atten, rho, energyUnit)
 
 
-Material = Atten
 WaterAtten = Atten.fromBuiltIn('Water')
 
 
-def calcMu(atten: Atten, spec: Spectrum, energyConversion: str) -> float:
+def computeMu(atten: Atten, spec: Spectrum, energyConversion: str) -> float:
     ''' Calculate the LAC \mu value (mm-1) of certain atten under a specific spectrum.
         energyConversion determines the energy conversion efficiency of the detector,
         can be "PCD" (Photon Counting), "EID" (Energy Integrating)
@@ -355,7 +347,7 @@ def computeContrastHU(contrast: Atten, spec: Spectrum, energyConversion: str, ba
     '''
     cripAssert(energyConversion in ['EID', 'PCD'], 'Invalid energyConversion.')
 
-    _calcMu = lambda atten: calcMu(atten, spec, energyConversion)
+    _calcMu = lambda atten: computeMu(atten, spec, energyConversion)
 
     muWater = _calcMu(WaterAtten)
     if base is not WaterAtten:
