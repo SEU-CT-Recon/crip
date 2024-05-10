@@ -6,14 +6,14 @@
 
 import cv2
 import numpy as np
-from matplotlib import font_manager
 import matplotlib.pyplot as plt
 import matplotlib.figure
 import matplotlib.patches
 import matplotlib.axes
 from mpl_toolkits.axes_grid1 import ImageGrid
+
 from ._typing import *
-from .utils import cripAssert, is1D, isInt, cripWarning
+from .utils import *
 from .physics import Spectrum, DiagEnergyRange, Atten
 from .shared import resize
 
@@ -33,9 +33,18 @@ def smooth1D(data: NDArray, winSize: int = 5) -> NDArray:
     return np.concatenate((start, out0, stop))
 
 
-def window(img: TwoOrThreeD, win: Or[Tuple[int], Tuple[float]], style: str = 'lr', normalize: Or[str, None] = None):
-    ''' Window `img` using `win` (ww, wl) with style 'wwwl' or (left, right) with style 'lr'.
-        Set `normalize` to '0255' to convert to 8-bit image, or '01' to [0, 1] float image.
+# def zsmooth(imgs: ThreeD, r: int):
+#     ''' Average along `C` dimension [i - r, i + r].
+#     '''
+#     return np.mean(imgs[i - r:i + r], axis=0)
+
+
+def window(img: TwoOrThreeD,
+           win: Tuple[float, float],
+           style: str = 'lr',
+           normalize: Or[str, None] = None) -> TwoOrThreeD:
+    ''' Window `img` using `win` (WW, WL) with style `wwwl` or (left, right) with style `lr`.
+        Set `normalize` to `0255` to convert to 8-bit image, or `01` to [0, 1] float image.
     '''
     cripAssert(len(win) == 2, '`win` should have length of 2.')
     cripAssert(style in ['wwwl', 'lr'], "`style` should be 'wwwl' or 'lr'")
@@ -47,7 +56,7 @@ def window(img: TwoOrThreeD, win: Or[Tuple[int], Tuple[float]], style: str = 'lr
     elif style == 'lr':
         l, r = win
 
-    res = img.copy()
+    res = asFloat(img.copy())
     res[res > r] = r
     res[res < l] = l
 
@@ -60,16 +69,9 @@ def window(img: TwoOrThreeD, win: Or[Tuple[int], Tuple[float]], style: str = 'lr
 
 
 def windowFullRange(img: TwoOrThreeD, normalize='01') -> TwoOrThreeD:
-    ''' Window `img` using full dynamic range of pixel values.
+    ''' Window `img` using its full dynamic range of pixel values.
     '''
     return window(img, (np.max(img), np.min(img)), 'lr', normalize)
-
-
-def average(imgs: ThreeD, i: int, r: int):
-    ''' Average along `channel` dimension [i - r, i + r].
-        Use for example, show CT slices smoother.
-    '''
-    return np.mean(imgs[i - r:i + r], axis=0)
 
 
 def zoomIn(img, row, col, h, w):

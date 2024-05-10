@@ -5,3 +5,4 @@ pydicom
 natsort
 matplotlib
 scikit-image
+periodictable

@@ -99,8 +99,8 @@ def deDecompRecon(low: TwoOrThreeD,
 
 @ConvertListNDArray
 def deDecompReconVolCon(low: TwoOrThreeD, high: TwoOrThreeD, muBase1, muBase2, muBase3):
-    '''Dual-Energy Three-Material decomposition with Volume Conservation.
-       muBase* = [low, high]
+    ''' Dual-Energy Three-Material decomposition with Volume Conservation.
+        muBase* = [low, high]
     '''
     cripAssert(isOfSameShape(low, high), 'Volumes should have same shape.')
 

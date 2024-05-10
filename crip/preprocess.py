@@ -6,14 +6,14 @@
 
 import numpy as np
 import warnings
-
-warnings.simplefilter("ignore", DeprecationWarning)
-
 from scipy.interpolate import interpn
 import cv2
+
 from .shared import *
 from ._typing import *
 from .utils import *
+
+warnings.simplefilter("ignore", DeprecationWarning)
 
 
 @ConvertListNDArray
@@ -66,8 +66,7 @@ def correctFlatDarkField(projections: TwoOrThreeD,
 @ConvertListNDArray
 def projectionsToSinograms(projections: ThreeD):
     ''' Permute projections to sinograms by axes swapping `(views, h, w) -> (h, views, w)`.
-
-        Note that the width direction is along detector channels of a row.
+        The width direction is along detector channels of a row.
     '''
     cripAssert(is3D(projections), 'projections should be 3D.')
 
@@ -82,8 +81,7 @@ def projectionsToSinograms(projections: ThreeD):
 @ConvertListNDArray
 def sinogramsToProjections(sinograms: ThreeD):
     ''' Permute sinograms back to projections by axes swapping `(h, views, w) -> (views, h, w)`.
-
-        Note that the width direction is along detector channels of a row.
+        The width direction is along detector channels of a row.
     '''
     cripAssert(is3D(sinograms), 'projections should be 3D.')
 
@@ -185,12 +183,12 @@ def correctRingArtifactInProj(sgm: TwoOrThreeD, sigma: float, ksize: Or[int, Non
 def fanToPara(sgm: TwoD, gammas: NDArray, betas: NDArray, sid: float, oThetas: Tuple[float],
               oLines: Tuple[float]) -> TwoD:
     '''
-        Re-order Fan-Beam sinogram to Parallel-Beam's.
-        `gammas`: fan angles from min to max [rad], e.g., `arctan(elementOffcenter / SDD)`
-        `betas`: system rotation angles from min to max [rad]
-        `sid`: Source-Isocenter-Distance [mm]
-        `oThetas`: output rotation angle range (min, delta, max) tuple [rad]
-        `oLines`: output detector element physical locations range (min, delta, max) tuple [mm], e.g., `elementOffcenter` array
+        Re-order a Fan-Beam sinogram to Parallel-Beam's.
+        `gammas` is fan angles from min to max [RAD], computed by `arctan(elementOffcenter / SDD)` for each element.
+        `betas` is system rotation angles from min to max [RAD].
+        `sid` is Source-Isocenter-Distance [mm].
+        `oThetas` is output rotation angle range (min, delta, max) tuple [RAD]
+        `oLines` is output detector element physical locations range (min, delta, max) tuple [mm], e.g., `elementOffcenter` array
         ```
                /| <- gamma for detector element X
               / | <- SID

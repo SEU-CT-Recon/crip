@@ -8,10 +8,11 @@ import json
 import re
 import numpy as np
 from os import path
+import periodictable as pt
 import enum
 
 from ._typing import *
-from .utils import cvtEnergyUnit, cvtMuUnit, inArray, cripAssert, getAsset, inRange, isOfSameShape, isType, readFileText, cvtConcentrationUnit
+from .utils import *
 from .io import listDirectory
 from .postprocess import muToHU
 
@@ -53,22 +54,22 @@ def getCommonDensity(materialName: str):
 
 
 class Spectrum:
-    ''' Construct Spectrum object with omega array of every energy.
-
-        Get \\omega of certain energy (keV):
+    ''' To get omega of certain energy (keV):
         ```py
             omega = spec.omega[E]
         ```
     '''
 
-    def __init__(self, omega: np.ndarray, unit='keV'):
+    def __init__(self, omega: NDArray, unit='keV'):
+        ''' Construct a Spectrum object with omega array describing every energy bin in DiagEnergyRange.
+        '''
         cripAssert(
             len(omega) == DiagEnergyLen,
-            f'omega array should have same length as DiagEnergyLen: got {len(omega)} expect {DiagEnergyLen}.')
-        cripAssert(inArray(unit, ['MeV', 'keV', 'eV']), f'Invalid unit: {unit}')
+            f'omega array should length of DiagEnergyLen ({DiagEnergyLen}), but got {len(omega)}.')
+        cripAssert(unit in EnergyUnits, f'Invalid unit: {unit}.')
 
         self.unit = unit
-        self.omega = np.array(omega, dtype=np.float32)
+        self.omega = np.array(omega, dtype=DefaultFloatDType)
         self.sumOmega = np.sum(self.omega)
 
     def isMonochromatic(self):
@@ -88,7 +89,7 @@ class Spectrum:
             
             Refer to the document for spectrum text format. @see https://github.com/SEU-CT-Recon/crip      
         '''
-        cripAssert(inArray(unit, ['MeV', 'keV', 'eV']), f'Invalid unit: {unit}')
+        cripAssert(unit in EnergyUnits, f'Invalid unit: {unit}.')
         omega = np.zeros(DiagEnergyLen, dtype=DefaultFloatDType)
 
         # split content into list, and ignore all lines starting with non-digit
@@ -108,7 +109,7 @@ class Spectrum:
         specOmega[specOmega < 0] = 0
 
         # to keV
-        specEnergy = cvtEnergyUnit(specEnergy, unit, DefaultEnergyUnit)
+        specEnergy = convertEnergyUnit(specEnergy, unit, DefaultEnergyUnit)
 
         startEnergy, cutOffEnergy = int(specEnergy[0]), int(specEnergy[-1])
         cripAssert(inRange(startEnergy, DiagEnergyRange),
@@ -124,8 +125,7 @@ class Spectrum:
 
     @staticmethod
     def fromFile(path: str, unit='keV'):
-        '''
-            Construct a Spectrum object from spectrum file (first column is energy while second is omega).
+        ''' Construct a Spectrum object from spectrum file (first column is energy while second is omega).
         '''
         spec = readFileText(path)
 
@@ -133,8 +133,7 @@ class Spectrum:
 
     @staticmethod
     def monochromatic(at: int, unit='keV', omega=10**5):
-        '''
-            Construct a monochromatic spectrum.
+        ''' Construct a monochromatic spectrum.
         '''
         text = '{} {}\n{} -1'.format(str(at), str(omega), str(at + 1))
 
@@ -160,8 +159,7 @@ class Atten:
 
     @staticmethod
     def builtInAttenList() -> List:
-        '''
-            Get all built-in materials.
+        ''' Get all built-in materials.
         '''
         attenListPath = path.join(getAsset('atten'), 'data')
         attenList = list(map(lambda x: x.replace('.txt', ''), listDirectory(attenListPath, style='filename')))
@@ -171,8 +169,7 @@ class Atten:
 
     @staticmethod
     def _builtInAttenText(materialName: str):
-        '''
-            Get the built-in atten file content of `materialName` from NIST data source.
+        ''' Get the built-in atten file content of `materialName` from NIST data source.
         '''
         if materialName in AttenAliases:
             materialName = AttenAliases[materialName]
@@ -185,8 +182,7 @@ class Atten:
 
     @staticmethod
     def fromBuiltIn(materialName: str, density: Or[float, None] = None):
-        '''
-            Get the built-in atten object.
+        ''' Get the built-in atten object.
             Call `builtInAttenList` to get available materials.
             The density is in g/cm^3.
         '''
@@ -211,14 +207,14 @@ class Atten:
 
         def procAttenLine(line: str):
             tup = tuple(map(float, re.split(r'\s+', line)))
-            cripAssert(inArray(len(tup), [2, 3]), f'Invalid line in attenText: {line}')
+            cripAssert(len(tup) in [2, 3], f'Invalid line in attenText: {line}')
             energy, muDivRho = tuple(map(float, re.split(r'\s+', line)))[0:2]
             return energy, muDivRho
 
         content = np.array(list(map(procAttenLine, content)), dtype=DefaultFloatDType)
 
         energy, muDivRho = content.T
-        energy = cvtEnergyUnit(energy, energyUnit, DefaultEnergyUnit)  # keV
+        energy = convertEnergyUnit(energy, energyUnit, DefaultEnergyUnit)  # keV
 
         # perform log-domain interpolation to fill in `DiagEnergyRange`
         interpEnergy = np.log(DiagEnergyRange[1:])  # avoid log(0)
@@ -226,7 +222,7 @@ class Atten:
 
         # now we have mu for every energy in `DiagEnergyRange`.
         mu = np.exp(interpMuDivRho) * rho  # cm-1
-        mu = cvtMuUnit(mu, 'cm-1', DefaultMuUnit)  # mm-1
+        mu = convertMuUnit(mu, 'cm-1', DefaultMuUnit)  # mm-1
         mu = np.insert(mu, 0, 0, axis=0)  # prepend energy = 0
 
         return Atten(mu, rho)
@@ -237,8 +233,7 @@ class Atten:
 
     @staticmethod
     def fromFile(path: str, rho: float, energyUnit='MeV'):
-        '''
-            Construct a new material from file where first column is energy while second
+        ''' Construct a new material from file where first column is energy while second
             is \\mu / \\rho.
         '''
         atten = readFileText(path)
@@ -255,7 +250,7 @@ def calcMu(atten: Atten, spec: Spectrum, energyConversion: str) -> float:
         energyConversion determines the energy conversion efficiency of the detector,
         can be "PCD" (Photon Counting), "EID" (Energy Integrating)
     '''
-    cripAssert(inArray(energyConversion, ['PCD', 'EID']), f'Invalid energyConversion: {energyConversion}')
+    cripAssert(energyConversion in ['PCD', 'EID'], f'Invalid energyConversion: {energyConversion}')
 
     mus = atten.mu
     eff = {'PCD': 1, 'EID': np.array(DiagEnergyRange)}[energyConversion]
@@ -346,16 +341,16 @@ def brewPowderSolution(solute: Atten,
                        rhoSolution: Or[float, None] = None) -> Atten:
     ''' Generate the Atten of powder solution with certain concentration (mg/mL by default).
     '''
-    cripAssert(inArray(concentrationUnit, ['mg/mL', 'g/mL']), f'Invalid concentration unit: {concentrationUnit}')
+    cripAssert(concentrationUnit in ['mg/mL', 'g/mL'], f'Invalid concentration unit: {concentrationUnit}')
 
-    concentration = cvtConcentrationUnit(concentration, concentrationUnit, 'g/mL')
+    concentration = convertConcentrationUnit(concentration, concentrationUnit, 'g/mL')
     mu = solvent.mu + (solute.mu / solute.rho) * concentration
     atten = Atten.fromMuArray(mu, rhoSolution)
 
     return atten
 
 
-def calcContrastHU(contrast: Atten, spec: Spectrum, energyConversion: str, base: Atten = WaterAtten):
+def computeContrastHU(contrast: Atten, spec: Spectrum, energyConversion: str, base: Atten = WaterAtten):
     ''' Calculate HU difference resulted by contrast.
     '''
     cripAssert(energyConversion in ['EID', 'PCD'], 'Invalid energyConversion.')
@@ -374,8 +369,8 @@ def calcContrastHU(contrast: Atten, spec: Spectrum, energyConversion: str, base:
     return contrastHU
 
 
-def calcPathLength(thickness: float, SID: float, detH: int, detW: int, detElementSize: float):
-    ''' Calculate the X-ray peneration pathlength of an cuboid object based on geometry.
+def computePathLength(thickness: float, SID: float, detH: int, detW: int, detElementSize: float) -> NDArray:
+    ''' Compute the X-ray peneration pathlength of an cuboid object based on geometry.
         SID is source-isocenter distance. Currently no offset can be assumed.
     '''
     detCenter = (detW / 2, detH / 2)
@@ -396,8 +391,9 @@ def calcPathLength(thickness: float, SID: float, detH: int, detW: int, detElemen
 NA = 6.02214076e23  # Avogadro's number
 
 
-def atomsFromMolecule(molecule):
-    '''e.g. H2O is 'H2 O1'
+def atomsFromMolecule(molecule: str) -> Dict[str, int]:
+    ''' Parse the molecule string to get the atoms and their counts.
+        e.g. `'H2 O1' -> {'H': 2, 'O': 1}`
     '''
     atoms = {}
     for part in molecule.split(' '):
@@ -408,8 +404,9 @@ def atomsFromMolecule(molecule):
     return atoms
 
 
-def zeffTheoretical(molecule, m=2.94):
-    '''Compute the THEORETICAL effective atomic number of a molecule.
+def zeffTheoretical(molecule: str, m=2.94) -> float:
+    ''' Compute the eheoretical effective atomic number (Zeff) of a molecule using the power law with parameter `m`.
+        `molecule` is parsed by `atomsFromMolecule`.
     '''
     atoms = atomsFromMolecule(molecule)
     totalElectrons = 0
@@ -425,8 +422,9 @@ def zeffTheoretical(molecule, m=2.94):
     return sumUnderSqrt**(1 / m)
 
 
-def zeffExperimental(a1, a2, rhoe1, rhoe2, zeff1, zeff2, m=2.94):
-    '''Compute the EXPERIMENTAL effective atomic number from material decomposition.
+def zeffExperimental(a1: float, a2: float, rhoe1: float, rhoe2: float, zeff1: float, zeff2: float, m=2.94):
+    ''' Compute the experimental effective atomic number (Zeff) from Dual-Energy Two-Material decomposition
+        using the power law with parameter `m`.
     '''
     n1 = a1 * rhoe1 * zeff1**m
     n2 = a2 * rhoe2 * zeff2**m

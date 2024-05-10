@@ -73,54 +73,71 @@ def ConvertListNDArray(f):
     return fn
 
 
-def asFloat(arr):
+def asFloat(arr: NDArray) -> NDArray:
     ''' Ensure `arr` has `DefaultFloatDType` dtype.
     '''
-    if isType(arr, NDArray):
-        arr = arr.astype(DefaultFloatDType)
+    cripAssert(isType(arr, NDArray), '`arr` should be NDArray.')
 
-    return arr
-
-
-def as3D(x: NDArray):
-    cripAssert(is2or3D(x))
-
-    return x if len(x.shape) == 3 else x[np.newaxis, ...]
+    return arr.astype(DefaultFloatDType)
 
 
-def is1D(x: NDArray):
+def is1D(x: NDArray) -> bool:
+    ''' Check if `x` is 1D ndarray.
+    '''
     return isType(x, NDArray) and len(x.shape) == 1
 
 
-def is2D(x: NDArray):
+def is2D(x: NDArray) -> bool:
+    ''' Check if `x` is 2D ndarray.
+    '''
     return isType(x, NDArray) and len(x.shape) == 2
 
 
-def is3D(x: NDArray):
+def is3D(x: NDArray) -> bool:
+    ''' Check if `x` is 3D ndarray.
+    '''
     return isType(x, NDArray) and len(x.shape) == 3
 
 
-def is2or3D(x: NDArray):
+def is2or3D(x: NDArray) -> bool:
+    ''' Check if `x` is 2D or 3D ndarray.
+    '''
     return is2D(x) or is3D(x)
 
 
-def isInt(n):
+def as3D(x: NDArray) -> NDArray:
+    ''' Ensure `x` to be 3D ndarray.
+    '''
+    cripAssert(is2or3D(x))
+
+    return x if is3D(x) else x[np.newaxis, ...]
+
+
+def isInt(n) -> bool:
+    ''' Check if `n` is int.
+    '''
     return math.floor(n) == n
 
 
-def isIntDtype(dtype):
+def isIntDtype(dtype) -> bool:
+    ''' Check if `dtype` is integer type.
+    '''
     return np.issubdtype(dtype, np.integer)
 
 
-def isFloatDtype(dtype):
+def isFloatDtype(dtype) -> bool:
+    ''' Check if `dtype` is float type.
+    '''
     return np.issubdtype(dtype, np.floating)
 
 
-def hasIntDtype(arr: np.ndarray):
+def hasIntDtype(arr: NDArray) -> bool:
+    ''' Check if `arr` has integer dtype.
+    '''
     return isIntDtype(arr.dtype)
 
 
-def isType(x, t):
+def isType(x, t) -> bool:
     ''' Check if `x` has type `t` or isinstance of `t`.
     '''
     if t is Callable:
@@ -128,20 +145,10 @@ def isType(x, t):
     return type(x) == t or isinstance(x, t)
 
 
-def isNDArray(x):
-    return isType(x, NDArray)
-
-
-def isNumber(a):
-    return isType(a, int) or isType(a, float)
-
-
-def isList(x):
-    return isType(x, list)
-
-
-def isListNDArray(arr):
-    return isType(arr, list) and isType(arr[0], np.ndarray)
+def isListNDArray(x) -> bool:
+    ''' Check if `x` is List[NDArray].
+    '''
+    return isType(x, list) and len(x) > 0 and isType(x[0], NDArray)
 
 
 def isOfSameShape(a: NDArray, b: NDArray) -> bool:

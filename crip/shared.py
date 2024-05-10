@@ -218,7 +218,7 @@ def shepplogan(size: int = 512):
 
 def fitPolyV2D2(x1: NDArray, x2: NDArray, y: NDArray, bias: bool = True) -> NDArray:
     ''' Fit a degree-2 polynomial using pseudo-inverse to a pair of variables `x1, x2`.
-        Output 6 coefficients `c[0~5]`, minimize the error of `y` and
+        Output 6 coefficients `c[0~5]`, minimizing the error of `y` and
         `c[0] * x1**2 + c[1] * x2**2 + c[2] * x1 * x2 + c[3] * x1 + c[4] * x2 + c[5]`.
         If `bias` is False, `c[5]` will be 0.
     '''
@@ -238,10 +238,10 @@ def fitPolyV2D2(x1: NDArray, x2: NDArray, y: NDArray, bias: bool = True) -> NDAr
 
 def applyPolyV2D2(coeff: NDArray, x1: NDArray, x2: NDArray):
     ''' Apply a degree-2 polynomial to a pair of variables `x1, x2`.
-        
-        `c[0] * x1**2 + c[1] * x2**2 + c[2] * x1 * x2 + c[3] * x1 + c[4] * x2 + c[5]`
+        `coeff` has 5 or 6 elements, expands to 
+        `c[0] * x1**2 + c[1] * x2**2 + c[2] * x1 * x2 + c[3] * x1 + c[4] * x2 + (c[5] or 0)`
     '''
-    cripAssert(len(coeff) in [5, 6], 'coeff should have length 5 or 6.')
+    cripAssert(len(coeff) in [5, 6], '`coeff` should have length of 5 or 6.')
 
     if len(coeff) == 5:
         bias = 0
@@ -272,7 +272,7 @@ def applyPolyV1D2(coeff: NDArray, x1: NDArray):
     '''
     cripAssert(len(coeff) in [2, 3], 'coeff should have length 2 or 3.')
 
-    if len(coeff) == 5:
+    if len(coeff) == 2:
         bias = 0
     else:
         bias = coeff[2]
