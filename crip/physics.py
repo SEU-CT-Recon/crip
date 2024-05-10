@@ -22,6 +22,7 @@ DiagEnergyLow = 0  # [keV] Lowest energy of diagnostic X-ray
 DiagEnergyHigh = 150  # [keV] Highest energy of diagnostic X-ray
 DiagEnergyRange = range(DiagEnergyLow, DiagEnergyHigh + 1)  # Diagonstic energy range, [0, 150] keV
 DiagEnergyLen = DiagEnergyHigh - DiagEnergyLow + 1
+NA = 6.02214076e23  # Avogadro's number
 
 # Alias for built-in materials
 AttenAliases = {
@@ -101,6 +102,7 @@ class Spectrum:
         def proc1(line: str):
             tup = tuple(map(float, re.split(r'\s+', line)))
             cripAssert(len(tup) == 2, f'Invalid line in spectrum: {line}.')
+
             return tup  # (energy, omega)
 
         # parse the spectrum text to get provided omega array
@@ -136,23 +138,21 @@ class Spectrum:
 class Atten:
 
     def __init__(self, muArray: NDArray, density: Or[None, float] = None) -> None:
-        ''' Parse atten text into `Atten` object. Interpolation is performed to fill `DiagEnergyRange`.
-        Refer to the document for atten text format (NIST ASCII). The density is in g/cm^3.
-
-        Get \\mu (mm-1) of certain energy (keV):
-        ```py
-            mu = atten.mu[E]
-        ```
+        ''' Construct an Atten object with mu array describing every LAC for energy bins in DiagEnergyRange.
+            The density is in [g/cm^3]. To access mu [mm-1] of certain energy E [keV], use `atten.mu[E]`.
         '''
-        cripAssert(len(muArray) == DiagEnergyLen, f'muArray should have length of {DiagEnergyLen} energy bins')
+        cripAssert(len(muArray) == DiagEnergyLen, f'muArray should have length of {DiagEnergyLen} energy bins.')
+        if density is not None:
+            cripAssert(density > 0, 'Density should be positive.')
+
         self.mu = muArray
         self.rho = density
         self.attenText = ''
         self.energyUnit = 'keV'
 
     @staticmethod
-    def builtInAttenList() -> List:
-        ''' Get all built-in materials.
+    def builtInAttenList() -> List[str]:
+        ''' Get all built-in material names and aliases.
         '''
         attenListPath = path.join(getAsset('atten'), 'data')
         attenList = list(map(lambda x: x.replace('.txt', ''), listDirectory(attenListPath, style='filename')))
@@ -161,35 +161,38 @@ class Atten:
         return attenList
 
     @staticmethod
-    def _builtInAttenText(materialName: str):
-        ''' Get the built-in atten file content of `materialName` from NIST data source.
+    def builtInAttenText(material: str):
+        ''' Get built-in atten file content of `material` from NIST data source.
         '''
-        if materialName in AttenAliases:
-            materialName = AttenAliases[materialName]
+        if material in AttenAliases:
+            material = AttenAliases[material]
 
-        attenFilePath = path.join(getAsset('atten'), f'data/{materialName}.txt')
-        cripAssert(path.exists(attenFilePath), f'Atten file for {materialName} does not exist.')
-        content = readFileText(attenFilePath)
+        attenFilePath = path.join(getAsset('atten'), f'data/{material}.txt')
+        cripAssert(path.exists(attenFilePath), f'Atten file for {material} does not exist.')
 
-        return content
+        return readFileText(attenFilePath)
 
     @staticmethod
-    def fromBuiltIn(materialName: str, density: Or[float, None] = None):
-        ''' Get the built-in atten object.
-            Call `builtInAttenList` to get available materials.
-            The density is in g/cm^3.
+    def fromBuiltIn(material: str, density: Or[float, None] = None):
+        ''' Get a built-in atten object for `material`.
+            Call `builtInAttenList` to inspect all available materials.
+            The density is in [g/cm^3], and will be automatically filled with common value if not provided.
         '''
-        if materialName in AttenAliases:
-            materialName = AttenAliases[materialName]
+        if material in AttenAliases:
+            material = AttenAliases[material]
 
         if density is None:
-            density = getCommonDensity(materialName)
+            density = getCommonDensity(material)
 
-        return Atten.fromText(Atten._builtInAttenText(materialName), density, BuiltInAttenEnergyUnit)
+        return Atten.fromText(Atten.builtInAttenText(material), density, BuiltInAttenEnergyUnit)
 
     @staticmethod
     def fromText(attenText: str, density: float, energyUnit='MeV'):
-        cripAssert(density > 0, '`density` should > 0.')
+        ''' Parse atten text into `Atten` object. Interpolation will be performed to fill `DiagEnergyRange`.
+            The text should be in the format of `<energy> <mu/density>` one pair per line,
+            or `<energy> <mu/density> <mu_en/density>` where the second column will be used.
+            Leading lines starting with non-digit will be ignored.
+        '''
         rho = density
 
         # split attenText into list, and ignore all lines starting with non-digit
@@ -198,14 +201,16 @@ class Atten:
                    list(map(lambda x: x.strip(),
                             attenText.replace('\r\n', '\n').split('\n')))))
 
-        def procAttenLine(line: str):
+        # process each line
+        def proc1(line: str):
             tup = tuple(map(float, re.split(r'\s+', line)))
-            cripAssert(len(tup) in [2, 3], f'Invalid line in attenText: {line}')
+            cripAssert(len(tup) in [2, 3], f'Invalid line in attenText: {line}.')
             energy, muDivRho = tuple(map(float, re.split(r'\s+', line)))[0:2]
+
             return energy, muDivRho
 
-        content = np.array(list(map(procAttenLine, content)), dtype=DefaultFloatDType)
-
+        # parse the atten text to get provided mu array
+        content = np.array(list(map(proc1, content)), dtype=DefaultFloatDType)
         energy, muDivRho = content.T
         energy = convertEnergyUnit(energy, energyUnit, DefaultEnergyUnit)  # keV
 
@@ -216,68 +221,58 @@ class Atten:
         # now we have mu for every energy in `DiagEnergyRange`.
         mu = np.exp(interpMuDivRho) * rho  # cm-1
         mu = convertMuUnit(mu, 'cm-1', DefaultMuUnit)  # mm-1
-        mu = np.insert(mu, 0, 0, axis=0)  # prepend energy = 0
+        mu = np.insert(mu, 0, 0, axis=0)  # prepend for E=0
 
-        return Atten(mu, rho)
-
-    @staticmethod
-    def fromMuArray(muArray: NDArray, rho: Or[float, None] = None):
-        return Atten(muArray, rho)
+        return Atten.fromMuArray(mu, rho)
 
     @staticmethod
-    def fromFile(path: str, rho: float, energyUnit='MeV'):
-        ''' Construct a new material from file where first column is energy while second
-            is \\mu / \\rho.
+    def fromMuArray(muArray: NDArray, density: Or[float, None] = None):
+        ''' Construct a new material from mu array for every energy in `DiagEnergyRange`.
+            The density is in [g/cm^3].
         '''
-        atten = readFileText(path)
+        return Atten(muArray, density)
 
-        return Atten.fromText(atten, rho, energyUnit)
+    @staticmethod
+    def fromFile(path: str, density: float, energyUnit='MeV'):
+        ''' Construct a new material from file where the format follows `fromText`.
+        '''
+        return Atten.fromText(readFileText(path), density, energyUnit)
 
 
 WaterAtten = Atten.fromBuiltIn('Water')
 
 
-def computeMu(atten: Atten, spec: Spectrum, energyConversion: str) -> float:
-    ''' Calculate the LAC \mu value (mm-1) of certain atten under a specific spectrum.
-        energyConversion determines the energy conversion efficiency of the detector,
-        can be "PCD" (Photon Counting), "EID" (Energy Integrating)
+def computeMu(atten: Atten, spec: Spectrum, energyConversion: EnergyConversion) -> float:
+    ''' Calculate the LAC (mu) [mm-1] for certain Atten under a Spectrum.
+        `energyConversion` determines the energy conversion efficiency of the detector.
     '''
-    cripAssert(energyConversion in ['PCD', 'EID'], f'Invalid energyConversion: {energyConversion}')
-
     mus = atten.mu
-    eff = {'PCD': 1, 'EID': np.array(DiagEnergyRange)}[energyConversion]
+    eff = {
+        EnergyConversion.PCD: 1,
+        EnergyConversion.EID: np.array(DiagEnergyRange),
+    }[energyConversion]
 
     return np.sum(spec.omega * eff * mus) / np.sum(spec.omega * eff)
 
 
-def calcAttenedSpec(spec: Spectrum, attens: Or[Atten, List[Atten]], Ls: Or[float, List[float]]) -> Spectrum:
-    ''' Calculate the attenuated spectrum using polychromatic Beer-Lambert law. Supports multiple materials.
-
-        I.e., `\\Omega(E) \\exp (- \\mu(E) L) through all E`. L in mm.
+def computeAttenedSpectrum(spec: Spectrum, attens: Or[Atten, List[Atten]], Ls: Or[float, List[float]]) -> Spectrum:
+    ''' Calculate the spectrum after attenuation through `attens` with thickness `Ls` [mm]
+        using Beer-Lambert law.
     '''
     if isType(attens, Atten):
         attens = [attens]
     if isType(Ls, float):
         Ls = [Ls]
-    cripAssert(len(attens) == len(Ls), 'atten should have same length as L.')
+    cripAssert(len(attens) == len(Ls), '`attens` should be paired with `Ls`.')
 
     N = len(attens)
     omega = np.array(spec.omega, copy=True)
-    for i in range(N):  # materials
-        atten = attens[i]
-        L = Ls[i]
+    for i in range(N):
+        atten, L = attens[i], Ls[i]
         for E in DiagEnergyRange:  # energies
             omega[E] *= np.exp(-atten.mu[E] * L)
 
     return Spectrum(omega, spec.unit)
-
-
-def calcPostLog(spec: Spectrum, atten: Or[Atten, List[Atten]], L: Or[float, List[float]]) -> float:
-    ''' Calculate post-log value after attenuation of `L` length `atten`. L in mm.
-    '''
-    attenSpec = calcAttenedSpec(spec, atten, L)
-
-    return -np.log(attenSpec.sumOmega / spec.sumOmega)
 
 
 def forwardProjectWithSpectrum(lengths: List[TwoD], materials: List[Atten], spec: Spectrum, energyConversion: str):
@@ -331,9 +326,9 @@ def brewPowderSolution(solute: Atten,
                        concentration: float,
                        concentrationUnit='mg/mL',
                        rhoSolution: Or[float, None] = None) -> Atten:
-    ''' Generate the Atten of powder solution with certain concentration (mg/mL by default).
+    ''' Generate the `Atten` of ideal powder solution with certain concentration.
     '''
-    cripAssert(concentrationUnit in ['mg/mL', 'g/mL'], f'Invalid concentration unit: {concentrationUnit}')
+    cripAssert(concentrationUnit in ConcentrationUnits, f'Invalid concentration unit: {concentrationUnit}.')
 
     concentration = convertConcentrationUnit(concentration, concentrationUnit, 'g/mL')
     mu = solvent.mu + (solute.mu / solute.rho) * concentration
@@ -342,28 +337,29 @@ def brewPowderSolution(solute: Atten,
     return atten
 
 
-def computeContrastHU(contrast: Atten, spec: Spectrum, energyConversion: str, base: Atten = WaterAtten):
-    ''' Calculate HU difference resulted by contrast.
+def computeContrastHU(contrast: Atten,
+                      spec: Spectrum,
+                      energyConversion: EnergyConversion,
+                      base: Atten = WaterAtten) -> float:
+    ''' Compute the HU difference caused by contrast.
     '''
-    cripAssert(energyConversion in ['EID', 'PCD'], 'Invalid energyConversion.')
-
     _calcMu = lambda atten: computeMu(atten, spec, energyConversion)
 
     muWater = _calcMu(WaterAtten)
+    muContrast = _calcMu(contrast)
     if base is not WaterAtten:
         muBase = _calcMu(base)
     else:
         muBase = muWater
-    muContrast = _calcMu(contrast)
 
-    contrastHU = muToHU(muContrast, muWater) - muToHU(muBase, muWater)
-
-    return contrastHU
+    return muToHU(muContrast, muWater) - muToHU(muBase, muWater)
 
 
-def computePathLength(thickness: float, SID: float, detH: int, detW: int, detElementSize: float) -> NDArray:
-    ''' Compute the X-ray peneration pathlength of an cuboid object based on geometry.
-        SID is source-isocenter distance. Currently no offset can be assumed.
+def computePathLength(thickness: float, sod: float, detH: int, detW: int, detElementSize: float) -> NDArray:
+    ''' Compute the ray peneration pathlength for each detector element using a cuboid object with `thickness`.
+        `sod` is the Source-Object Distance. `(detH, detW)` is the detector size [pixel].
+        `detElementSize` is the element size of detector.
+        All length units are recommended to be [mm]. Currently no object offset can be assumed.
     '''
     detCenter = (detW / 2, detH / 2)
     r, c = np.meshgrid(np.arange(detH), np.arange(detW))
@@ -373,14 +369,11 @@ def computePathLength(thickness: float, SID: float, detH: int, detW: int, detEle
     offcenter = np.abs(offcenter) * detElementSize
     offcenterDist = np.sqrt(np.sum(offcenter**2, axis=1))
 
-    theta = np.arctan(offcenterDist / SID)
+    theta = np.arctan(offcenterDist / sod)
     rayIntersect = thickness / np.cos(theta)
     rayIntersect = rayIntersect.reshape((detW, detH)).T
 
     return rayIntersect
-
-
-NA = 6.02214076e23  # Avogadro's number
 
 
 def atomsFromMolecule(molecule: str) -> Dict[str, int]:
@@ -416,7 +409,9 @@ def zeffTheoretical(molecule: str, m=2.94) -> float:
 
 def zeffExperimental(a1: float, a2: float, rhoe1: float, rhoe2: float, zeff1: float, zeff2: float, m=2.94):
     ''' Compute the experimental effective atomic number (Zeff) from Dual-Energy Two-Material decomposition
-        using the power law with parameter `m`.
+        using the power law with parameter `m`. `(a1, a2)` are material decomposition coefficients.
+        `(rhoe1, rhoe2)` are electron densities of material bases.
+        `(zeff1, zeff2)` are effective atomic numbers of material bases.
     '''
     n1 = a1 * rhoe1 * zeff1**m
     n2 = a2 * rhoe2 * zeff2**m

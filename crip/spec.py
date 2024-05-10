@@ -69,21 +69,22 @@ def deDecompProj(lowProj: TwoOrThreeD, highProj: TwoOrThreeD, coeff1: NDArray,
 @ConvertListNDArray
 def deDecompRecon(low: TwoOrThreeD,
                   high: TwoOrThreeD,
-                  muBase1Low: float,
-                  muBase1High: float,
-                  muBase2Low: float,
-                  muBase2High: float,
-                  checkCond: bool = True):
+                  muB1: List[float, float],
+                  muB2: List[float, float],
+                  checkCond: bool = True) -> TwoOrThreeD:
     ''' Perform Dual-Energy Two-Material decomposition in image domain.
-        The outputs are decomposing coefficients.
+        The outputs are decomposing coefficients. Used values can be LAC (mu), or HU+1000.
+        `muB*` stores the value of base* in low-energy, high-energy order.
     '''
     cripAssert(isOfSameShape(low, high), 'Two volumes should have same shape.')
     COND_TOLERANCE = 1000
 
-    A = np.array([[muBase1Low, muBase2Low], [muBase1High, muBase2High]])
-    if checkCond:
-        cripWarning(
-            np.linalg.cond(A) <= COND_TOLERANCE, 'The material decomposition matrix possesses high condition number.')
+    A = np.array([
+        [muB1[0], muB2[0]],
+        [muB1[1], muB2[1]],
+    ])
+    checkCond and cripWarning(
+        np.linalg.cond(A) <= COND_TOLERANCE, 'Material decomposition matrix possesses high condition number.')
     M = np.linalg.inv(A)
 
     def decomp1(low, high):
@@ -98,47 +99,22 @@ def deDecompRecon(low: TwoOrThreeD,
 
 
 @ConvertListNDArray
-def deDecompReconVolCon(low: TwoOrThreeD, high: TwoOrThreeD, muBase1, muBase2, muBase3):
-    ''' Dual-Energy Three-Material decomposition with Volume Conservation.
-        muBase* = [low, high]
-    '''
-    cripAssert(isOfSameShape(low, high), 'Volumes should have same shape.')
-
-    A = np.array([
-        [muBase1[0], muBase2[0], muBase3[0]],
-        [muBase1[1], muBase2[1], muBase3[1]],
-        [1, 1, 1],
-    ])
-    M = np.linalg.pinv(A)
-
-    def decompOne(low, high):
-        c1 = M[0, 0] * low + M[0, 1] * high + M[0, 2]
-        c2 = M[1, 0] * low + M[1, 1] * high + M[1, 2]
-        c3 = M[2, 0] * low + M[2, 1] * high + M[2, 2]
-
-        return c1, c2, c3
-
-    if is2D(low):
-        return decompOne(low, high)
-    else:
-        return np.array(list(map(lambda args: decompOne(*args), zip(low, high)))).transpose((1, 0, 2, 3))
-
-
-@ConvertListNDArray
-def teDecompRecon(low: TwoOrThreeD, mid: TwoOrThreeD, high: TwoOrThreeD, muBase1, muBase2, muBase3):
-    ''' Triple-Energy Triple-Material decomposition.
-        muBase* = [low, mid, high]
+def teDecompRecon(low: TwoOrThreeD, mid: TwoOrThreeD, high: TwoOrThreeD, muB1: List[float], muB2: List[float],
+                  muB3: List[float]) -> TwoOrThreeD:
+    ''' Perform Triple-Energy Three-Material decomposition in image domain.
+        The outputs are decomposing coefficients. Used values can be LAC (mu), or HU+1000.
+        `muB*` stores the value of base* in low-energy, mid-energy, high-energy order.
     '''
     cripAssert(isOfSameShape(low, mid) and isOfSameShape(low, high), 'Volumes should have same shape.')
 
     A = np.array([
-        [muBase1[0], muBase2[0], muBase3[0]],
-        [muBase1[1], muBase2[1], muBase3[1]],
-        [muBase1[2], muBase2[2], muBase3[2]],
+        [muB1[0], muB2[0], muB3[0]],
+        [muB1[1], muB2[1], muB3[1]],
+        [muB1[2], muB2[2], muB3[2]],
     ])
     M = np.linalg.inv(A)
 
-    def decompOne(low, mid, high):
+    def decomp1(low, mid, high):
         c1 = M[0, 0] * low + M[0, 1] * mid + M[0, 2] * high
         c2 = M[1, 0] * low + M[1, 1] * mid + M[1, 2] * high
         c3 = M[2, 0] * low + M[2, 1] * mid + M[2, 2] * high
@@ -146,66 +122,47 @@ def teDecompRecon(low: TwoOrThreeD, mid: TwoOrThreeD, high: TwoOrThreeD, muBase1
         return c1, c2, c3
 
     if is2D(low):
-        return decompOne(low, mid, high)
+        return decomp1(low, mid, high)
     else:
-        return np.array(list(map(lambda args: decompOne(*args), zip(low, mid, high)))).transpose((1, 0, 2, 3))
+        return np.array(list(map(lambda args: decomp1(*args), zip(low, mid, high)))).transpose((1, 0, 2, 3))
 
 
 @ConvertListNDArray
-def teDecompReconVolCon(low: TwoOrThreeD, mid: TwoOrThreeD, high: TwoOrThreeD, muBase1, muBase2, muBase3):
-    ''' Triple-Energy Triple-Material decomposition with Volume Conservation.
-        muBase* = [low, mid, high]
+def deDecompReconVolCon(low: TwoOrThreeD, high: TwoOrThreeD, muB1: List[float], muB2: List[float],
+                        muB3: List[float]) -> TwoOrThreeD:
+    ''' Perform Dual-Energy Three-Material decomposition with Volume Conservation constraint in image domain.
+        `muB*` stores the value of base* in low-energy, high-energy order.
     '''
-    cripAssert(isOfSameShape(low, mid) and isOfSameShape(low, high), 'Volumes should have same shape.')
+    pseudoMid = np.zeros_like(low)
 
-    A = np.array([
-        [muBase1[0], muBase2[0], muBase3[0]],
-        [muBase1[1], muBase2[1], muBase3[1]],
-        [muBase1[2], muBase2[2], muBase3[2]],
-        [1, 1, 1],
-    ])
-    M = np.linalg.pinv(A)
-
-    def decompOne(low, mid, high):
-        c1 = M[0, 0] * low + M[0, 1] * mid + M[0, 2] * high + M[0, 3]
-        c2 = M[1, 0] * low + M[1, 1] * mid + M[1, 2] * high + M[1, 3]
-        c3 = M[2, 0] * low + M[2, 1] * mid + M[2, 2] * high + M[2, 3]
-
-        return c1, c2, c3
-
-    if is2D(low):
-        return decompOne(low, mid, high)
-    else:
-        return np.array(list(map(lambda args: decompOne(*args), zip(low, mid, high)))).transpose((1, 0, 2, 3))
-
-
-def softThreshold(img: np.ndarray, l, h, mode='lower'):
-    shape = img.shape
-    img = img.flatten()
-
-    lower = img < l
-    upper = img >= h
-
-    transitional = (img >= l) * (img < h)
-    if mode == 'upper':
-        transitional = transitional * (img - l) / (h - l)
-        res = upper + transitional
-    elif mode == 'lower':
-        transitional = transitional * (h - img) / (h - l)
-        res = lower + transitional
-
-    return res.reshape(shape)
+    return teDecompRecon(low, pseudoMid, high, [*muB1, 1.0], [*muB2, 1.0], [*muB3, 1.0])
 
 
 def genMaterialPhantom(img, zsmooth=3, sigma=1, l=80, h=300, base=1000):
-    '''
-        Generate the phantom of material bases (one is water) from SECT using soft-thresholding.
+    ''' Generate the phantom of material bases (one is water) from SECT using soft-thresholding.
         zsmooth: smooth window in slice direction.
         sigma: Gaussian smooth sigma in single slice.
         [l, h] defines the fuzzy range of another material, e.g., bone.
         base: the reference HU of another material.
     '''
-    assert np.min(img) < 0  # HU
+    cripAssert(np.min(img)) < 0  # HU
+
+    def softThreshold(img: NDArray, l, h, mode='lower'):
+        shape = img.shape
+        img = img.flatten()
+
+        lower = img < l
+        upper = img >= h
+
+        transitional = (img >= l) * (img < h)
+        if mode == 'upper':
+            transitional = transitional * (img - l) / (h - l)
+            res = upper + transitional
+        elif mode == 'lower':
+            transitional = transitional * (h - img) / (h - l)
+            res = lower + transitional
+
+        return res.reshape(shape)
 
     kernel = (zsmooth, 1, 1) if zsmooth is not None else (1, 1)
     img = uniform_filter(img, kernel, mode='reflect')

@@ -13,6 +13,7 @@ DefaultMuUnit = 'mm-1'  # Default attenuation coefficient unit
 BuiltInAttenEnergyUnit = 'MeV'  # Built-in attenuation files' energy unit
 
 EnergyUnits = ['MeV', 'keV', 'eV']
+ConcentrationUnits = ['g/mL', 'mg/mL']
 
 Or = Union
 UintLike = Or[np.uint8, np.uint16, np.uint32, np.uint64]
