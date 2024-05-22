@@ -5,6 +5,7 @@
 '''
 
 import numpy as np
+from scipy.stats import ttest_ind, ttest_rel
 from skimage.metrics import structural_similarity, peak_signal_noise_ratio
 
 from .utils import cripWarning, cripAssert, is3D, isOfSameShape
@@ -46,6 +47,27 @@ def computeRMSE(x: TwoOrThreeD, y: TwoOrThreeD) -> float:
     sq = (x - y)**2
 
     return np.sqrt(sq.mean())
+
+
+def computeMAE(x: TwoOrThreeD, y: TwoOrThreeD) -> float:
+    ''' Compute the Mean Absolute Error (MAE) between `x` and `y`.
+    '''
+
+    return np.mean(np.abs(x - y))
+
+
+def pvalueIndepedent(control: NDArray, treated: NDArray, equalVar: bool = True) -> float:
+    ''' Compute the two-sided p-value of the independent t-test between metrics `control` and `treated`.
+    '''
+
+    return ttest_ind(control.flatten(), treated.flatten(), equal_var=equalVar).pvalue
+
+
+def pvalueRelated(control: NDArray, treated: NDArray) -> float:
+    ''' Compute the two-sided p-value of the related t-test between metrics `control` and `treated`.
+    '''
+
+    return ttest_rel(control.flatten(), treated.flatten()).pvalue
 
 
 class AverageMeter():
