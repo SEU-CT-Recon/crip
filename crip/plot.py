@@ -15,7 +15,7 @@ from mpl_toolkits.axes_grid1 import ImageGrid
 from ._typing import *
 from .utils import *
 from .physics import Spectrum, DiagEnergyRange, Atten
-from .shared import resize
+from .shared import resizeTo
 
 
 def smooth1D(data: NDArray, winSize: int = 5) -> NDArray:
@@ -74,17 +74,23 @@ def windowFullRange(img: TwoOrThreeD, normalize='01') -> TwoOrThreeD:
     return window(img, (np.max(img), np.min(img)), 'lr', normalize)
 
 
-def zoomIn(img, row, col, h, w):
-    ''' Crop a patch. (row, col) determines the left-top point. (h, w) gives height and width.
+def zoomIn(img: TwoD, row: int, col: int, h: int, w: int) -> TwoD:
+    ''' Crop a patch. `(row, col)` determines the left-top point. `(h, w)` gives height and width.
     '''
     return img[row:row + h, col:col + w]
 
 
-def stddev(img, row, col, h, w):
+def stddev(img: TwoD) -> float:
     ''' Compute the standard deviation of a image crop.
-        (row, col) determines the left-top point. (h, w) gives height and width.
+        `(row, col)` determines the left-top point. (h, w) gives height and width.
     '''
-    return np.std(zoomIn(img, row, col, h, w))
+    return np.std(img)
+
+
+def meanstd(x: Any) -> Tuple[float, float]:
+    ''' Compute the mean and standard deviation of `x`.
+    '''
+    return np.mean(x), np.std(x)
 
 
 def fontdict(family, weight, size):
@@ -141,7 +147,7 @@ def makeImageGrid(subimages: List[TwoD],
         box = None
         if crops is not None and crops[cur // ncols]:
             r, c, hw = crops[cur // ncols]
-            patch = resize(zoomIn(img, r, c, hw, hw), (cropSize, cropSize))
+            patch = resizeTo(zoomIn(img, r, c, hw, hw), (cropSize, cropSize))
             box = overlayPatch(img, patch, cropLoc)
 
         # display the image
@@ -172,18 +178,14 @@ def makeImageGrid(subimages: List[TwoD],
 
 
 def plotSpectrum(ax: matplotlib.axes.Axes, spec: Spectrum):
-    ''' Plot the spectrum in `ax`. Example
-        ```
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
-        plotSpectrum(ax, spec)
+    ''' Plot the spectrum using handler `ax`.
     '''
     energies = DiagEnergyRange
     omega = spec.omega
 
     ax.plot(energies, omega, 'k')
     ax.set_xlabel('Energy (keV)')
-    ax.set_ylabel('Omega')
+    ax.set_ylabel('Omega (a.u.)')
 
 
 def plotMu(ax: matplotlib.axes.Axes, atten: Atten, startEnergy: int = 1, logScale=True):
@@ -202,7 +204,3 @@ def plotMu(ax: matplotlib.axes.Axes, atten: Atten, startEnergy: int = 1, logScal
 def savefigTight(fig, path, dpi=200, pad=0.05):
     fig.tight_layout()
     fig.savefig(path, dpi=dpi, bbox_inches='tight', pad_inches=pad)
-
-
-def meanstd(x):
-    return np.mean(x), np.std(x)

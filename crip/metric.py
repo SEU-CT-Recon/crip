@@ -8,7 +8,7 @@ import numpy as np
 from scipy.stats import ttest_ind, ttest_rel
 from skimage.metrics import structural_similarity, peak_signal_noise_ratio
 
-from .utils import cripWarning, cripAssert, is3D, isOfSameShape
+from .utils import *
 from ._typing import *
 
 
@@ -41,29 +41,32 @@ def computeSSIM(x: TwoOrThreeD, y: TwoOrThreeD, range_=1) -> float:
     return structural_similarity(x, y, data_range=range_, channel_axis=0 if is3D(x) else None)
 
 
-def computeRMSE(x: TwoOrThreeD, y: TwoOrThreeD) -> float:
+def computeRMSE(x: TwoOrThreeD, y: TwoOrThreeD, pixelwise: bool = False) -> Or[float, TwoOrThreeD]:
     ''' Compute the Root Mean Squared Error (RMSE) between `x` and `y`.
     '''
-    sq = (x - y)**2
+    se = (x - y)**2
+    reducer = identity if pixelwise else np.mean
 
-    return np.sqrt(sq.mean())
+    return np.sqrt(reducer(se))
 
 
-def computeMAE(x: TwoOrThreeD, y: TwoOrThreeD) -> float:
+def computeMAE(x: TwoOrThreeD, y: TwoOrThreeD, pixelwise: bool = False) -> Or[float, TwoOrThreeD]:
     ''' Compute the Mean Absolute Error (MAE) between `x` and `y`.
     '''
+    ae = np.abs(x - y)
+    reducer = identity if pixelwise else np.mean
 
-    return np.mean(np.abs(x - y))
+    return reducer(ae)
 
 
-def pvalueIndepedent(control: NDArray, treated: NDArray, equalVar: bool = True) -> float:
+def pvalueInd(control: NDArray, treated: NDArray, equalVar: bool = True) -> float:
     ''' Compute the two-sided p-value of the independent t-test between metrics `control` and `treated`.
     '''
 
     return ttest_ind(control.flatten(), treated.flatten(), equal_var=equalVar).pvalue
 
 
-def pvalueRelated(control: NDArray, treated: NDArray) -> float:
+def pvalueRel(control: NDArray, treated: NDArray) -> float:
     ''' Compute the two-sided p-value of the related t-test between metrics `control` and `treated`.
     '''
 

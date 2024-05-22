@@ -208,7 +208,7 @@ def permute(vol: ThreeD, from_: str, to: str) -> ThreeD:
     return transpose(vol, order)
 
 
-def shepplogan(size: int = 512):
+def shepplogan(size: int = 512) -> TwoD:
     ''' Generate a `size x size` Shepp-Logan phantom.
     '''
     cripAssert(size in [256, 512, 1024], 'Shepp-Logan size should be in [256, 512, 1024]')
@@ -236,10 +236,10 @@ def fitPolyV2D2(x1: NDArray, x2: NDArray, y: NDArray, bias: bool = True) -> NDAr
     return np.linalg.pinv(A) @ y
 
 
-def applyPolyV2D2(coeff: NDArray, x1: NDArray, x2: NDArray):
+def applyPolyV2D2(coeff: NDArray, x1: NDArray, x2: NDArray) -> NDArray:
     ''' Apply a degree-2 polynomial to a pair of variables `x1, x2`.
         `coeff` has 5 or 6 elements, expands to 
-        `c[0] * x1**2 + c[1] * x2**2 + c[2] * x1 * x2 + c[3] * x1 + c[4] * x2 + (c[5] or 0)`
+        `c[0] * x1**2 + c[1] * x2**2 + c[2] * x1 * x2 + c[3] * x1 + c[4] * x2 + (c[5] or 0)`.
     '''
     cripAssert(len(coeff) in [5, 6], '`coeff` should have length of 5 or 6.')
 
@@ -251,11 +251,11 @@ def applyPolyV2D2(coeff: NDArray, x1: NDArray, x2: NDArray):
     return coeff[0] * x1**2 + coeff[1] * x2**2 + coeff[2] * x1 * x2 + coeff[3] * x1 + coeff[4] * x2 + bias
 
 
-def fitPolyV1D2(x1: NDArray, y: NDArray, bias: bool = True):
+def fitPolyV1D2(x1: NDArray, y: NDArray, bias: bool = True) -> NDArray:
     ''' Fit a degree-2 polynomial using pseudo-inverse to a variable `x1`.
-        Output 3 coefficients. If `bias` is False, the last coefficient will be 0.
-
-        `c[0] * x1**2 + c[1] * x1 + c[2]`
+        Output 3 coefficients `c[0~2]`, minimizing the error of `y` and
+        `c[0] * x1**2 + c[1] * x1 + c[2]`.
+        If `bias` is False, `c[2]` will be 0.
     '''
     x1sq = x1.T**2
     x1 = x1.T
@@ -265,10 +265,10 @@ def fitPolyV1D2(x1: NDArray, y: NDArray, bias: bool = True):
     return np.linalg.pinv(A) @ y
 
 
-def applyPolyV1D2(coeff: NDArray, x1: NDArray):
+def applyPolyV1D2(coeff: NDArray, x1: NDArray) -> NDArray:
     ''' Apply a degree-2 polynomial to a variable `x1`.
-        
-        `c[0] * x1**2 + c[1] * x1 + c[2]`
+        `coeff` has 2 or 3 elements, expands to 
+        `c[0] * x1**2 + c[1] * x1 + (c[2] or 0)`.
     '''
     cripAssert(len(coeff) in [2, 3], 'coeff should have length 2 or 3.')
 
