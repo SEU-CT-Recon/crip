@@ -5,24 +5,9 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
+  workflow_dispatch:
 
 jobs:
-  test-on-python37:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: InstallPython37
-        uses: actions/setup-python@v1
-        with:
-          python-version: '3.7'
-      - name: InstallCrip
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-      - name: RunTests
-        run: |
-          python -m unittest discover
-
   test-on-python38:
     runs-on: ubuntu-latest
     steps:
@@ -34,10 +19,10 @@ jobs:
       - name: InstallCrip
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
       - name: RunTests
         run: |
-          python -m unittest discover
+          pytest test
 
   test-on-python39:
     runs-on: ubuntu-latest
@@ -50,10 +35,10 @@ jobs:
       - name: InstallCrip
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
       - name: RunTests
         run: |
-          python -m unittest discover
+          pytest test
 
   test-on-python310:
     runs-on: ubuntu-latest
@@ -66,7 +51,7 @@ jobs:
       - name: InstallCrip
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
       - name: RunTests
         run: |
-          python -m unittest discover
+          pytest test

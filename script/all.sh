@@ -9,4 +9,5 @@ python setup.py sdist bdist_wheel
 twine upload ./dist/crip-$1-py3-none-any.whl
 
 # run all unittests
-python -m unittest discover
+pytest test # basic
+pytest --cov-report html --cov=crip test # with coverage report

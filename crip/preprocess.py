@@ -31,34 +31,40 @@ def averageProjections(projections: ThreeD) -> TwoD:
 @ConvertListNDArray
 def correctFlatDarkField(projections: TwoOrThreeD,
                          flat: Or[TwoD, ThreeD, float, None] = None,
-                         dark: Or[TwoD, ThreeD, float] = 0) -> TwoOrThreeD:
+                         dark: Or[TwoD, ThreeD, float] = 0,
+                         fillNaN: Or[float, None] = 0,
+                         fillInf: Or[float, None] = 0) -> TwoOrThreeD:
     ''' Perform flat field (air) and dark field correction to get post-log projections.
-        If `flat` is 3D and `projections` is also 3D, the correction will be performed view by view.
-        I.e., `- log [(X - D) / (F - D)]`. Multi projections accepted.
-        If flat is None, air is estimated using the brightest pixel by default.
+        I.e., `- log [(X - D) / (F - D)]`.
+        Usually `flat` and `dark` are 2D.
+        If `flat` and `projections` are both 3D, perform view by view.
+        If `flat` is None, estimate it by brightest pixel each view.
     '''
+    if flat is None:
+        cripWarning(False, '`flat` is None. Use the maximum value of each view instead.')
+        flat = np.max(projections, axis=0) * np.ones_like(projections)
+
     sampleProjection = projections if is2D(projections) else projections[0]
 
-    if is2D(flat):
-        cripAssert(isOfSameShape(sampleProjection, flat), '`projection` and `flat` should have same shape.')
-    if is3D(flat):
-        cripAssert(isOfSameShape(projections, flat), '`projection` and `flat` should have same shape.')
-    if is2D(dark):
-        cripAssert(isOfSameShape(sampleProjection, dark), '`projection` and `dark` should have same shape.')
-    if is3D(dark):
-        cripAssert(isOfSameShape(projections, dark), '`projection` and `dark` should have same shape.')
-    if flat is None:
-        cripWarning(False, '`flat` is None. Use the maximum value instead.')
-        flat = np.max(projections)
+    def checkShape(haystack, needle, needleName):
+        cripAssert(
+            isOfSameShape(haystack, needle),
+            f'`projections` and `{needleName}` should have same shape, but got {haystack.shape} and {needle.shape}.')
+
+    checkShape(sampleProjection if is2D(flat) else projections, flat, 'flat')
+    checkShape(sampleProjection if is2D(dark) else projections, dark, 'dark')
 
     numerator = projections - dark
     denominator = flat - dark
-    cripAssert(np.min(numerator > 0), 'Some projections values are not greater than zero.')
-    cripAssert(np.min(denominator > 0), 'Some flat field values are not greater than zero.')
+    cripAssert(np.min(numerator > 0), 'Some `projections` values are not greater than zero after canceling `dark`.')
+    cripAssert(np.min(denominator > 0), 'Some `flat` values are not greater than zero after canceling `dark`.')
 
     res = -np.log(numerator / denominator)
-    res[res == np.inf] = 0
-    res[res == np.nan] = 0
+
+    if fillInf is not None:
+        res[res == np.inf] = fillInf
+    if fillNaN is not None:
+        res[res == np.nan] = fillNaN
 
     return res
 

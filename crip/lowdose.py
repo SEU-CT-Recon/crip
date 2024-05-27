@@ -12,7 +12,10 @@ from .utils import *
 
 
 @ConvertListNDArray
-def injectGaussianNoise(projections: TwoOrThreeD, sigma: float, mu: float = 0) -> TwoOrThreeD:
+def injectGaussianNoise(projections: TwoOrThreeD,
+                        sigma: float,
+                        mu: float = 0,
+                        clipMinMax: Or[None, Tuple[float, float]] = None) -> TwoOrThreeD:
     ''' Inject additive Gaussian noise ~ `N(mu, sigma^2)` where `sigma` is the standard deviation and `mu` is the mean.
     '''
     cripAssert(is2or3D(projections), f'`projections` should be 2 or 3-D, but got {projections.ndim}-D.')
@@ -23,6 +26,10 @@ def injectGaussianNoise(projections: TwoOrThreeD, sigma: float, mu: float = 0) -
         res = np.array(list(map(_inject1, projections)))
     else:
         res = _inject1(projections)
+
+    if clipMinMax is not None:
+        cripAssert(len(clipMinMax) == 2, 'Invalid `clipMinMax`.')
+        res = np.clip(res, *clipMinMax)
 
     return res
 
