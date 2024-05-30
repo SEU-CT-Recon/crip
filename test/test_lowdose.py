@@ -12,10 +12,8 @@ class Test_injectGaussianNoise:
 
     def test_1(self):
         noisy = injectGaussianNoise(self.clean, self.sigma, self.mu)
-
         assert isOfSameShape(noisy, self.clean)
 
         noise = noisy - self.clean
-        another = np.random.randn(*self.clean.shape) * self.sigma + self.mu
-
-        assert stats.ttest_ind(noise.flatten(), another.flatten(), equal_var=True).pvalue > 0.1
+        assert np.mean(noise) == pytest.approx(self.mu, abs=1)
+        assert np.std(noise) == pytest.approx(self.sigma, abs=1)

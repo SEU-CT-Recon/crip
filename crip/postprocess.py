@@ -11,7 +11,7 @@ from ._typing import *
 from .utils import *
 
 
-def fovCropRadius(sid: float, sdd: float, detectorWidth: float, pixelSize: float, roundOff=True) -> float:
+def fovCropRadius(sid: float, sdd: float, detectorWidth: float, pixelSize: float, roundOff=True) -> Or[int, float]:
     ''' Compute the radius [pixel] of the valid FOV of the reconstruction.
         `sid` and `sdd` are Source-Isocenter-Distance and Source-Detector-Distance, respectively.
         `detectorWidth` is the width of the detector, i.e., `#elements * elementWidth`.
@@ -75,7 +75,7 @@ def huNoRescale(image: TwoOrThreeD, b: float = -1000, k: float = 1) -> TwoOrThre
 
 
 @ConvertListNDArray
-def postlogsToProjections(postlogs: TwoOrThreeD, flat: Or[TwoD, float]) -> TwoOrThreeD:
-    ''' Invert `postlog` images to the original projections according to `flat` field.
+def postlogsToRaws(postlogs: TwoOrThreeD, flat: Or[TwoD, float]) -> TwoOrThreeD:
+    ''' Invert `postlog` images to the original raw projections according to `flat` field.
     '''
     return np.exp(-postlogs) * flat
