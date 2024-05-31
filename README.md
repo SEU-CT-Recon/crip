@@ -1,7 +1,7 @@
 <p align="center">
   <img src="crip.png" />
 </p>
-An all-in-one tool for Cone-Beam CT Data IO, Pre/Post-process, Physics, Dual Energy, Low Dose and everything.
+**C**T **R**econ **i**n **P**ython - All-in-one toolkit for CT Data IO, Pre/Post-process, Physics, Dual Energy, Low Dose and everything.
 
 :warning: crip is still under very "agile" development and **no** API consistency and correctness validation between versions are guaranteed. Use at your own risk! :construction:
 

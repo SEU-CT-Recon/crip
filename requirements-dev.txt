@@ -7,3 +7,4 @@ matplotlib
 scikit-image
 periodictable
 pytest
+pooch

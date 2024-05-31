@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import matplotlib.figure
 import matplotlib.patches
 import matplotlib.axes
-from mpl_toolkits.axes_grid1 import ImageGrid
+from mpl_toolkits.axes_grid1 import ImageGrid as MplImageGrid
 
 from ._typing import *
 from .utils import *
@@ -97,84 +97,121 @@ def fontdict(family, weight, size):
     return {'family': family, 'weight': weight, 'size': size}
 
 
-def makeImageGrid(subimages: List[TwoD],
-                  colTitles: List[str],
-                  rowTitles: List[str],
-                  preproc=None,
-                  fontdict=None,
-                  crops=None,
-                  cropLoc='bottom right',
-                  cropSize=96 * 2,
-                  arrows=None,
-                  arrowLen=24):
-    # determine the number of rows and columns
-    ncols = len(colTitles)
-    nrows = len(rowTitles)
-    cripAssert(len(subimages) == ncols * nrows, 'Number of subimages should be equal to ncols * nrows.')
-    cripAssert(crops is None or len(crops) == nrows, 'Number of crops should be equal to nrows.')
-    cripAssert(arrows is None or len(arrows) == nrows, 'Number of arrows should be equal to nrows.')
+class ImageGrid:
+    subimgs: List[TwoD]
+    nrow: int
+    ncol: int
+    fig: matplotlib.figure.Figure
+    grid: MplImageGrid
 
-    # create the figure
-    fig = plt.figure(figsize=(ncols * 2, nrows * 2))
-    grid = ImageGrid(fig, 111, nrows_ncols=(nrows, ncols), axes_pad=0)
+    def __init__(self, subimgs: List[TwoD], nrow: int, ncol: int) -> None:
+        ''' Initialize the ImageGrid with `subimgs` in `nrow` * `ncol` layout.
+        '''
+        self.subimgs = subimgs
+        self.nrow = nrow
+        self.ncol = ncol
+        cripAssert(len(subimgs) == nrow * ncol, 'Number of subimages should be equal to nrow * ncol.')
 
-    # apply the preprocessor
-    if preproc:
-        subimages = list(map(lambda ix: preproc(*ix), list(enumerate(subimages))))
+    def setTitles(self, rowTitles: List[str], colTitles: List[str]):
+        ''' Set the row and column titles.
+        '''
+        self.rowTitles = rowTitles
+        self.colTitles = colTitles
 
-    def overlayPatch(img, patch, loc):
-        if loc == 'bottom left':
-            img[-patch.shape[0]:, :patch.shape[1]] = patch
-            box = matplotlib.patches.Rectangle((0, img.shape[0] - patch.shape[0]),
-                                               patch.shape[1],
-                                               patch.shape[0],
-                                               linewidth=1,
-                                               edgecolor='yellow',
-                                               facecolor='none')
-            return box
-        else:
-            raise 'Invalid cropLoc, not in `bottom left`.'
+    def setPreprocessor(self, fn: Callable):
+        ''' Set the preprocessor for the subimages.
+            A preprocessor is a function that takes the index of a subimage and the subimage and returns a new one.
+        '''
+        self.preprocessor = fn
 
-    # display the subimages
-    cur = 0
-    for ax, img in zip(grid, subimages):
-        # remove the ticks and spines
-        ax.get_xaxis().set_ticks([])
-        ax.get_yaxis().set_ticks([])
-        list(map(lambda x: x.set_visible(False), ax.spines.values()))
+    def setFontdict(self, fontdict):
+        ''' Set the fontdict for the texts in the figure.
+        '''
+        self.fontdict = fontdict
 
-        # prepare the image crop
-        box = None
-        if crops is not None and crops[cur // ncols]:
-            r, c, hw = crops[cur // ncols]
-            patch = resizeTo(zoomIn(img, r, c, hw, hw), (cropSize, cropSize))
-            box = overlayPatch(img, patch, cropLoc)
+    def setCrops(self):
+        pass
 
-        # display the image
-        ax.imshow(img, cmap='gray', vmin=0, vmax=1)
+        def overlayPatch(img, patch, loc):
+            if loc == 'bottom left':
+                img[-patch.shape[0]:, :patch.shape[1]] = patch
+                box = matplotlib.patches.Rectangle((0, img.shape[0] - patch.shape[0]),
+                                                   patch.shape[1],
+                                                   patch.shape[0],
+                                                   linewidth=1,
+                                                   edgecolor='yellow',
+                                                   facecolor='none')
+                return box
+            else:
+                raise 'Invalid cropLoc, not in `bottom left`.'
 
-        # display the crop box
-        box and ax.add_patch(box)
-        if box and cur % ncols == 0:
-            r, c, hw = crops[cur // ncols]
-            box = matplotlib.patches.Rectangle((c, r), hw, hw, linewidth=0.8, edgecolor='yellow', facecolor='none')
-            ax.add_patch(box)
+    def setArrows(self):
+        pass
 
-        # display the arrow
-        if arrows is not None and arrows[cur // ncols]:
-            r, c = arrows[cur // ncols]
-            ax.arrow(c + arrowLen, r - arrowLen, -arrowLen, +arrowLen, color='yellow', head_width=10)
+    def fig(self):
+        ''' Execute the plot and return the figure.
+        '''
+        # preprocess the subimages
+        if self.preprocessor is not None:
+            self.subimages = list(map(lambda ix: self.preprocessor(*ix), list(enumerate(self.subimages))))
 
-        # display the column titles
-        if cur < len(colTitles):
-            ax.set_title(colTitles[cur], loc='center', fontdict=fontdict)
-        cur += 1
+        # create the figure
+        self.fig = plt.figure(figsize=(self.ncol * 2, self.nrow * 2))
+        self.grid = MplImageGrid(self.fig, 111, nrows_ncols=(self.nrow, self.ncol), axes_pad=0)
 
-    # display the row titles
-    for i in range(nrows):
-        grid[ncols * i].set_ylabel(rowTitles[i], fontdict=fontdict)
+        # display the subimages
+        cur = 0
+        for ax, img in zip(self.grid, self.subimages):
+            # remove the ticks and spines
+            ax.get_xaxis().set_ticks([])
+            ax.get_yaxis().set_ticks([])
+            list(map(lambda x: x.set_visible(False), ax.spines.values()))
 
-    return fig
+            # prepare the image crop
+            # box = None
+            # if crops is not None and crops[cur // ncols]:
+            #     r, c, hw = crops[cur // ncols]
+            #     patch = resizeTo(zoomIn(img, r, c, hw, hw), (cropSize, cropSize))
+            #     box = overlayPatch(img, patch, cropLoc)
+
+            # display the image
+            ax.imshow(img, cmap='gray', vmin=0, vmax=1)
+
+            # display the crop box
+            # box and ax.add_patch(box)
+            # if box and cur % ncols == 0:
+            #     r, c, hw = crops[cur // ncols]
+            #     box = matplotlib.patches.Rectangle((c, r), hw, hw, linewidth=0.8, edgecolor='yellow', facecolor='none')
+            #     ax.add_patch(box)
+
+            # display the arrow
+            # if arrows is not None and arrows[cur // ncols]:
+            #     r, c = arrows[cur // ncols]
+            #     ax.arrow(c + arrowLen, r - arrowLen, -arrowLen, +arrowLen, color='yellow', head_width=10)
+
+            # display the column titles
+            # if cur < len(colTitles):
+            #     ax.set_title(colTitles[cur], loc='center', fontdict=fontdict)
+            # cur += 1
+
+        # display the row titles
+        if self.rowTitles:
+            for i in range(self.nrows):
+                self.grid[self.ncols * i].set_ylabel(self.rowTitles[i], fontdict=fontdict)
+
+        return self.fig
+
+
+# def makeImageGrid(subimages: List[TwoD],
+#                   colTitles: List[str],
+#                   rowTitles: List[str],
+#                   preproc=None,
+#                   fontdict=None,
+#                   crops=None,
+#                   cropLoc='bottom right',
+#                   cropSize=96 * 2,
+#                   arrows=None,
+#                   arrowLen=24):
 
 
 def plotSpectrum(ax: matplotlib.axes.Axes, spec: Spectrum):

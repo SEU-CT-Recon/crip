@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="pdoc 14.4.0"/>
+    <meta name="generator" content="pdoc 14.3.0"/>
     <title>crip.spec API documentation</title>
 
     <style>/*! * Bootstrap Reboot v5.0.0 (https://getbootstrap.com/) * Copyright 2011-2021 The Bootstrap Authors * Copyright 2011-2021 Twitter, Inc. * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE) * Forked from Normalize.css, licensed MIT (https://github.com/necolas/normalize.css/blob/master/LICENSE.md) */*,::after,::before{box-sizing:border-box}@media (prefers-reduced-motion:no-preference){:root{scroll-behavior:smooth}}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";font-size:1rem;font-weight:400;line-height:1.5;color:#212529;background-color:#fff;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}hr{margin:1rem 0;color:inherit;background-color:currentColor;border:0;opacity:.25}hr:not([size]){height:1px}h1,h2,h3,h4,h5,h6{margin-top:0;margin-bottom:.5rem;font-weight:500;line-height:1.2}h1{font-size:calc(1.375rem + 1.5vw)}@media (min-width:1200px){h1{font-size:2.5rem}}h2{font-size:calc(1.325rem + .9vw)}@media (min-width:1200px){h2{font-size:2rem}}h3{font-size:calc(1.3rem + .6vw)}@media (min-width:1200px){h3{font-size:1.75rem}}h4{font-size:calc(1.275rem + .3vw)}@media (min-width:1200px){h4{font-size:1.5rem}}h5{font-size:1.25rem}h6{font-size:1rem}p{margin-top:0;margin-bottom:1rem}abbr[data-bs-original-title],abbr[title]{-webkit-text-decoration:underline dotted;text-decoration:underline dotted;cursor:help;-webkit-text-decoration-skip-ink:none;text-decoration-skip-ink:none}address{margin-bottom:1rem;font-style:normal;line-height:inherit}ol,ul{padding-left:2rem}dl,ol,ul{margin-top:0;margin-bottom:1rem}ol ol,ol ul,ul ol,ul ul{margin-bottom:0}dt{font-weight:700}dd{margin-bottom:.5rem;margin-left:0}blockquote{margin:0 0 1rem}b,strong{font-weight:bolder}small{font-size:.875em}mark{padding:.2em;background-color:#fcf8e3}sub,sup{position:relative;font-size:.75em;line-height:0;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}a{color:#0d6efd;text-decoration:underline}a:hover{color:#0a58ca}a:not([href]):not([class]),a:not([href]):not([class]):hover{color:inherit;text-decoration:none}code,kbd,pre,samp{font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:1em;direction:ltr;unicode-bidi:bidi-override}pre{display:block;margin-top:0;margin-bottom:1rem;overflow:auto;font-size:.875em}pre code{font-size:inherit;color:inherit;word-break:normal}code{font-size:.875em;color:#d63384;word-wrap:break-word}a>code{color:inherit}kbd{padding:.2rem .4rem;font-size:.875em;color:#fff;background-color:#212529;border-radius:.2rem}kbd kbd{padding:0;font-size:1em;font-weight:700}figure{margin:0 0 1rem}img,svg{vertical-align:middle}table{caption-side:bottom;border-collapse:collapse}caption{padding-top:.5rem;padding-bottom:.5rem;color:#6c757d;text-align:left}th{text-align:inherit;text-align:-webkit-match-parent}tbody,td,tfoot,th,thead,tr{border-color:inherit;border-style:solid;border-width:0}label{display:inline-block}button{border-radius:0}button:focus:not(:focus-visible){outline:0}button,input,optgroup,select,textarea{margin:0;font-family:inherit;font-size:inherit;line-height:inherit}button,select{text-transform:none}[role=button]{cursor:pointer}select{word-wrap:normal}select:disabled{opacity:1}[list]::-webkit-calendar-picker-indicator{display:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button}[type=button]:not(:disabled),[type=reset]:not(:disabled),[type=submit]:not(:disabled),button:not(:disabled){cursor:pointer}::-moz-focus-inner{padding:0;border-style:none}textarea{resize:vertical}fieldset{min-width:0;padding:0;margin:0;border:0}legend{float:left;width:100%;padding:0;margin-bottom:.5rem;font-size:calc(1.275rem + .3vw);line-height:inherit}@media (min-width:1200px){legend{font-size:1.5rem}}legend+*{clear:left}::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-fields-wrapper,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-minute,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-text,::-webkit-datetime-edit-year-field{padding:0}::-webkit-inner-spin-button{height:auto}[type=search]{outline-offset:-2px;-webkit-appearance:textfield}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-color-swatch-wrapper{padding:0}::file-selector-button{font:inherit}::-webkit-file-upload-button{font:inherit;-webkit-appearance:button}output{display:inline-block}iframe{border:0}summary{display:list-item;cursor:pointer}progress{vertical-align:baseline}[hidden]{display:none!important}</style>
@@ -56,6 +56,18 @@
             </li>
             <li>
                     <a class="function" href="#compose3">compose3</a>
+            </li>
+            <li>
+                    <a class="function" href="#vmi2Mat">vmi2Mat</a>
+            </li>
+            <li>
+                    <a class="function" href="#vmi3Mat">vmi3Mat</a>
+            </li>
+            <li>
+                    <a class="function" href="#deSubtration">deSubtration</a>
+            </li>
+            <li>
+                    <a class="function" href="#vncBasis">vncBasis</a>
             </li>
     </ul>
 
@@ -271,6 +283,30 @@
 </span><span id="L-187"><a href="#L-187"><span class="linenos">187</span></a>
 </span><span id="L-188"><a href="#L-188"><span class="linenos">188</span></a><span class="k">def</span> <span class="nf">compose3</span><span class="p">(</span><span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">b3</span><span class="p">,</span> <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">v3</span><span class="p">):</span>
 </span><span id="L-189"><a href="#L-189"><span class="linenos">189</span></a>    <span class="k">return</span> <span class="n">b1</span> <span class="o">*</span> <span class="n">v1</span> <span class="o">+</span> <span class="n">b2</span> <span class="o">*</span> <span class="n">v2</span> <span class="o">+</span> <span class="n">b3</span> <span class="o">*</span> <span class="n">v3</span>
+</span><span id="L-190"><a href="#L-190"><span class="linenos">190</span></a>
+</span><span id="L-191"><a href="#L-191"><span class="linenos">191</span></a>
+</span><span id="L-192"><a href="#L-192"><span class="linenos">192</span></a><span class="k">def</span> <span class="nf">vmi2Mat</span><span class="p">(</span><span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">b1Mat</span><span class="p">,</span> <span class="n">b2Mat</span><span class="p">,</span> <span class="n">E</span><span class="p">):</span>
+</span><span id="L-193"><a href="#L-193"><span class="linenos">193</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39; Virtual Monoenergetic Imaging using two-material decomposition.</span>
+</span><span id="L-194"><a href="#L-194"><span class="linenos">194</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-195"><a href="#L-195"><span class="linenos">195</span></a>    <span class="k">pass</span>
+</span><span id="L-196"><a href="#L-196"><span class="linenos">196</span></a>
+</span><span id="L-197"><a href="#L-197"><span class="linenos">197</span></a>
+</span><span id="L-198"><a href="#L-198"><span class="linenos">198</span></a><span class="k">def</span> <span class="nf">vmi3Mat</span><span class="p">(</span><span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">b1Mat</span><span class="p">,</span> <span class="n">b2Mat</span><span class="p">,</span> <span class="n">E</span><span class="p">):</span>
+</span><span id="L-199"><a href="#L-199"><span class="linenos">199</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39; Virtual Monoenergetic Imaging using three-material decomposition.</span>
+</span><span id="L-200"><a href="#L-200"><span class="linenos">200</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-201"><a href="#L-201"><span class="linenos">201</span></a>    <span class="k">pass</span>
+</span><span id="L-202"><a href="#L-202"><span class="linenos">202</span></a>
+</span><span id="L-203"><a href="#L-203"><span class="linenos">203</span></a>
+</span><span id="L-204"><a href="#L-204"><span class="linenos">204</span></a><span class="k">def</span> <span class="nf">deSubtration</span><span class="p">():</span>
+</span><span id="L-205"><a href="#L-205"><span class="linenos">205</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39; Dual-Energy Subtraction.</span>
+</span><span id="L-206"><a href="#L-206"><span class="linenos">206</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-207"><a href="#L-207"><span class="linenos">207</span></a>    <span class="k">pass</span>
+</span><span id="L-208"><a href="#L-208"><span class="linenos">208</span></a>
+</span><span id="L-209"><a href="#L-209"><span class="linenos">209</span></a>
+</span><span id="L-210"><a href="#L-210"><span class="linenos">210</span></a><span class="k">def</span> <span class="nf">vncBasis</span><span class="p">():</span>
+</span><span id="L-211"><a href="#L-211"><span class="linenos">211</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39; Construct Virtual Non-Contrast basis.</span>
+</span><span id="L-212"><a href="#L-212"><span class="linenos">212</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-213"><a href="#L-213"><span class="linenos">213</span></a>    <span class="k">pass</span>
 </span></pre></div>
 
 
@@ -612,6 +648,98 @@ base: the reference HU of another material.</p>
 
 
     
+
+                </section>
+                <section id="vmi2Mat">
+                            <input id="vmi2Mat-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">vmi2Mat</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">b1</span>, </span><span class="param"><span class="n">b2</span>, </span><span class="param"><span class="n">b1Mat</span>, </span><span class="param"><span class="n">b2Mat</span>, </span><span class="param"><span class="n">E</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="vmi2Mat-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#vmi2Mat"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="vmi2Mat-193"><a href="#vmi2Mat-193"><span class="linenos">193</span></a><span class="k">def</span> <span class="nf">vmi2Mat</span><span class="p">(</span><span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">b1Mat</span><span class="p">,</span> <span class="n">b2Mat</span><span class="p">,</span> <span class="n">E</span><span class="p">):</span>
+</span><span id="vmi2Mat-194"><a href="#vmi2Mat-194"><span class="linenos">194</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39; Virtual Monoenergetic Imaging using two-material decomposition.</span>
+</span><span id="vmi2Mat-195"><a href="#vmi2Mat-195"><span class="linenos">195</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="vmi2Mat-196"><a href="#vmi2Mat-196"><span class="linenos">196</span></a>    <span class="k">pass</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Virtual Monoenergetic Imaging using two-material decomposition.</p>
+</div>
+
+
+                </section>
+                <section id="vmi3Mat">
+                            <input id="vmi3Mat-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">vmi3Mat</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">b1</span>, </span><span class="param"><span class="n">b2</span>, </span><span class="param"><span class="n">b1Mat</span>, </span><span class="param"><span class="n">b2Mat</span>, </span><span class="param"><span class="n">E</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="vmi3Mat-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#vmi3Mat"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="vmi3Mat-199"><a href="#vmi3Mat-199"><span class="linenos">199</span></a><span class="k">def</span> <span class="nf">vmi3Mat</span><span class="p">(</span><span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">b1Mat</span><span class="p">,</span> <span class="n">b2Mat</span><span class="p">,</span> <span class="n">E</span><span class="p">):</span>
+</span><span id="vmi3Mat-200"><a href="#vmi3Mat-200"><span class="linenos">200</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39; Virtual Monoenergetic Imaging using three-material decomposition.</span>
+</span><span id="vmi3Mat-201"><a href="#vmi3Mat-201"><span class="linenos">201</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="vmi3Mat-202"><a href="#vmi3Mat-202"><span class="linenos">202</span></a>    <span class="k">pass</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Virtual Monoenergetic Imaging using three-material decomposition.</p>
+</div>
+
+
+                </section>
+                <section id="deSubtration">
+                            <input id="deSubtration-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">deSubtration</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="deSubtration-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#deSubtration"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="deSubtration-205"><a href="#deSubtration-205"><span class="linenos">205</span></a><span class="k">def</span> <span class="nf">deSubtration</span><span class="p">():</span>
+</span><span id="deSubtration-206"><a href="#deSubtration-206"><span class="linenos">206</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39; Dual-Energy Subtraction.</span>
+</span><span id="deSubtration-207"><a href="#deSubtration-207"><span class="linenos">207</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="deSubtration-208"><a href="#deSubtration-208"><span class="linenos">208</span></a>    <span class="k">pass</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Dual-Energy Subtraction.</p>
+</div>
+
+
+                </section>
+                <section id="vncBasis">
+                            <input id="vncBasis-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">vncBasis</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="vncBasis-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#vncBasis"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="vncBasis-211"><a href="#vncBasis-211"><span class="linenos">211</span></a><span class="k">def</span> <span class="nf">vncBasis</span><span class="p">():</span>
+</span><span id="vncBasis-212"><a href="#vncBasis-212"><span class="linenos">212</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39; Construct Virtual Non-Contrast basis.</span>
+</span><span id="vncBasis-213"><a href="#vncBasis-213"><span class="linenos">213</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="vncBasis-214"><a href="#vncBasis-214"><span class="linenos">214</span></a>    <span class="k">pass</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Construct Virtual Non-Contrast basis.</p>
+</div>
+
 
                 </section>
     </main>

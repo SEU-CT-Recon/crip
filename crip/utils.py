@@ -13,10 +13,10 @@ import functools
 from ._typing import *
 
 
-def readFileText(path_: str) -> str:
+def readFileText(path_: str, encoding=None) -> str:
     ''' Read text file.
     '''
-    with open(path_, 'r') as fp:
+    with open(path_, 'r', encoding=encoding) as fp:
         content = fp.read()
 
     return content
