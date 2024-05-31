@@ -4,7 +4,7 @@
 
 CT Recon in Python (crip) is an All-in-one toolkit for CT Data IO, Pre/Post-process, Physics, Dual Energy, Low Dose and everything.
 
-:warning: crip is still under very "agile" development and **no** API consistency and correctness validation between versions are guaranteed. Use at your own risk! :construction: Check [Unit Test Coverage](seu-ct-recon.github.io/crip/htmlcov) to find relatively reliable functions.
+:warning: crip is still under very "agile" development and **no** API consistency and correctness validation between versions are guaranteed. Use at your own risk! :construction: Check [Unit Test Coverage](https://seu-ct-recon.github.io/crip/htmlcov) to find relatively reliable functions.
 
 ## Install
 
@@ -16,8 +16,8 @@ pip install crip
 
 ## Documentation
 
-- [Official documentation](seu-ct-recon.github.io/crip)
-- [Unit Test Coverage](seu-ct-recon.github.io/crip/htmlcov)
+- [Official documentation](https://seu-ct-recon.github.io/crip)
+- [Unit Test Coverage](https://seu-ct-recon.github.io/crip/htmlcov)
 - Ask everything in [issue](https://github.com/SEU-CT-Recon/crip/issues).
 
 ## License
