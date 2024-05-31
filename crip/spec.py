@@ -182,32 +182,36 @@ def genMaterialPhantom(img, zsmooth=3, sigma=1, l=80, h=300, base=1000):
 
 
 def compose2(b1, b2, v1, v2):
+    ''' Compose two vectors `(v1, v2)` by coeffs `(b1, b2)`.
+    '''
     return b1 * v1 + b2 * v2
 
 
 def compose3(b1, b2, b3, v1, v2, v3):
+    ''' Compose two vectors `(v1, v2, v3)` by coeffs `(b1, b2, b3)`.
+    '''
     return b1 * v1 + b2 * v2 + b3 * v3
 
 
-def vmi2Mat(b1, b2, b1Mat, b2Mat, E):
+def vmi2Mat(b1, b2, b1Mat: Atten, b2Mat: Atten, E: int):
     ''' Virtual Monoenergetic Imaging using two-material decomposition.
     '''
-    pass
+    return b1 * b1Mat.mu[E] + b2 * b2Mat.mu[E]
 
 
-def vmi3Mat(b1, b2, b1Mat, b2Mat, E):
+def vmi3Mat(b1, b2, b3, b1Mat, b2Mat, b3Mat, E):
     ''' Virtual Monoenergetic Imaging using three-material decomposition.
     '''
-    pass
+    return b1 * b1Mat.mu[E] + b2 * b2Mat.mu[E] + b3 * b3Mat.mu[E]
 
 
-def deSubtration():
-    ''' Dual-Energy Subtraction.
+def deSubtration(low: TwoOrThreeD, high: TwoOrThreeD, kLow: float, kHigh: float = 1) -> TwoOrThreeD:
+    ''' Dual-Energy subtraction for e.g. bone removal in CT slices or X-ray DR projections.
     '''
-    pass
+    return kHigh * high - kLow * low
 
 
-def vncBasis():
-    ''' Construct Virtual Non-Contrast basis.
-    '''
-    pass
+# def vncBasis():
+#     ''' Construct Virtual Non-Contrast basis.
+#     '''
+#     pass

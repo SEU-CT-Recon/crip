@@ -80,10 +80,12 @@ def resizeTo(img: TwoOrThreeD, dsize: Tuple[int], interp='bicubic') -> TwoOrThre
 
 
 @ConvertListNDArray
-def resizeBy(img: TwoOrThreeD, factor: Tuple[int], interp='bicubic') -> TwoOrThreeD:
-    ''' Resize each image by `factor=(fH, fW)` using `interp` [bicubic, linear, nearest].
+def resizeBy(img: TwoOrThreeD, factor: Or[Tuple[float], float], interp='bicubic') -> TwoOrThreeD:
+    ''' Resize each slice in img by `factor=(fH, fW)` or `(f, f)` float using `interp` [bicubic, linear, nearest].
     '''
     cripAssert(interp in ['bicubic', 'linear', 'nearest'], f'Invalid interp method: {interp}.')
+    if not isType(factor, Tuple):
+        factor = (factor, factor)
     cripAssert(len(factor) == 2, '`factor` should be 2D.')
 
     interp_ = {'bicubic': cv2.INTER_CUBIC, 'linear': cv2.INTER_LINEAR, 'nearest': cv2.INTER_NEAREST}
@@ -93,6 +95,7 @@ def resizeBy(img: TwoOrThreeD, factor: Tuple[int], interp='bicubic') -> TwoOrThr
         res = [cv2.resize(img[i, ...], None, None, fW, fH, interpolation=interp_[interp]) for i in range(img.shape[0])]
         return np.array(res)
     else:
+        print(img, fW, fH, interp_[interp])
         return cv2.resize(img, None, None, fW, fH, interpolation=interp_[interp])
 
 
@@ -106,14 +109,21 @@ def resize3D(img: ThreeD, factor: Tuple[int], order=3) -> ThreeD:
 
 
 @ConvertListNDArray
-def gaussianSmooth(img: TwoOrThreeD, sigma: Or[float, int, Tuple[Or[float, int]]], ksize: int = None) -> TwoOrThreeD:
+def gaussianSmooth(img: TwoOrThreeD,
+                   sigma: Or[float, int, Tuple[Or[float, int]]],
+                   ksize: Or[Tuple[int], int, None] = None) -> TwoOrThreeD:
     ''' Perform Gaussian smooth with kernel size `ksize` and Gaussian sigma = `sigma` [int or tuple (row, col)].
         Leave `ksize=None` to auto determine it to include the majority of kernel energy.
     '''
     if ksize is not None:
-        cripAssert(isInt(ksize), 'ksize should be int.')
+        if not isType(ksize, Sequence):
+            cripAssert(isInt(ksize), 'ksize should be int or sequence of int.')
+            ksize = (ksize, ksize)
+        else:
+            cripAssert(len(ksize) == 2, 'ksize should have length 2.')
+            cripAssert(isInt(ksize[0]) and isInt(ksize[1]), 'ksize should be int or sequence of int.')
 
-    if not isType(sigma, Tuple):
+    if not isType(sigma, Sequence):
         sigma = (sigma, sigma)
 
     if is3D(img):

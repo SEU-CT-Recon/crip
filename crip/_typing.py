@@ -5,7 +5,7 @@
 '''
 
 import numpy as np
-from typing import List, Union, Any, Dict, Callable, Iterable, Tuple
+from typing import List, Union, Any, Dict, Callable, Iterable, Tuple, Sequence
 
 DefaultFloatDType = np.float32  # Default data type for decimal numbers
 DefaultEnergyUnit = 'keV'  # Default energy unit

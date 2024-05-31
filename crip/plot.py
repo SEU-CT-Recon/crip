@@ -104,13 +104,25 @@ class ImageGrid:
     fig: matplotlib.figure.Figure
     grid: MplImageGrid
 
+    # titles
+    rowTitles: List[str] = None
+    colTitles: List[str] = None
+    # preprocessor
+    preprocessor: Callable = None
+    # fontdict
+    fontdict: Dict = None
+    # crops
+    crops: List[Tuple[int, int, int]] = None
+    cropLoc: str = 'bottom left'
+    cropSize: int = 96 * 2
+
     def __init__(self, subimgs: List[TwoD], nrow: int, ncol: int) -> None:
         ''' Initialize the ImageGrid with `subimgs` in `nrow` * `ncol` layout.
         '''
         self.subimgs = subimgs
         self.nrow = nrow
         self.ncol = ncol
-        cripAssert(len(subimgs) == nrow * ncol, 'Number of subimages should be equal to nrow * ncol.')
+        cripAssert(len(subimgs) == nrow * ncol, 'Number of subimages should be equal to `nrow * ncol`.')
 
     def setTitles(self, rowTitles: List[str], colTitles: List[str]):
         ''' Set the row and column titles.
@@ -124,29 +136,28 @@ class ImageGrid:
         '''
         self.preprocessor = fn
 
-    def setFontdict(self, fontdict):
+    def setFontdict(self, fontdict: Dict):
         ''' Set the fontdict for the texts in the figure.
         '''
         self.fontdict = fontdict
 
-    def setCrops(self):
-        pass
+    def setCrops(self, crops, cropLoc='bottom left', cropSize=96 * 2):
+        self.crops = crops
+        self.cropLoc = cropLoc
+        self.cropSize = cropSize
 
-        def overlayPatch(img, patch, loc):
-            if loc == 'bottom left':
-                img[-patch.shape[0]:, :patch.shape[1]] = patch
-                box = matplotlib.patches.Rectangle((0, img.shape[0] - patch.shape[0]),
-                                                   patch.shape[1],
-                                                   patch.shape[0],
-                                                   linewidth=1,
-                                                   edgecolor='yellow',
-                                                   facecolor='none')
-                return box
-            else:
-                raise 'Invalid cropLoc, not in `bottom left`.'
-
-    def setArrows(self):
-        pass
+    def _overlayPatch(self, img, patch, loc):
+        if loc == 'bottom left':
+            img[-patch.shape[0]:, :patch.shape[1]] = patch
+            box = matplotlib.patches.Rectangle((0, img.shape[0] - patch.shape[0]),
+                                               patch.shape[1],
+                                               patch.shape[0],
+                                               linewidth=1,
+                                               edgecolor='yellow',
+                                               facecolor='none')
+            return box
+        else:
+            cripAssert(False, 'Currently only loc at `bottom left` is supported.')
 
     def fig(self):
         ''' Execute the plot and return the figure.
@@ -168,31 +179,26 @@ class ImageGrid:
             list(map(lambda x: x.set_visible(False), ax.spines.values()))
 
             # prepare the image crop
-            # box = None
-            # if crops is not None and crops[cur // ncols]:
-            #     r, c, hw = crops[cur // ncols]
-            #     patch = resizeTo(zoomIn(img, r, c, hw, hw), (cropSize, cropSize))
-            #     box = overlayPatch(img, patch, cropLoc)
+            box = None
+            if self.crops is not None and self.crops[cur // self.ncol]:
+                r, c, hw = self.crops[cur // self.ncol]
+                patch = resizeTo(zoomIn(img, r, c, hw, hw), (self.cropSize, self.cropSize))
+                box = self._overlayPatch(img, patch, self.cropLoc)
 
             # display the image
             ax.imshow(img, cmap='gray', vmin=0, vmax=1)
 
             # display the crop box
-            # box and ax.add_patch(box)
-            # if box and cur % ncols == 0:
-            #     r, c, hw = crops[cur // ncols]
-            #     box = matplotlib.patches.Rectangle((c, r), hw, hw, linewidth=0.8, edgecolor='yellow', facecolor='none')
-            #     ax.add_patch(box)
-
-            # display the arrow
-            # if arrows is not None and arrows[cur // ncols]:
-            #     r, c = arrows[cur // ncols]
-            #     ax.arrow(c + arrowLen, r - arrowLen, -arrowLen, +arrowLen, color='yellow', head_width=10)
+            box and ax.add_patch(box)
+            if box and cur % self.ncol == 0:
+                r, c, hw = self.crops[cur // self.ncol]
+                box = matplotlib.patches.Rectangle((c, r), hw, hw, linewidth=0.8, edgecolor='yellow', facecolor='none')
+                ax.add_patch(box)
 
             # display the column titles
-            # if cur < len(colTitles):
-            #     ax.set_title(colTitles[cur], loc='center', fontdict=fontdict)
-            # cur += 1
+            if self.colTitles and cur < len(self.colTitles):
+                ax.set_title(self.colTitles[cur], loc='center', fontdict=fontdict)
+            cur += 1
 
         # display the row titles
         if self.rowTitles:
@@ -200,18 +206,6 @@ class ImageGrid:
                 self.grid[self.ncols * i].set_ylabel(self.rowTitles[i], fontdict=fontdict)
 
         return self.fig
-
-
-# def makeImageGrid(subimages: List[TwoD],
-#                   colTitles: List[str],
-#                   rowTitles: List[str],
-#                   preproc=None,
-#                   fontdict=None,
-#                   crops=None,
-#                   cropLoc='bottom right',
-#                   cropSize=96 * 2,
-#                   arrows=None,
-#                   arrowLen=24):
 
 
 def plotSpectrum(ax: matplotlib.axes.Axes, spec: Spectrum):
