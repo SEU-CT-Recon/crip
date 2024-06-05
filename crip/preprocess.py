@@ -32,8 +32,7 @@ def averageProjections(projections: ThreeD) -> TwoD:
 def correctFlatDarkField(projections: TwoOrThreeD,
                          flat: Or[TwoD, ThreeD, float, None] = None,
                          dark: Or[TwoD, ThreeD, float] = 0,
-                         fillNaN: Or[float, None] = 0,
-                         fillInf: Or[float, None] = 0) -> TwoOrThreeD:
+                         fillNaN: Or[float, None] = 0) -> TwoOrThreeD:
     ''' Perform flat field (air) and dark field correction to get post-log projections.
         I.e., `- log [(X - D) / (F - D)]`.
         Usually `flat` and `dark` are 2D.
@@ -42,7 +41,13 @@ def correctFlatDarkField(projections: TwoOrThreeD,
     '''
     if flat is None:
         cripWarning(False, '`flat` is None. Use the maximum value of each view instead.')
-        flat = np.max(projections, axis=0) * np.ones_like(projections)
+        flat = np.max(projections.reshape((projections.shape[0], -1)), axis=1)
+        flat = np.ones_like(projections) * flat[:, np.newaxis, np.newaxis]
+
+    if not isType(flat, np.ndarray):
+        flat = np.ones_like(projections) * flat
+    if not isType(dark, np.ndarray):
+        dark = np.ones_like(projections) * dark
 
     sampleProjection = projections if is2D(projections) else projections[0]
 
@@ -56,15 +61,13 @@ def correctFlatDarkField(projections: TwoOrThreeD,
 
     numerator = projections - dark
     denominator = flat - dark
-    cripAssert(np.min(numerator > 0), 'Some `projections` values are not greater than zero after canceling `dark`.')
-    cripAssert(np.min(denominator > 0), 'Some `flat` values are not greater than zero after canceling `dark`.')
+    cripWarning(np.min(numerator > 0), 'Some `projections` values are not greater than zero after canceling `dark`.')
+    cripWarning(np.min(denominator > 0), 'Some `flat` values are not greater than zero after canceling `dark`.')
 
     res = -np.log(numerator / denominator)
 
-    if fillInf is not None:
-        res[res == np.inf] = fillInf
     if fillNaN is not None:
-        res[res == np.nan] = fillNaN
+        res = np.nan_to_num(res, nan=fillNaN)
 
     return res
 
@@ -102,39 +105,35 @@ def sinogramsToProjections(sinograms: ThreeD):
 @ConvertListNDArray
 def padImage(img: TwoOrThreeD,
              padding: Tuple[int, int, int, int],
-             mode: str = 'symmetric',
-             decay: Or[str, None] = None):
+             mode: str = 'reflect',
+             decay: bool = False,
+             cval: float = 0):
     '''
-        Pad the image on four directions using symmetric `padding` (Up, Right, Down, Left). \\
-        `mode` determines the border value, can be `symmetric`, `edge`, `constant` (zero), `reflect`. \\
-        `decay` can be None, `cosine`, `smoothCosine` to perform a decay on padded border.
+        Pad each 2D image on four directions using symmetric `padding` (Up, Right, Down, Left).
+        `mode` determines the border value, can be `edge`, `constant` (with `cval`), `reflect`.
+        `decay` can be True to smooth padded border.
     '''
-    cripAssert(mode in ['symmetric', 'edge', 'constant', 'reflect'], f'Invalid mode: {mode}.')
-    cripAssert(decay in [None, 'cosine', 'smoothCosine'], f'Invalid decay: {decay}.')
+    cripAssert(mode in ['edge', 'constant', 'reflect'], f'Invalid mode: {mode}.')
 
-    decays = {
-        'cosine':
-            lambda ascend, dot: np.cos(np.linspace(-np.pi / 2, 0, dot) if ascend else np.linspace(0, np.pi / 2, dot)),
-        'smoothCosine':
-            lambda ascend, dot: 0.5 * np.cos(np.linspace(-np.pi, 0, dot)) + 0.5
-            if ascend else 0.5 * np.cos(np.linspace(0, np.pi, dot)) + 0.5
-    }
+    cosineDecay = lambda ascend, dot: np.cos(
+        np.linspace(-np.pi / 2, 0, dot) if ascend else np.linspace(0, np.pi / 2, dot)),
 
     h, w = getHnW(img)
     nPadU, nPadR, nPadD, nPadL = padding
     padH = h + nPadU + nPadD
     padW = w + nPadL + nPadR
 
-    def decayLR(xPad, w, nPadL, nPadR, decay):
-        xPad[:, 0:nPadL] *= decay(True, nPadL)[:]
-        xPad[:, w - nPadR:w] *= decay(False, nPadR)[:]
+    def decayLR(xPad, w, nPadL, nPadR):
+        xPad[:, 0:nPadL] *= cosineDecay(True, nPadL)[:]
+        xPad[:, w - nPadR:w] *= cosineDecay(False, nPadR)[:]
         return xPad
 
     def procOne(img):
-        xPad = np.pad(img, ((nPadU, nPadD), (nPadL, nPadR)), mode=mode)
-        if decay is not None:
-            xPad = decayLR(xPad, padW, nPadL, nPadR, decays[decay])
-            xPad = decayLR(xPad.T, padH, nPadU, nPadD, decays[decay])
+        kwargs = {'constant_values': cval} if mode == 'constant' else {}
+        xPad = np.pad(img, ((nPadU, nPadD), (nPadL, nPadR)), mode=mode, **kwargs)
+        if decay:
+            xPad = decayLR(xPad, padW, nPadL, nPadR)
+            xPad = decayLR(xPad.T, padH, nPadU, nPadD)
             xPad = xPad.T
         return xPad
 
@@ -146,23 +145,7 @@ def padImage(img: TwoOrThreeD,
 
 
 @ConvertListNDArray
-def padSinogram(sgms: TwoOrThreeD, padding: Or[int, Tuple[int, int]], mode='symmetric', decay='smoothCosine'):
-    '''
-        Pad sinograms in width direction (same line detector elements) using `mode` and `decay`\\
-        with `padding` (single int, or (right, left)).
-
-        @see padImage for parameter details.
-    '''
-    if isType(padding, int):
-        padding = (padding, padding)
-
-    l, r = padding
-
-    return padImage(sgms, (0, r, 0, l), mode, decay)
-
-
-@ConvertListNDArray
-def correctRingArtifactInProj(sgm: TwoOrThreeD, sigma: float, ksize: Or[int, None] = None):
+def correctRingArtifactProjLi(sgm: TwoOrThreeD, sigma: float, ksize: Or[int, None] = None):
     '''
         Apply the ring artifact correction method in projection domain (input postlog sinogram),
         using gaussian filter in sinogram detector direction [1].
@@ -193,8 +176,8 @@ def fanToPara(sgm: TwoD, gammas: NDArray, betas: NDArray, sid: float, oThetas: T
         `gammas` is fan angles from min to max [RAD], computed by `arctan(elementOffcenter / SDD)` for each element.
         `betas` is system rotation angles from min to max [RAD].
         `sid` is Source-Isocenter-Distance [mm].
-        `oThetas` is output rotation angle range (min, delta, max) tuple [RAD]
-        `oLines` is output detector element physical locations range (min, delta, max) tuple [mm], e.g., `elementOffcenter` array
+        `oThetas` is output rotation angle range as (min, delta, max) tuple [RAD] (excluding max)
+        `oLines` is output detector element physical locations range as (min, delta, max) tuple [mm] (excluding max)
         ```
                /| <- gamma for detector element X
               / | <- SID
