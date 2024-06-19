@@ -41,3 +41,22 @@ class Test_Spectrum:
     def test_monochromatic(self):
         spec = Spectrum.monochromatic(100)
         assert [spec.omega[100], spec.omega[101]] == [10**5, 0]
+
+
+class Test_Atten():
+
+    def test_init(self):
+        pass
+
+
+def test_atomsFromMolecule():
+    assert atomsFromMolecule('H2 O1') == {'H': 2, 'O': 1}
+    assert atomsFromMolecule('H2 O2') == {'H': 2, 'O': 2}
+
+def test_zeffTheoretical():
+    assert zeffTheoretical('H1') == 1
+    assert zeffTheoretical('He1') == 2
+    assert zeffTheoretical('H2 O1') == pytest.approx(7.42, abs=0.05)
+
+def test_zeffExperimental():
+    pass

@@ -390,8 +390,9 @@ def atomsFromMolecule(molecule: str) -> Dict[str, int]:
 
 
 def zeffTheoretical(molecule: str, m=2.94) -> float:
-    ''' Compute the eheoretical effective atomic number (Zeff) of a molecule using the power law with parameter `m`.
+    ''' Compute the theoretical effective atomic number (Zeff) of a molecule using the power law with parameter `m`.
         `molecule` is parsed by `atomsFromMolecule`.
+        [1] https://en.wikipedia.org/wiki/Effective_atomic_number_(compounds_and_mixtures)
     '''
     atoms = atomsFromMolecule(molecule)
     totalElectrons = 0

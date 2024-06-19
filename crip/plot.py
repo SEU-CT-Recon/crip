@@ -11,6 +11,7 @@ import matplotlib.figure
 import matplotlib.patches
 import matplotlib.axes
 from mpl_toolkits.axes_grid1 import ImageGrid as MplImageGrid
+from scipy.ndimage import uniform_filter
 
 from ._typing import *
 from .utils import *
@@ -19,7 +20,7 @@ from .shared import resizeTo
 
 
 def smooth1D(data: NDArray, winSize: int = 5) -> NDArray:
-    ''' Smooth an 1D array using moving average window.
+    ''' Smooth an 1D array using moving average window with length `winSize`.
         The implementation is from https://stackoverflow.com/questions/40443020
     '''
     cripAssert(is1D(data), '`data` should be 1D array.')
@@ -33,10 +34,15 @@ def smooth1D(data: NDArray, winSize: int = 5) -> NDArray:
     return np.concatenate((start, out0, stop))
 
 
-# def zsmooth(imgs: ThreeD, r: int):
-#     ''' Average along `C` dimension [i - r, i + r].
-#     '''
-#     return np.mean(imgs[i - r:i + r], axis=0)
+def smoothZ(img: ThreeD, ksize=3) -> ThreeD:
+    ''' Smooth a 3D image using a uniform filter with `ksize` along Z dimension.
+    '''
+    cripAssert(is3D(img), '`img` should be 3D array.')
+
+    kernel = (ksize, 1, 1)
+    img = uniform_filter(img, kernel, mode='reflect')
+
+    return img
 
 
 def window(img: TwoOrThreeD,

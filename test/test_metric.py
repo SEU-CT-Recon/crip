@@ -51,6 +51,40 @@ class Test_computeSSIM:
             computeSSIM(x, y)
 
 
+def test_computeRMSE():
+    x = np.array([[1, 2], [3, 4]])
+    y = x + 1
+
+    assert computeRMSE(x, y) == 1.0
+    assert np.allclose(computeRMSE(x, y, pixelwise=True), np.ones((2, 2)))
+
+
+def test_computeMAE():
+    x = np.array([[1, 2], [3, 4]])
+    y1 = x + 1
+    y2 = x - 1
+
+    assert computeMAE(x, y1) == 1.0
+    assert computeMAE(x, y2) == 1.0
+    assert np.allclose(computeMAE(x, y2, pixelwise=True) == 1.0, np.ones((2, 2)))
+
+
+def test_pvalueInd():
+    samples = np.random.randn(100)
+    s1 = samples[:50]
+    s2 = samples[50:]
+
+    assert pvalueInd(s1, s2, True) > 0.05
+
+
+def test_pvalueRel():
+    samples = np.random.randn(100)
+    s1 = samples[:50]
+    s2 = samples[50:]
+
+    assert pvalueInd(s1, s2, True) > 0.05
+
+
 class Test_AverageMeter:
     meter = AverageMeter()
 
