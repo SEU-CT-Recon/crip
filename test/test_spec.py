@@ -4,9 +4,15 @@ import numpy as np
 from crip.spec import *
 
 
-# def test_decompMaterial():
-#     src = Atten([1, 2])
-#     base1 = Atten([3, 4])
-#     base2 = Atten([5, 6])
-#     res = decompMaterial(src, base1, base2, mode='coeff')
-#     assert np.allclose(res, [0.2, 0.4])
+def test_compose2():
+    v1 = np.array([1, 0])
+    v2 = np.array([0, 1])
+    assert np.allclose(compose2(1, 1, v1, v2), np.array([1, 1]))
+
+
+def test_compose3():
+    v1 = np.array([1, 0, 0])
+    v2 = np.array([0, 1, 0])
+    v3 = np.array([0, 0, 1])
+    assert np.allclose(compose3(1, 1, 1, v1, v2, v3), np.array([1, 1, 1]))
+

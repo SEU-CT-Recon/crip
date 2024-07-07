@@ -255,14 +255,10 @@ def computeMu(atten: Atten, spec: Spectrum, energyConversion: EnergyConversion) 
     return np.sum(spec.omega * eff * mus) / np.sum(spec.omega * eff)
 
 
-def computeAttenedSpectrum(spec: Spectrum, attens: Or[Atten, List[Atten]], Ls: Or[float, List[float]]) -> Spectrum:
+def computeAttenedSpectrum(spec: Spectrum, attens: List[Atten], Ls: List[float]) -> Spectrum:
     ''' Calculate the spectrum after attenuation through `attens` with thickness `Ls` [mm]
         using Beer-Lambert law.
     '''
-    if isType(attens, Atten):
-        attens = [attens]
-    if isType(Ls, float):
-        Ls = [Ls]
     cripAssert(len(attens) == len(Ls), '`attens` should be paired with `Ls`.')
 
     N = len(attens)
@@ -273,6 +269,12 @@ def computeAttenedSpectrum(spec: Spectrum, attens: Or[Atten, List[Atten]], Ls: O
             omega[E] *= np.exp(-atten.mu[E] * L)
 
     return Spectrum(omega, spec.unit)
+
+
+def normalizeSpectrum(spec: Spectrum):
+    ''' Normalize a Spectrum.
+    '''
+    return Spectrum(spec.omega / spec.sumOmega, spec.unit)
 
 
 def forwardProjectWithSpectrum(lengths: List[TwoD], materials: List[Atten], spec: Spectrum, energyConversion: str):

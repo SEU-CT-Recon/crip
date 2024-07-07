@@ -18,25 +18,13 @@ def decompMaterial(src: Atten, base1: Atten, base2: Atten, mode='coeff') -> NDAr
     ''' Decompose material `src`'s attenuation onto two materials `base1` and `base2`.
         Return decomposing coefficients in `DiagEnergyRange` when `mode='coeff'`, or proportion when `mode='prop'`.
     '''
-    cripAssert(mode in ['coeff', 'prop'], f'Invalid mode: {mode}.')
-
-    srcMu = src.mu
-    baseMu1 = base1.mu
-    baseMu2 = base2.mu
-    M = np.array([baseMu1, baseMu2], dtype=DefaultFloatDType).T
-
-    if mode == 'prop':
-        M /= srcMu
-        srcMu = np.ones_like(srcMu)
-
-    res = np.linalg.pinv(M) @ (srcMu.T)
-
-    return res
+    cripAssert(False, 'The implementation of `decompMaterial` requires more investigation.')
 
 
-def deDecompCoeff(lowSpec: Spectrum, highSpec: Spectrum, base1: Atten, len1: Or[NDArray, Iterable], base2: Atten,
+def deDecompProjCoeff(lowSpec: Spectrum, highSpec: Spectrum, base1: Atten, len1: Or[NDArray, Iterable], base2: Atten,
                   len2: Or[NDArray, Iterable]):
-    ''' Compute the decomposing coefficient (Order 2 with bias term) of two spectra onto two material bases.
+    ''' Compute the decomposing coefficient (Order 2 with bias term) of two spectra onto two material bases
+        used in the projection domain.
     '''
 
     def computePostlog(spec, attens, Ls):
@@ -63,7 +51,7 @@ def deDecompCoeff(lowSpec: Spectrum, highSpec: Spectrum, base1: Atten, len1: Or[
 def deDecompProj(lowProj: TwoOrThreeD, highProj: TwoOrThreeD, coeff1: NDArray,
                  coeff2: NDArray) -> Tuple[TwoOrThreeD, TwoOrThreeD]:
     ''' Perform dual-energy decompose in projection domain point-by-point using coeffs.
-        Coefficients can be generated using @see `deDecompCoeff`.
+        Coefficients can be generated using @see `deDecompProjCoeff`.
     '''
     cripAssert(isOfSameShape(lowProj, highProj), 'Two projection sets should have same shape.')
     cripAssert(
@@ -194,7 +182,7 @@ def compose3(b1, b2, b3, v1, v2, v3):
 
 
 def vmi2Mat(b1, b2, b1Mat: Atten, b2Mat: Atten, E: int):
-    ''' Virtual Monoenergetic Imaging using two-material decomposition.
+    ''' Virtual Monoenergetic Imaging using two-material decomposition at energy `E` [keV].
     '''
     return b1 * b1Mat.mu[E] + b2 * b2Mat.mu[E]
 
