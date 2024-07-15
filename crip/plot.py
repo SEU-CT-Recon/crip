@@ -18,6 +18,8 @@ from .utils import *
 from .physics import Spectrum, DiagEnergyRange, Atten
 from .shared import resizeTo
 
+VMIN0_VMAX1 = {'vmin': 0, 'vmax': 1}
+
 
 def smooth1D(data: NDArray, winSize: int = 5) -> NDArray:
     ''' Smooth an 1D array using moving average window with length `winSize`.

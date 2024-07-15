@@ -14,15 +14,8 @@ from .physics import Atten, Spectrum, computeAttenedSpectrum
 from .shared import applyPolyV2D2, fitPolyV2D2
 
 
-def decompMaterial(src: Atten, base1: Atten, base2: Atten, mode='coeff') -> NDArray:
-    ''' Decompose material `src`'s attenuation onto two materials `base1` and `base2`.
-        Return decomposing coefficients in `DiagEnergyRange` when `mode='coeff'`, or proportion when `mode='prop'`.
-    '''
-    cripAssert(False, 'The implementation of `decompMaterial` requires more investigation.')
-
-
 def deDecompProjCoeff(lowSpec: Spectrum, highSpec: Spectrum, base1: Atten, len1: Or[NDArray, Iterable], base2: Atten,
-                  len2: Or[NDArray, Iterable]):
+                      len2: Or[NDArray, Iterable]):
     ''' Compute the decomposing coefficient (Order 2 with bias term) of two spectra onto two material bases
         used in the projection domain.
     '''
@@ -69,7 +62,7 @@ def deDecompRecon(low: TwoOrThreeD,
                   checkCond: bool = True) -> TwoOrThreeD:
     ''' Perform Dual-Energy Two-Material decomposition in image domain.
         The outputs are decomposing coefficients. Used values can be LAC (mu), or HU+1000.
-        `muB*` stores the value of base* in low-energy, high-energy order.
+        `muB*` stores the value of base* in (low-energy, high-energy) order.
     '''
     cripAssert(isOfSameShape(low, high), 'Two volumes should have same shape.')
     COND_TOLERANCE = 1000
@@ -169,19 +162,19 @@ def genMaterialPhantom(img, zsmooth=3, sigma=1, l=80, h=300, base=1000):
     return water, b2
 
 
-def compose2(b1, b2, v1, v2):
+def compose2(b1: float, b2: float, v1: NDArray, v2: NDArray) -> NDArray:
     ''' Compose two vectors `(v1, v2)` by coeffs `(b1, b2)`.
     '''
     return b1 * v1 + b2 * v2
 
 
-def compose3(b1, b2, b3, v1, v2, v3):
-    ''' Compose two vectors `(v1, v2, v3)` by coeffs `(b1, b2, b3)`.
+def compose3(b1: float, b2: float, b3: float, v1: NDArray, v2: NDArray, v3: NDArray) -> NDArray:
+    ''' Compose three vectors `(v1, v2, v3)` by coeffs `(b1, b2, b3)`.
     '''
     return b1 * v1 + b2 * v2 + b3 * v3
 
 
-def vmi2Mat(b1, b2, b1Mat: Atten, b2Mat: Atten, E: int):
+def vmi2Mat(b1: TwoOrThreeD, b2, b1Mat: Atten, b2Mat: Atten, E: int):
     ''' Virtual Monoenergetic Imaging using two-material decomposition at energy `E` [keV].
     '''
     return b1 * b1Mat.mu[E] + b2 * b2Mat.mu[E]
@@ -199,7 +192,7 @@ def deSubtration(low: TwoOrThreeD, high: TwoOrThreeD, kLow: float, kHigh: float 
     return kHigh * high - kLow * low
 
 
-# def vncBasis():
-#     ''' Construct Virtual Non-Contrast basis.
-#     '''
-#     pass
+def vncBasis(contrastHULow: float, contrastHUHigh: float) -> NDArray:
+    ''' Construct Virtual Non-Contrast basis on CT images with HU as value.
+    '''
+    pass

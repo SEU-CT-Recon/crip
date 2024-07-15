@@ -5,6 +5,8 @@
 '''
 
 import os
+import io
+import sys
 import json
 import tempfile
 import subprocess
@@ -250,13 +252,10 @@ class _MgCliBin(object):
             tmp.close()
 
         os.environ['CUDA_VISIBLE_DEVICES'] = str(self.cudaDevice)
-        stdout = stderr = None if verbose else subprocess.DEVNULL
-        for cmd in self.cmd:
-            if len(cmd) == 2:  # include args
-                cmd[1] = cmd[1].replace('<1>', conf)
-                subprocess.run(cmd, stdout=stdout, stderr=stderr)
-            else:
-                os.system(cmd[0])
+        self.cmd[1] = self.cmd[1].replace('<1>', conf)
+        proc = subprocess.Popen(self.cmd, stdout=subprocess.PIPE)
+        for line in io.TextIOWrapper(proc.stdout, encoding="utf-8"):
+            print(line, flush=True, file=sys.stdout)
 
 
 class MgCliFbp(_MgCliBin):
@@ -275,5 +274,6 @@ class MgCliFpj(_MgCliBin):
             `exe` is the path to the executable.
         '''
         super().__init__(exe, 'mgfpj', cudaDevice, tempDir)
+
 
 # TODO Add supports for Taichi version mangoct.

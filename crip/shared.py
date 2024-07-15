@@ -219,11 +219,12 @@ def permute(vol: ThreeD, from_: str, to: str) -> ThreeD:
 
 
 def shepplogan(size: int = 512) -> TwoD:
-    ''' Generate a `size x size` Shepp-Logan phantom.
+    ''' Generate a `size x size` Shepp-Logan phantom whose pixel values are approximately
+        LAC (mu) [mm-1].
     '''
     cripAssert(size in [256, 512, 1024], 'Shepp-Logan size should be in [256, 512, 1024]')
 
-    return imreadTiff(path.join(getAsset('shepplogan'), f'{size}.tif'))
+    return imreadTiff(path.join(getAsset('shepplogan'), f'{size}.tif')) / 10
 
 
 def fitPolyV2D2(x1: NDArray, x2: NDArray, y: NDArray, bias: bool = True) -> NDArray:

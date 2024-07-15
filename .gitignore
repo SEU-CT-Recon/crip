@@ -4,3 +4,5 @@
 /*.egg-info/
 /.idea/
 .pytest_cache
+/example/.ipynb_checkpoints/*
+/**/tmp
